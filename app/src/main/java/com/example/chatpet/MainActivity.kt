@@ -92,12 +92,12 @@ fun MainScreen(
                 label = { Text("Enter your prompt") },
                 modifier = Modifier.fillMaxWidth()
             )
-
+            val testPrompt = "You are a Dragon named Fluffy at level 1. Answer in English like a Dragon would."
             Button(
                 onClick = {
                     if (inputText.isNotBlank()) {
                         val modelPath = context.getString(R.string.model_path)
-                        chatViewModel.generateResponse(context, modelPath, inputText)
+                        chatViewModel.generateResponse(context, modelPath, inputText, testPrompt)
                     }
                 },
                 enabled = uiState !is LlmUiState.Loading && inputText.isNotBlank()
