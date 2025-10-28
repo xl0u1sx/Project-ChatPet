@@ -1,5 +1,6 @@
 package com.example.chatpet
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -121,6 +122,20 @@ fun MainScreen(
                     Text("Error:", style = androidx.compose.material3.MaterialTheme.typography.titleMedium, color = androidx.compose.material3.MaterialTheme.colorScheme.error)
                     Text(state.errorMessage, color = androidx.compose.material3.MaterialTheme.colorScheme.error)
                 }
+            }
+
+            // JournalActivity
+            androidx.compose.material3.HorizontalDivider(
+                modifier = Modifier.padding(vertical = 16.dp)
+            )
+            Button(
+                onClick = {
+                    val intent = Intent(context, JournalActivity::class.java)
+                    context.startActivity(intent)
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Open Pet Journal")
             }
         }
     }
