@@ -30,6 +30,12 @@
             android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
             android:parentActivityName=".MainActivity">
         </activity>
+        <activity android:name=".PetActivity"
+            android:exported="false"
+            android:label="Pet Activity"
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
+            android:parentActivityName=".MainActivity"/>
+
     </application>
 
 </manifest>
