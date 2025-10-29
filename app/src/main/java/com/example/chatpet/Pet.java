@@ -1,7 +1,7 @@
 package com.example.chatpet;
 
 public interface Pet {
-    String petActivity();
+    String petAction();
     PetState.Meters getPetState();
     String getPetType();
     String getPetName();

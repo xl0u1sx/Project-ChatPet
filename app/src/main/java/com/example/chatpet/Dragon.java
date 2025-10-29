@@ -14,7 +14,7 @@ public class Dragon implements Pet {
         Log.d("Dragon", "Happiness: "+petState.getHappinessMeter()+" Energy: "+petState.getEnergyMeter()+" Hunger: "+petState.getHungerMeter());
     }
     @Override
-    public String petActivity(){
+    public String petAction(){
         update(15, -10, -5);
         return petState.getPetName()+" flies through the air with its wings wide open!!!";
     }

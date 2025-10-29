@@ -138,7 +138,7 @@ public class PetActivity extends AppCompatActivity {
         if (petAcitivityButton != null) {
             petAcitivityButton.setOnClickListener(v -> {
                 if (pet == null) return;
-                String msg = pet.petActivity();
+                String msg = pet.petAction();
                 if (statusText != null) statusText.setText(msg);
                 refreshMeters();
             });

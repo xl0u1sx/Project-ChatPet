@@ -14,7 +14,7 @@ public class Unicorn implements Pet {
         Log.d("Unicorn", "Happiness: "+petState.getHappinessMeter()+" Energy: "+petState.getEnergyMeter()+" Hunger: "+petState.getHungerMeter());
     }
     @Override
-    public String petActivity(){
+    public String petAction(){
         update(+12, -10, -5);
         return petState.getPetName()+" walks around the magical forest with its magical unicorn horn!!!";
     }
