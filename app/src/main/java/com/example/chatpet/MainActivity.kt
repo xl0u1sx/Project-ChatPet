@@ -141,8 +141,8 @@ fun MainScreen(
                 onClick = {
                     val intent = Intent(context, PetActivity::class.java).apply {
                         putExtra(PetActivity.temp_user_id, "user123")         // TODO: replace with real user id
-                        putExtra(PetActivity.temp_pet_type, "Dragon")         // "Dragon" or "Unicorn"
-                        putExtra(PetActivity.temp_pet_name, "Fluffy")         // chosen name
+                        putExtra(PetActivity.temp_pet_type, "Unicorn")         // "Dragon" or "Unicorn"
+                        putExtra(PetActivity.temp_pet_name, "Daisy")         // chosen name
                     }
                     context.startActivity(intent)
                 },

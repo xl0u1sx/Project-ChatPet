@@ -1,7 +1,7 @@
 package com.example.chatpet;
 import androidx.annotation.NonNull;
 public class PetState {
-    private int happinessMeter=100;
+    private int happinessMeter=0;
     private int energyMeter=100;
     private int hungerMeter=100;
     @NonNull private String petType;

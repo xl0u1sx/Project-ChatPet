@@ -36,7 +36,7 @@
             android:id="@+id/petName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Fluffy"
+            android:text="Pearl"
             android:textSize="20sp"
             android:textStyle="bold"
             android:gravity="center" />
@@ -45,7 +45,7 @@
             android:id="@+id/petType"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Dragon"
+            android:text="Unicorn"
             android:textSize="16sp"
             android:textColor="@android:color/darker_gray"
             android:gravity="center"

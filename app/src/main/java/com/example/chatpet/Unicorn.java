@@ -15,7 +15,7 @@ public class Unicorn implements Pet {
     }
     @Override
     public String petActivity(){
-        update(+15, -10, -5);
+        update(+12, -10, -5);
         return petState.getPetName()+" walks around the magical forest with its magical unicorn horn!!!";
     }
     public String tellMagicalStory(){
