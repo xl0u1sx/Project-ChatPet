@@ -20,12 +20,35 @@ import java.util.concurrent.Executors;
 public class ChatViewModel extends ViewModel {
     private static final String TAG = "ChatViewModel";
     
+    // static instance to persist chat service across mounts 
+    private static ChatService chatService;
+    
     private final MutableLiveData<LlmUiState> _uiState = new MutableLiveData<>(LlmUiState.Idle.INSTANCE);
     private final LiveData<LlmUiState> uiState = _uiState;
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
-    private final ChatService chatService = new ChatService(); // chat service to connect to LLM api
+    
+    public ChatViewModel() {
+        // only create chatservice once
+        if (chatService == null) {
+            chatService = new ChatService();
+            Log.d(TAG, "ChatService initialized");
+        }
+    }
     public LiveData<LlmUiState> getUiState() {
         return uiState;
+    }
+    
+    // method to get conversation history for debugging or UI purposes
+    public java.util.List<ChatService.ChatMessage> getConversationHistory() {
+        return chatService != null ? chatService.getConversationHistory() : new java.util.ArrayList<>();
+    }
+    
+    // method to clear conversation history manually if needed
+    public void clearConversationHistory() {
+        if (chatService != null) {
+            chatService.clearConversationHistory();
+            Log.d(TAG, "Conversation history cleared from ViewModel");
+        }
     }
     
     public void generateResponse(Context context, String modelPath, String userMsg, String prompt) {
