@@ -1,12 +1,16 @@
 // ChatViewModel.java
 package com.example.chatpet;
 
+import android.app.Application;
+import android.database.Cursor;
+
 import android.content.Context;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+//import androidx.lifecycle.AndroidViewModel;
 
 import com.google.mediapipe.tasks.genai.llminference.LlmInference;
 
@@ -44,6 +48,8 @@ public class ChatViewModel extends ViewModel {
                 _uiState.postValue(new LlmUiState.Error(errorMessage));
             }
         });
+
+
     }
     
     @Override

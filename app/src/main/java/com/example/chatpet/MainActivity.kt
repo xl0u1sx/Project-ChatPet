@@ -38,6 +38,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.livedata.observeAsState
 
 
+
+
 class MainActivity : ComponentActivity() {
     companion object {
         private const val TAG = "MainActivity"
@@ -47,6 +49,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate called")
         enableEdgeToEdge()
+
+
 
         setContent {
             ChatPetTheme {

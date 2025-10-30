@@ -62,4 +62,6 @@ dependencies {
     implementation("com.google.mediapipe:tasks-genai:0.10.27")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.3") // Or latest version
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.9.3") // For viewModelScope
+
+    implementation("com.readystatesoftware.sqliteasset:sqliteassethelper:2.0.1") // for sqlite database
 }
