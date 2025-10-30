@@ -19,7 +19,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -32,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -85,53 +92,91 @@ fun MainScreen(
                 .padding(innerPadding)
                 .fillMaxSize()
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("ChatPet: Ask something!")
+            // Pet Image at the top
+            Image(
+                painter = painterResource(id = R.drawable.unicorn), // Default to unicorn, could be made dynamic
+                contentDescription = "Pet Image",
+                modifier = Modifier
+                    .size(120.dp)
+                    .padding(top = 24.dp, bottom = 16.dp)
+            )
 
+            // Pet Response Area (takes up available space)
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(bottom = 16.dp),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    when (val state = uiState) {
+                        is LlmUiState.Idle -> {
+                            Text(
+                                "Hi! I'm your pet companion. Ask me anything!",
+                                style = androidx.compose.material3.MaterialTheme.typography.bodyLarge
+                            )
+                        }
+                        is LlmUiState.Loading -> {
+                            CircularProgressIndicator()
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text("Thinking...")
+                        }
+                        is LlmUiState.Success -> {
+                            Text(
+                                state.resultText,
+                                style = androidx.compose.material3.MaterialTheme.typography.bodyLarge
+                            )
+                        }
+                        is LlmUiState.Error -> {
+                            Text(
+                                "Oops! Something went wrong:",
+                                style = androidx.compose.material3.MaterialTheme.typography.titleMedium,
+                                color = androidx.compose.material3.MaterialTheme.colorScheme.error
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                state.errorMessage,
+                                color = androidx.compose.material3.MaterialTheme.colorScheme.error
+                            )
+                        }
+                    }
+                }
+            }
+
+            // User Input Area
             OutlinedTextField(
                 value = inputText,
                 onValueChange = { inputText = it },
-                label = { Text("Enter your prompt") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            val testPrompt = "You are a Dragon named Fluffy at level 1. Answer in English like a Dragon would."
-            Button(
-                onClick = {
-                    if (inputText.isNotBlank()) {
-                        val modelPath = context.getString(R.string.model_path)
-                        chatViewModel.generateResponse(context, modelPath, inputText, testPrompt)
+                label = { Text("Chat with me!") },
+                modifier = Modifier.fillMaxWidth(),
+                trailingIcon = {
+                    if (uiState !is LlmUiState.Loading && inputText.isNotBlank()) {
+                        Button(
+                            onClick = {
+                                val modelPath = context.getString(R.string.model_path)
+                                val testPrompt = "You are a friendly pet companion named Daisy. Answer in a warm, caring way like a pet would."
+                                chatViewModel.generateResponse(context, modelPath, inputText, testPrompt)
+                                inputText = "" // Clear input after sending
+                            }
+                        ) {
+                            Text("Send")
+                        }
                     }
-                },
-                enabled = uiState !is LlmUiState.Loading && inputText.isNotBlank()
-            ) {
-                Text("Send Prompt")
-            }
-
-            // Safe null check and when statement
-            when (val state = uiState) {
-                is LlmUiState.Idle -> {
-                    Text("Ready to chat.")
                 }
-                is LlmUiState.Loading -> {
-                    CircularProgressIndicator()
-                    Text("Thinking...")
-                }
-                is LlmUiState.Success -> {
-                    Text("Response:", style = androidx.compose.material3.MaterialTheme.typography.titleMedium)
-                    Text(state.resultText)
-                }
-                is LlmUiState.Error -> {
-                    Text("Error:", style = androidx.compose.material3.MaterialTheme.typography.titleMedium, color = androidx.compose.material3.MaterialTheme.colorScheme.error)
-                    Text(state.errorMessage, color = androidx.compose.material3.MaterialTheme.colorScheme.error)
-                }
-            }
-
-            // JournalActivity
-            androidx.compose.material3.HorizontalDivider(
-                modifier = Modifier.padding(vertical = 16.dp)
             )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Navigation Buttons at the bottom
             Button(
                 onClick = {
                     val intent = Intent(context, JournalActivity::class.java)
@@ -141,6 +186,9 @@ fun MainScreen(
             ) {
                 Text("Open Pet Journal")
             }
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
             Button(
                 onClick = {
                     val intent = Intent(context, PetActivity::class.java).apply {
