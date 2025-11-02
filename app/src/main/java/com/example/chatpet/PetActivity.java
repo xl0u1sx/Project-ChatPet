@@ -39,13 +39,6 @@ public class PetActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pet);
 
-        getViews();
-        initFromIntent(getIntent());
-        setupButtons();
-        refreshMeters();
-    }
-
-    private void getViews() {
         petTitle = findViewById(R.id.petTitle);
         petType = findViewById(R.id.petType);
         petName = findViewById(R.id.petName);
@@ -62,7 +55,12 @@ public class PetActivity extends AppCompatActivity {
         if (happinessProg != null) happinessProg.setMax(100);
         if (energyProg != null)    energyProg.setMax(100);
         if (hungerProg != null)    hungerProg.setMax(100);
+
+        initFromIntent(getIntent());
+        setupButtons();
+        refreshMeters();
     }
+
 
     private void initFromIntent(@Nullable Intent intent) {
         // Read extras with safe defaults
@@ -78,18 +76,10 @@ public class PetActivity extends AppCompatActivity {
             name="Pet";
             uid="temp_user_id";
         }
-//        String type  = intent != null ? intent.getStringExtra(temp_pet_type) : null;
-//        String name = intent != null ? intent.getStringExtra(temp_pet_name)     : null;
-//        String uid  = intent != null ? intent.getStringExtra(temp_user_id)      : null;
-//
-//        if (type == null  || type.isEmpty())  type  = "Unicorn";
-//        if (name == null || name.isEmpty()) name = "Pet";
-//        if (uid == null  || uid.isEmpty())  uid  = "temp_user_id";
 
-        // Your PetService signature is (petCategory, petName, userID)
         pet = petService.createPet(type, name, uid);
 
-        if (petTitle != null) petTitle.setText("Your Pet");
+        if (petTitle != null) petTitle.setText("");
         if (pet != null) {
             if (petType != null) petType.setText(pet.getPetType());
             if (petName != null)     petName.setText(pet.getPetName());
@@ -105,9 +95,10 @@ public class PetActivity extends AppCompatActivity {
 
         }
 
-        // Toggle special buttons
+
         if(pet!=null){
-            if(pet.getPetType().equals("Dragon")){
+            //pet.getPetType().equals("Dragon")
+            if(pet instanceof Dragon){
                 if (breatheFireButton != null) breatheFireButton.setVisibility(View.VISIBLE);
                 if (tellStoryButton != null)   tellStoryButton.setVisibility(View.GONE);
             }
@@ -117,9 +108,7 @@ public class PetActivity extends AppCompatActivity {
             }
 
         }
-//        boolean isDragon = pet != null && "Dragon".equalsIgnoreCase(pet.getPetType());
-//        if (breatheFireButton != null) breatheFireButton.setVisibility(isDragon ? View.VISIBLE : View.GONE);
-//        if (tellStoryButton != null)   tellStoryButton.setVisibility(isDragon ? View.GONE : View.VISIBLE);
+
 
         if (statusText != null) {
             statusText.setText(pet != null ? ("Say hi to " + pet.getPetName() + "!") : "No pet found.");
@@ -156,7 +145,7 @@ public class PetActivity extends AppCompatActivity {
         if (tellStoryButton != null) {
             tellStoryButton.setOnClickListener(v -> {
                 if (!(pet instanceof Unicorn)) return;
-                String msg = ((Unicorn) pet).tellMagicalStory(); // matches your Unicorn API
+                String msg = ((Unicorn) pet).tellMagicalStory();
                 if (statusText != null) statusText.setText(msg);
                 refreshMeters();
             });

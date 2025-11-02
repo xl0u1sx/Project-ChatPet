@@ -18,12 +18,10 @@
             android:id="@+id/petTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Your Pet"
-            android:textSize="20sp"
+            android:layout_marginBottom="50dp"
             android:gravity="center"
-            android:textStyle="bold"
-            android:layout_marginTop="50dp"
-            android:paddingBottom="12dp"/>
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
         <ImageView
             android:id="@+id/petImage"
@@ -137,29 +135,35 @@
 
         <Button
             android:id="@+id/petActivityButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="180dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="20dp"
             android:text="Do Pet Action"
             android:textSize="16sp"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/custom_button3"/>
 
         <Button
             android:id="@+id/breatheFireButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="180dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="20dp"
             android:text="Breathe Fire"
             android:textSize="16sp"
             android:layout_marginBottom="8dp"
-            android:visibility="gone" />
+            android:visibility="gone"
+            android:background="@drawable/custom_button3"/>
 
         <Button
             android:id="@+id/tellStoryButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="180dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="20dp"
             android:text="Tell Magical Story"
             android:textSize="16sp"
             android:layout_marginBottom="8dp"
-            android:visibility="gone" />
+            android:visibility="gone"
+            android:background="@drawable/custom_button3"/>
 
         <!-- Status Text -->
         <TextView

@@ -23,9 +23,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -43,8 +49,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.livedata.observeAsState
-
-
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.sp
 
 
 class MainActivity : ComponentActivity() {
@@ -109,12 +116,17 @@ fun MainScreen(
                     .fillMaxWidth()
                     .weight(1f)
                     .padding(bottom = 16.dp),
-                shape = RoundedCornerShape(12.dp)
+                colors = CardDefaults.cardColors(containerColor = Color.Transparent)
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(16.dp),
+                        .padding(16.dp)
+                        .background(
+                            brush = Brush.linearGradient(
+                                colors = listOf(Color(0xFFFFD1DC), Color(0xFFFFD1DC))),
+                            shape = RoundedCornerShape(10.dp)
+                ),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -177,15 +189,38 @@ fun MainScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             // Navigation Buttons at the bottom
+
             Button(
                 onClick = {
                     val intent = Intent(context, JournalActivity::class.java)
                     context.startActivity(intent)
                 },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Open Pet Journal")
-            }
+                modifier = Modifier
+                    .width(200.dp)
+                    .height(70.dp)
+                    .padding(start=10.dp, top=10.dp)
+                    .background(
+                        brush=Brush.linearGradient(
+                            colors=listOf(Color(0xFFFFB6C1), Color(0xFFFFD1DC))
+                        ),
+                        shape=RoundedCornerShape(190.dp)
+                    )
+                    .border(
+                        width = 1.dp,
+                        color = Color.Black,
+                        shape = RoundedCornerShape(190.dp)
+                    ),
+                colors= ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                shape = RoundedCornerShape(190.dp),
+                contentPadding = PaddingValues(0.dp)
+            )
+                 {
+                    Text(text = "PET JOURNAL",
+                        color = Color(0xFF3E2723),
+                        fontSize = 16.sp)
+
+                }
+
             
             Spacer(modifier = Modifier.height(8.dp))
             
@@ -198,9 +233,31 @@ fun MainScreen(
                     }
                     context.startActivity(intent)
                 },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Open Pet Screen")
+                modifier = Modifier
+                    .width(200.dp)
+                    .height(70.dp)
+                    .padding(start=10.dp, top=10.dp)
+                    .background(
+                        brush=Brush.linearGradient(
+                            colors=listOf(Color(0xFFFFB6C1), Color(0xFFFFD1DC))
+                        ),
+                        shape=RoundedCornerShape(190.dp)
+                    )
+                    .border(
+                        width = 1.dp,
+                        color = Color.Black,
+                        shape = RoundedCornerShape(190.dp)
+                    ),
+
+                colors= ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                shape = RoundedCornerShape(190.dp),
+                contentPadding = PaddingValues(0.dp)
+            )
+
+            {
+                Text(text="PET SCREEN",
+                    color = Color(0xFF3E2723),
+                    fontSize = 16.sp)
             }
 
         }

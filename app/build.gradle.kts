@@ -51,6 +51,7 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation("androidx.compose.runtime:runtime-livedata:1.7.6") // For observeAsState()
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.ui.graphics)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
