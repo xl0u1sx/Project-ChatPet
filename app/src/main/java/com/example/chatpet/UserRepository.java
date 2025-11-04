@@ -1,0 +1,239 @@
+package com.example.chatpet;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
+
+public class UserRepository {
+    private static final String TAG = "UserRepository";
+    private DatabaseHelper dbHelper;
+
+    public UserRepository(Context context) {
+        this.dbHelper = new DatabaseHelper(context); // use dbhelper 
+        // https://github.com/jgilfelt/android-sqlite-asset-helper
+    }
+
+    /**
+     * check username and password
+     * return User obj if it is in db, null otherwise
+     * 
+     * database driver helper: 
+     * // https://github.com/jgilfelt/android-sqlite-asset-helper
+     */
+    public User authenticate(String username, String password) {
+        SQLiteDatabase db = null;
+        Cursor cursor = null;
+
+        try {
+            db = dbHelper.getReadableDatabase();
+
+            String[] columns = {"username", "password", "first_name", "last_name"};
+            String selection = "username = ? AND password = ?";
+            String[] selectionArgs = {username, password};
+
+            cursor = db.query(
+                "users",
+                columns,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                null
+            );
+
+            if (cursor != null && cursor.moveToFirst()) {
+                String foundUsername = cursor.getString(cursor.getColumnIndexOrThrow("username"));
+                String foundPassword = cursor.getString(cursor.getColumnIndexOrThrow("password"));
+                String firstName = cursor.getString(cursor.getColumnIndexOrThrow("first_name"));
+                String lastName = cursor.getString(cursor.getColumnIndexOrThrow("last_name"));
+
+                Log.d(TAG, "User authenticated successfully: " + foundUsername);
+                return new User(foundUsername, foundPassword, firstName, lastName);
+            } else {
+                Log.d(TAG, "Authentication failed for username: " + username);
+                return null;
+            }
+
+        } catch (Exception e) {
+            Log.e(TAG, "Error during authentication", e);
+            return null;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            if (db != null) {
+                db.close();
+            }
+        }
+    }
+
+    /**
+     * Check if a username already exists
+     */
+    public boolean userExists(String username) {
+        SQLiteDatabase db = null;
+        Cursor cursor = null;
+
+        try {
+            db = dbHelper.getReadableDatabase();
+
+            String[] columns = {"username"};
+            String selection = "username = ?";
+            String[] selectionArgs = {username};
+
+            cursor = db.query(
+                "users",
+                columns,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                null
+            );
+
+            boolean exists = cursor != null && cursor.moveToFirst();
+            Log.d(TAG, "User exists check for " + username + ": " + exists);
+            return exists;
+
+        } catch (Exception e) {
+            Log.e(TAG, "Error checking if user exists", e);
+            return false;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            if (db != null) {
+                db.close();
+            }
+        }
+    }
+
+    /**
+     * Register a new user
+     */
+    public boolean registerUser(User user) {
+        SQLiteDatabase db = null;
+
+        try {
+            // Check if user already exists
+            if (userExists(user.getUsername())) {
+                Log.d(TAG, "Username already exists: " + user.getUsername());
+                return false;
+            }
+
+            db = dbHelper.getWritableDatabase();
+
+            ContentValues values = new ContentValues();
+            values.put("username", user.getUsername());
+            values.put("password", user.getPassword());
+            values.put("first_name", user.getFirstName());
+            values.put("last_name", user.getLastName());
+
+            long result = db.insert("users", null, values);
+
+            if (result != -1) {
+                Log.d(TAG, "User registered successfully: " + user.getUsername());
+                return true;
+            } else {
+                Log.e(TAG, "Failed to register user: " + user.getUsername());
+                return false;
+            }
+            
+
+        } catch (Exception e) {
+            Log.e(TAG, "Error during user registration", e);
+            return false;
+        } finally {
+            if (db != null) {
+                db.close();
+            }
+        }
+    }
+
+    /**
+     * Creates a pet for a user
+     * create pet for user, 
+     * store username, petName, and petType
+     */
+    public boolean createPetForUser(String username, String petName, String petType) {
+        // return true if success
+        SQLiteDatabase db = null;
+
+        try {
+            db = dbHelper.getWritableDatabase();
+
+            ContentValues values = new ContentValues();
+            values.put("pet_name", petName);
+            values.put("pet_type", petType);
+            values.put("username", username);
+            values.put("happiness_meter", 50);
+            values.put("energy_meter", 100);
+            values.put("hunger_meter", 100);
+            values.put("pet_level", 1);
+            values.put("level_progress", 0);
+            values.put("times_fed", 0);
+            values.put("times_tucked_in", 0);
+
+            long result = db.insert("pet_services", null, values);
+
+            if (result != -1) {
+                Log.d(TAG, "Pet created successfully for user: " + username);
+                return true;
+            } else {
+                Log.e(TAG, "Failed to create pet for user: " + username);
+                return false;
+            }
+
+        } catch (Exception e) {
+            Log.e(TAG, "Error creating pet for user", e);
+            return false;
+        } finally {
+            if (db != null) {
+                db.close();
+            }
+        }
+    }
+
+    /**
+     * check if user already has pet
+     */
+    public boolean userHasPet(String username) {
+        SQLiteDatabase db = null;
+        Cursor cursor = null;
+
+        try {
+            db = dbHelper.getReadableDatabase();
+
+            String[] columns = {"pet_id"};
+            String selection = "username = ?";
+            String[] selectionArgs = {username};
+
+            cursor = db.query(
+                "pet_services",
+                columns,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                null
+            );
+
+            boolean hasPet = cursor != null && cursor.moveToFirst();
+            Log.d(TAG, "User has pet check for " + username + ": " + hasPet);
+            return hasPet;
+
+        } catch (Exception e) {
+            Log.e(TAG, "Error checking if user has pet", e);
+            return false;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            if (db != null) {
+                db.close();
+            }
+        }
+    }
+}

@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFE5F0">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Create Account"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textColor="#3E2723"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Join ChatPet and meet your new companion"
+            android:textSize="14sp"
+            android:textColor="#5D4037"
+            android:layout_marginBottom="24dp" />
+
+        <!-- User Information Section -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Personal Information"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#3E2723"
+            android:layout_marginBottom="16dp" />
+
+        <EditText
+            android:id="@+id/firstNameInput"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="First Name"
+            android:inputType="textCapWords"
+            android:textColor="#3E2723"
+            android:textColorHint="#999999"
+            android:background="@android:drawable/edit_text"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp" />
+
+        <EditText
+            android:id="@+id/lastNameInput"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="Last Name"
+            android:inputType="textCapWords"
+            android:textColor="#3E2723"
+            android:textColorHint="#999999"
+            android:background="@android:drawable/edit_text"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp" />
+
+        <EditText
+            android:id="@+id/usernameInput"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="Username"
+            android:inputType="text"
+            android:textColor="#3E2723"
+            android:textColorHint="#999999"
+            android:background="@android:drawable/edit_text"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp" />
+
+        <EditText
+            android:id="@+id/passwordInput"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="Password"
+            android:inputType="textPassword"
+            android:textColor="#3E2723"
+            android:textColorHint="#999999"
+            android:background="@android:drawable/edit_text"
+            android:padding="12dp"
+            android:layout_marginBottom="24dp" />
+
+        <!-- Pet Selection Section -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Choose Your Pet"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#3E2723"
+            android:layout_marginBottom="16dp" />
+
+        <EditText
+            android:id="@+id/petNameInput"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="Pet Name"
+            android:inputType="textCapWords"
+            android:textColor="#3E2723"
+            android:textColorHint="#999999"
+            android:background="@android:drawable/edit_text"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Select Pet Type:"
+            android:textSize="16sp"
+            android:textColor="#3E2723"
+            android:layout_marginBottom="12dp" />
+
+        <RadioGroup
+            android:id="@+id/petTypeRadioGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="8dp">
+
+                <ImageView
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:src="@drawable/unicorn"
+                    android:contentDescription="Unicorn" />
+
+                <RadioButton
+                    android:id="@+id/unicornRadio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Unicorn"
+                    android:textColor="#3E2723"
+                    android:checked="true"
+                    android:buttonTint="#FFB6C1" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="8dp">
+
+                <ImageView
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:src="@drawable/dragon"
+                    android:contentDescription="Dragon" />
+
+                <RadioButton
+                    android:id="@+id/dragonRadio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Dragon"
+                    android:textColor="#3E2723"
+                    android:buttonTint="#FFB6C1" />
+            </LinearLayout>
+        </RadioGroup>
+
+        <TextView
+            android:id="@+id/errorText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="#D32F2F"
+            android:textSize="14sp"
+            android:layout_marginBottom="16dp"
+            android:gravity="center"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/createAccountButton"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="CREATE ACCOUNT"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:backgroundTint="#FFB6C1"
+            android:textColor="#3E2723"
+            android:layout_marginBottom="16dp" />
+
+        <Button
+            android:id="@+id/backToLoginButton"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="BACK TO LOGIN"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:backgroundTint="#FFD1DC"
+            android:textColor="#3E2723"
+            android:layout_marginBottom="24dp" />
+
+    </LinearLayout>
+</ScrollView>
