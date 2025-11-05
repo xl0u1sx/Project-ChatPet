@@ -13,14 +13,37 @@ public class Unicorn implements Pet {
         petState.setHungerMeter(petState.getHungerMeter()+hungerMeter);
         Log.d("Unicorn", "Happiness: "+petState.getHappinessMeter()+" Energy: "+petState.getEnergyMeter()+" Hunger: "+petState.getHungerMeter());
     }
+    
     @Override
-    public String petAction(){
-        update(+12, -10, -5);
-        return petState.getPetName()+" walks around the magical forest with its magical unicorn horn!!!";
+    public String chat(){
+        petState.increaseHappiness(15);
+        Log.d("Unicorn", "Chat - Happiness: "+petState.getHappinessMeter()+" Energy: "+petState.getEnergyMeter()+" Hunger: "+petState.getHungerMeter());
+        return petState.getPetName()+" sparkles with joy! Happiness increased by 15.";
     }
+    
+    @Override
+    public String feed(){
+        petState.increaseHunger(30);
+        petState.increaseEnergy(10);
+        Log.d("Unicorn", "Feed - Happiness: "+petState.getHappinessMeter()+" Energy: "+petState.getEnergyMeter()+" Hunger: "+petState.getHungerMeter());
+        return petState.getPetName()+" munches on magical treats! Hunger increased by 30.";
+    }
+    
+    @Override
+    public String tuckIn(){
+        petState.fillEnergy();
+        Log.d("Unicorn", "Tuck-in - Happiness: "+petState.getHappinessMeter()+" Energy: "+petState.getEnergyMeter()+" Hunger: "+petState.getHungerMeter());
+        return petState.getPetName()+" nestles down in a bed of clouds. Energy fully restored!";
+    }
+    
+    // @Override
+    // public String petAction(){
+    //     update(+12, -10, -5);
+    //     return petState.getPetName()+" walks around the magical forest with its magical unicorn horn!!!";
+    // }
     public String tellMagicalStory(){
         update(+10, -15, -7);
-        return petState.getPetName()+"narrates a magical story with its magical unicorn horn!!!";
+        return petState.getPetName()+" narrates a magical story with its magical unicorn horn!!!";
     }
     @Override
     public PetState.Meters getPetState(){

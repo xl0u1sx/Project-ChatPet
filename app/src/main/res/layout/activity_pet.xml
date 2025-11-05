@@ -134,12 +134,32 @@
             android:layout_marginBottom="8dp" />
 
         <Button
-            android:id="@+id/petActivityButton"
+            android:id="@+id/chatButton"
             android:layout_width="180dp"
             android:layout_height="60dp"
-            android:layout_marginTop="20dp"
-            android:text="Do Pet Action"
-            android:textSize="16sp"
+            android:layout_marginTop="8dp"
+            android:text="Chat (+ Happiness)"
+            android:textSize="14sp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/custom_button3"/>
+
+        <Button
+            android:id="@+id/feedButton"
+            android:layout_width="180dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="8dp"
+            android:text="Feed (+ Hunger)"
+            android:textSize="14sp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/custom_button3"/>
+
+        <Button
+            android:id="@+id/tuckInButton"
+            android:layout_width="180dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="8dp"
+            android:text="Tuck-in (Full Energy)"
+            android:textSize="14sp"
             android:layout_marginBottom="8dp"
             android:background="@drawable/custom_button3"/>
 
@@ -147,9 +167,9 @@
             android:id="@+id/breatheFireButton"
             android:layout_width="180dp"
             android:layout_height="60dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="8dp"
             android:text="Breathe Fire"
-            android:textSize="16sp"
+            android:textSize="14sp"
             android:layout_marginBottom="8dp"
             android:visibility="gone"
             android:background="@drawable/custom_button3"/>
@@ -158,9 +178,9 @@
             android:id="@+id/tellStoryButton"
             android:layout_width="180dp"
             android:layout_height="60dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="8dp"
             android:text="Tell Magical Story"
-            android:textSize="16sp"
+            android:textSize="14sp"
             android:layout_marginBottom="8dp"
             android:visibility="gone"
             android:background="@drawable/custom_button3"/>

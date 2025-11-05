@@ -1,6 +1,8 @@
 package com.example.chatpet;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -23,7 +25,9 @@ public class PetActivity extends AppCompatActivity {
     private ProgressBar happinessProg;
     private ProgressBar energyProg;
     private ProgressBar hungerProg;
-    private Button petAcitivityButton; // keep your variable name
+    private Button chatButton;
+    private Button feedButton;
+    private Button tuckInButton;
     private Button breatheFireButton;
     private Button tellStoryButton;
     private ImageView petImage;
@@ -33,6 +37,11 @@ public class PetActivity extends AppCompatActivity {
     public static final String temp_user_id = "temp_user_id";
     public static final String temp_pet_name = "temp_pet_name";
     public static final String temp_pet_type = "temp_pet_type";
+    
+    // SharedPreferences for tracking tuck-in cooldown
+    private static final String PREFS_NAME = "PetActivityPrefs";
+    private static final String KEY_LAST_TUCK_IN = "lastTuckInTime";
+    private static final long TUCK_IN_COOLDOWN = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +54,9 @@ public class PetActivity extends AppCompatActivity {
         happinessProg = findViewById(R.id.happinessProg);
         energyProg = findViewById(R.id.energyProg);
         hungerProg = findViewById(R.id.hungerProg);
-        petAcitivityButton = findViewById(R.id.petActivityButton);
+        chatButton = findViewById(R.id.chatButton);
+        feedButton = findViewById(R.id.feedButton);
+        tuckInButton = findViewById(R.id.tuckInButton);
         breatheFireButton = findViewById(R.id.breatheFireButton);
         tellStoryButton = findViewById(R.id.tellStoryButton);
         petImage = findViewById(R.id.petImage);
@@ -124,15 +135,55 @@ public class PetActivity extends AppCompatActivity {
     }
 
     private void setupButtons() {
-        if (petAcitivityButton != null) {
-            petAcitivityButton.setOnClickListener(v -> {
+        // Chat button - increases happiness by 15
+        if (chatButton != null) {
+            chatButton.setOnClickListener(v -> {
                 if (pet == null) return;
-                String msg = pet.petAction();
+                String msg = pet.chat();
                 if (statusText != null) statusText.setText(msg);
                 refreshMeters();
             });
         }
 
+        // Feed button - increases hunger by 30, increase energy by 10
+        if (feedButton != null) {
+            feedButton.setOnClickListener(v -> {
+                if (pet == null) return;
+                String msg = pet.feed();
+                if (statusText != null) statusText.setText(msg);
+                refreshMeters();
+            });
+        }
+
+        // Tuck-in button - fills energy to 100, but only once per 24 hours
+        if (tuckInButton != null) {
+            tuckInButton.setOnClickListener(v -> {
+                if (pet == null) return;
+                
+                SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+                long lastTuckInTime = prefs.getLong(KEY_LAST_TUCK_IN, 0);
+                long currentTime = System.currentTimeMillis();
+                long timeSinceLastTuckIn = currentTime - lastTuckInTime;
+                
+                if (timeSinceLastTuckIn >= TUCK_IN_COOLDOWN) {
+                    // Tuck-in is available
+                    String msg = pet.tuckIn();
+                    prefs.edit().putLong(KEY_LAST_TUCK_IN, currentTime).apply();
+                    if (statusText != null) statusText.setText(msg);
+                    refreshMeters();
+                } else {
+                    // Still on cooldown
+                    long remainingTime = TUCK_IN_COOLDOWN - timeSinceLastTuckIn;
+                    long hoursRemaining = remainingTime / (60 * 60 * 1000);
+                    long minutesRemaining = (remainingTime % (60 * 60 * 1000)) / (60 * 1000);
+                    String cooldownMsg = pet.getPetName() + " is still resting! Please wait " + 
+                                       hoursRemaining + " hours and " + minutesRemaining + " minutes.";
+                    if (statusText != null) statusText.setText(cooldownMsg);
+                }
+            });
+        }
+
+        // Special action buttons for each pet type
         if (breatheFireButton != null) {
             breatheFireButton.setOnClickListener(v -> {
                 if (!(pet instanceof Dragon)) return;

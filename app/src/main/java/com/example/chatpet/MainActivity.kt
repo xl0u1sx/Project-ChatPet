@@ -92,6 +92,27 @@ fun MainScreen(
     val uiState: LlmUiState by chatViewModel.uiState.observeAsState(LlmUiState.Idle.INSTANCE as LlmUiState)
 
     var inputText by remember { mutableStateOf("") }
+    
+    // Get username and fetch pet info
+    val username = remember {
+        if (context is MainActivity) {
+            context.intent.getStringExtra("username") ?: "user123"
+        } else {
+            "user123"
+        }
+    }
+    
+    val petInfo = remember(username) {
+        val userRepository = UserRepository(context)
+        userRepository.getPetInfo(username)
+    }
+    
+    // Determine which pet image to display
+    val petImageRes = if (petInfo?.petType == "Dragon") {
+        R.drawable.dragon
+    } else {
+        R.drawable.unicorn
+    }
 
     Scaffold(modifier = modifier.fillMaxSize()) { innerPadding ->
         Column(
@@ -101,9 +122,9 @@ fun MainScreen(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Pet Image at the top
+            // Pet Image at the top - now dynamic based on user's pet
             Image(
-                painter = painterResource(id = R.drawable.unicorn), // Default to unicorn, could be made dynamic
+                painter = painterResource(id = petImageRes),
                 contentDescription = "Pet Image",
                 modifier = Modifier
                     .size(120.dp)
@@ -132,8 +153,10 @@ fun MainScreen(
                 ) {
                     when (val state = uiState) {
                         is LlmUiState.Idle -> {
+                            val petName = petInfo?.petName ?: "your pet"
+                            val petType = petInfo?.petType ?: "companion"
                             Text(
-                                "Hi! I'm your pet companion. Ask me anything!",
+                                "Hi! I'm $petName, your $petType companion. Ask me anything!",
                                 style = androidx.compose.material3.MaterialTheme.typography.bodyLarge
                             )
                         }
@@ -175,7 +198,9 @@ fun MainScreen(
                         Button(
                             onClick = {
                                 val modelPath = context.getString(R.string.model_path)
-                                val testPrompt = "You are a friendly pet companion named Daisy. Answer in a warm, caring way like a pet would."
+                                val petName = petInfo?.petName ?: "Daisy"
+                                val petType = petInfo?.petType ?: "Unicorn"
+                                val testPrompt = "You are a friendly $petType companion named $petName. Answer in a warm, caring way like a $petType pet would."
                                 chatViewModel.generateResponse(context, modelPath, inputText, testPrompt)
                                 inputText = "" // Clear input after sending
                             }
@@ -226,10 +251,21 @@ fun MainScreen(
             
             Button(
                 onClick = {
+                    // Get username from intent (passed from login/registration)
+                    val username = if (context is MainActivity) {
+                        context.intent.getStringExtra("username") ?: "user123"
+                    } else {
+                        "user123"
+                    }
+                    
+                    // Fetch pet information from database
+                    val userRepository = UserRepository(context)
+                    val petInfo = userRepository.getPetInfo(username)
+                    
                     val intent = Intent(context, PetActivity::class.java).apply {
-                        putExtra(PetActivity.temp_user_id, "user123")         // TODO: replace with real user id
-                        putExtra(PetActivity.temp_pet_type, "Unicorn")         // "Dragon" or "Unicorn"
-                        putExtra(PetActivity.temp_pet_name, "Daisy")         // chosen name
+                        putExtra(PetActivity.temp_user_id, username)
+                        putExtra(PetActivity.temp_pet_type, petInfo?.petType ?: "Unicorn")
+                        putExtra(PetActivity.temp_pet_name, petInfo?.petName ?: "Daisy")
                     }
                     context.startActivity(intent)
                 },

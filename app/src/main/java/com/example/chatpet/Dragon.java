@@ -13,14 +13,38 @@ public class Dragon implements Pet {
         petState.setHungerMeter(petState.getHungerMeter()+hungerMeter);
         Log.d("Dragon", "Happiness: "+petState.getHappinessMeter()+" Energy: "+petState.getEnergyMeter()+" Hunger: "+petState.getHungerMeter());
     }
+    
     @Override
-    public String petAction(){
-        update(15, -10, -5);
-        return petState.getPetName()+" flies through the air with its wings wide open!!!";
+    public String chat(){
+        petState.increaseHappiness(15);
+        Log.d("Dragon", "Chat - Happiness: "+petState.getHappinessMeter()+" Energy: "+petState.getEnergyMeter()+" Hunger: "+petState.getHungerMeter());
+        return petState.getPetName()+" roars happily! Happiness increased by 15.";
     }
+    
+    @Override
+    public String feed(){
+        petState.increaseHunger(30);
+        petState.increaseEnergy(10);
+        Log.d("Dragon", "Feed - Happiness: "+petState.getHappinessMeter()+" Energy: "+petState.getEnergyMeter()+" Hunger: "+petState.getHungerMeter());
+        return petState.getPetName()+" devours the food with delight! Hunger increased by 30.";
+    }
+    
+    @Override
+    public String tuckIn(){
+        petState.fillEnergy();
+        Log.d("Dragon", "Tuck-in - Happiness: "+petState.getHappinessMeter()+" Energy: "+petState.getEnergyMeter()+" Hunger: "+petState.getHungerMeter());
+        return petState.getPetName()+" curls up in its cozy nest and falls asleep. Energy fully restored!";
+    }
+    
+    // @Override
+    // public String petAction(){
+    //     update(15, -10, -5);
+    //     return petState.getPetName()+" flies through the air with its wings wide open!!!";
+    // }
+    
     public String breatheFire(){
         update(10, -15, -7);
-        return petState.getPetName()+"breathes fire in the air!!!";
+        return petState.getPetName()+" breathes fire in the air!!!";
     }
     @Override
     public PetState.Meters getPetState(){

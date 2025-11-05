@@ -1,7 +1,7 @@
 package com.example.chatpet;
 import androidx.annotation.NonNull;
 public class PetState {
-    private int happinessMeter=0;
+    private int happinessMeter=100;
     private int energyMeter=100;
     private int hungerMeter=100;
     @NonNull private String petType;
@@ -23,13 +23,35 @@ public class PetState {
         return hungerMeter;
     }
     public void setHappinessMeter(int happinessMeter){
-        this.happinessMeter=happinessMeter;
+        this.happinessMeter=clamp(happinessMeter, 0, 100);
     }
     public void setEnergyMeter(int energyMeter){
-        this.energyMeter=energyMeter;
+        this.energyMeter=clamp(energyMeter, 0, 100);
     }
     public void setHungerMeter(int hungerMeter){
-        this.hungerMeter=hungerMeter;
+        this.hungerMeter=clamp(hungerMeter, 0, 100);
+    }
+
+    // Helper method to clamp values between min and max
+    private int clamp(int value, int min, int max) {
+        return Math.max(min, Math.min(max, value));
+    }
+
+    // Action methods for the three main interactions
+    public void increaseHappiness(int amount) {
+        setHappinessMeter(happinessMeter + amount);
+    }
+
+    public void increaseHunger(int amount) {
+        setHungerMeter(hungerMeter + amount);
+    }
+
+    public void increaseEnergy(int amount) {
+        setEnergyMeter(energyMeter + amount);
+    }
+
+    public void fillEnergy() {
+        setEnergyMeter(100);
     }
     @NonNull public String getPetType(){
         return petType;

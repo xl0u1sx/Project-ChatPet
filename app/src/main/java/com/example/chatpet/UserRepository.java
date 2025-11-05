@@ -176,10 +176,12 @@ public class UserRepository {
             values.put("times_fed", 0);
             values.put("times_tucked_in", 0);
 
+            Log.d(TAG, "Creating pet - Name: " + petName + ", Type: " + petType + ", Username: " + username);
+            
             long result = db.insert("pet_services", null, values);
 
             if (result != -1) {
-                Log.d(TAG, "Pet created successfully for user: " + username);
+                Log.d(TAG, "Pet created successfully for user: " + username + " (ID: " + result + ")");
                 return true;
             } else {
                 Log.e(TAG, "Failed to create pet for user: " + username);
@@ -234,6 +236,76 @@ public class UserRepository {
             if (db != null) {
                 db.close();
             }
+        }
+    }
+
+    /**
+     * Get pet information for a user
+     * Returns a PetInfo object containing pet name and type, or null if not found
+     */
+    public PetInfo getPetInfo(String username) {
+        SQLiteDatabase db = null;
+        Cursor cursor = null;
+
+        try {
+            db = dbHelper.getReadableDatabase();
+
+            String[] columns = {"pet_name", "pet_type"};
+            String selection = "username = ?";
+            String[] selectionArgs = {username};
+
+            cursor = db.query(
+                "pet_services",
+                columns,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                null
+            );
+
+            if (cursor != null && cursor.moveToFirst()) {
+                String petName = cursor.getString(cursor.getColumnIndexOrThrow("pet_name"));
+                String petType = cursor.getString(cursor.getColumnIndexOrThrow("pet_type"));
+                
+                Log.d(TAG, "Pet info retrieved for " + username + ": " + petName + " (" + petType + ")");
+                return new PetInfo(petName, petType);
+            } else {
+                Log.d(TAG, "No pet found for user: " + username);
+                return null;
+            }
+
+        } catch (Exception e) {
+            Log.e(TAG, "Error getting pet info", e);
+            return null;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            if (db != null) {
+                db.close();
+            }
+        }
+    }
+
+    /**
+     * Simple class to hold pet information
+     */
+    public static class PetInfo {
+        private final String petName;
+        private final String petType;
+
+        public PetInfo(String petName, String petType) {
+            this.petName = petName;
+            this.petType = petType;
+        }
+
+        public String getPetName() {
+            return petName;
+        }
+
+        public String getPetType() {
+            return petType;
         }
     }
 }

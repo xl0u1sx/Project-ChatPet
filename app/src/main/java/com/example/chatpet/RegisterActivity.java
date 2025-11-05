@@ -2,6 +2,7 @@ package com.example.chatpet;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,6 +15,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class RegisterActivity extends AppCompatActivity {
 
+    private static final String TAG = "RegisterActivity";
+    
     private EditText firstNameInput;
     private EditText lastNameInput;
     private EditText usernameInput;
@@ -26,6 +29,9 @@ public class RegisterActivity extends AppCompatActivity {
     private Button backToLoginButton;
     private TextView errorText;
     private UserRepository userRepository;
+    
+    // Track selected pet type explicitly
+    private String selectedPetType = "Unicorn"; // Default to Unicorn
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +54,22 @@ public class RegisterActivity extends AppCompatActivity {
         // Initialize repository
         userRepository = new UserRepository(this);
 
+        // Set up radio button mutual exclusion manually
+        // (needed because RadioButtons are nested in LinearLayouts)
+        unicornRadio.setOnClickListener(v -> {
+            selectedPetType = "Unicorn";
+            unicornRadio.setChecked(true);
+            dragonRadio.setChecked(false);
+            Log.d(TAG, "Unicorn selected");
+        });
+
+        dragonRadio.setOnClickListener(v -> {
+            selectedPetType = "Dragon";
+            dragonRadio.setChecked(true);
+            unicornRadio.setChecked(false);
+            Log.d(TAG, "Dragon selected");
+        });
+
         // create account buttong
         createAccountButton.setOnClickListener(v -> handleRegistration());
 
@@ -65,14 +87,13 @@ public class RegisterActivity extends AppCompatActivity {
         String password = passwordInput.getText().toString().trim();
         String petName = petNameInput.getText().toString().trim();
 
-        // Get selected pet type
-        int selectedPetTypeId = petTypeRadioGroup.getCheckedRadioButtonId();
-        String petType;
-        if (selectedPetTypeId == R.id.unicornRadio) {
-            petType = "Unicorn";
-        } else {
-            petType = "Dragon";
-        }
+        // Use the tracked pet type variable
+        String petType = selectedPetType;
+        
+        // Log for debugging
+        Log.d(TAG, "Registration - Pet Type: " + petType);
+        Log.d(TAG, "Dragon checked: " + dragonRadio.isChecked());
+        Log.d(TAG, "Unicorn checked: " + unicornRadio.isChecked());
 
         // make sure no inputs are empty
         if (firstName.isEmpty() || lastName.isEmpty() || username.isEmpty() || password.isEmpty()) {
