@@ -60,6 +60,10 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 
+import androidx.compose.foundation.layout.padding
+//import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+
 
 class MainActivity : ComponentActivity() {
     companion object {
@@ -209,7 +213,8 @@ fun MainScreen(
                             val petType = petInfo?.petType ?: "companion"
                             Text(
                                 "Hi! I'm $petName, your $petType companion. Ask me anything!",
-                                style = androidx.compose.material3.MaterialTheme.typography.bodyLarge
+                                style = androidx.compose.material3.MaterialTheme.typography.bodyLarge,
+                                modifier = Modifier.padding(18.dp)
                             )
                         }
                         is LlmUiState.Loading -> {
@@ -277,7 +282,10 @@ fun MainScreen(
                                 }
                                 
                                 inputText = "" // Clear input after sending
-                            }
+
+                            },
+                            modifier = Modifier.padding(end = 7.dp)
+
                         ) {
                             Text("Send")
                         }
