@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -41,7 +43,12 @@ public class PetActivity extends AppCompatActivity {
     // SharedPreferences for tracking tuck-in cooldown
     private static final String PREFS_NAME = "PetActivityPrefs";
     private static final String KEY_LAST_TUCK_IN = "lastTuckInTime";
-    private static final long TUCK_IN_COOLDOWN = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+    private static final long TUCK_IN_COOLDOWN = 20 * 60 * 1000; // 20 minutes in milliseconds (for demo)
+    
+    // Handler for meter decay timer
+    private Handler meterDecayHandler;
+    private Runnable meterDecayRunnable;
+    private static final long DECAY_INTERVAL = 60 * 1000; // 1 minute in milliseconds
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,23 +76,25 @@ public class PetActivity extends AppCompatActivity {
 
         initFromIntent(getIntent());
         setupButtons();
+        setupMeterDecay();
         refreshMeters();
     }
 
 
     private void initFromIntent(@Nullable Intent intent) {
         // Read extras with safe defaults
-        String type, name, uid;
+        String type = "Unicorn";
+        String name = "Pet";
+        String uid = "temp_user_id";
 
         if(intent!=null){
-            type=intent.getStringExtra(temp_pet_type);
-            name=intent.getStringExtra(temp_pet_name);
-            uid=intent.getStringExtra(temp_user_id);
-        }
-        else{
-            type="Unicorn";
-            name="Pet";
-            uid="temp_user_id";
+            String intentType = intent.getStringExtra(temp_pet_type);
+            String intentName = intent.getStringExtra(temp_pet_name);
+            String intentUid = intent.getStringExtra(temp_user_id);
+            
+            if(intentType != null) type = intentType;
+            if(intentName != null) name = intentName;
+            if(intentUid != null) uid = intentUid;
         }
 
         pet = petService.createPet(type, name, uid);
@@ -200,6 +209,63 @@ public class PetActivity extends AppCompatActivity {
                 if (statusText != null) statusText.setText(msg);
                 refreshMeters();
             });
+        }
+    }
+
+    private void setupMeterDecay() {
+        meterDecayHandler = new Handler(Looper.getMainLooper());
+        meterDecayRunnable = new Runnable() {
+            @Override
+            public void run() {
+                applyMeterDecay();
+                // Schedule next decay
+                meterDecayHandler.postDelayed(this, DECAY_INTERVAL);
+            }
+        };
+    }
+
+    private void applyMeterDecay() {
+        if (pet == null) return;
+        
+        PetState petStateObj = pet.getPetStateObject();
+        PetState.Meters currentMeters = pet.getPetState();
+        
+        // Decrease happiness by 10 per minute, stop at 20
+        if (currentMeters.happiness > 20) {
+            int newHappiness = Math.max(20, currentMeters.happiness - 10);
+            petStateObj.setHappinessMeter(newHappiness);
+        }
+        
+        // Decrease energy by 5 per minute, stop at 0
+        if (currentMeters.energy > 0) {
+            int newEnergy = Math.max(0, currentMeters.energy - 5);
+            petStateObj.setEnergyMeter(newEnergy);
+        }
+        
+        // Decrease hunger by 5 per minute, stop at 1
+        if (currentMeters.hunger > 1) {
+            int newHunger = Math.max(1, currentMeters.hunger - 5);
+            petStateObj.setHungerMeter(newHunger);
+        }
+        
+        refreshMeters();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Start the meter decay timer when activity is visible
+        if (meterDecayHandler != null && meterDecayRunnable != null) {
+            meterDecayHandler.postDelayed(meterDecayRunnable, DECAY_INTERVAL);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Stop the meter decay timer when activity is not visible
+        if (meterDecayHandler != null && meterDecayRunnable != null) {
+            meterDecayHandler.removeCallbacks(meterDecayRunnable);
         }
     }
 }

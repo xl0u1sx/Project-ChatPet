@@ -50,6 +50,12 @@ public class Dragon implements Pet {
     public PetState.Meters getPetState(){
         return petState.getMeters();
     }
+    
+    @Override
+    public PetState getPetStateObject(){
+        return petState;
+    }
+    
     @Override
     public String getPetType(){
         return petState.getPetType();

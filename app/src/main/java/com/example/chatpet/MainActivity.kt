@@ -1,5 +1,6 @@
 package com.example.chatpet
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -49,14 +50,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 
 
 class MainActivity : ComponentActivity() {
     companion object {
         private const val TAG = "MainActivity"
+        const val PREFS_NAME = "ChatPetPrefs"
+        const val KEY_USERNAME = "username"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,7 +71,13 @@ class MainActivity : ComponentActivity() {
         Log.d(TAG, "onCreate called")
         enableEdgeToEdge()
 
-
+        // Save username to SharedPreferences if provided in intent
+        val username = intent.getStringExtra("username")
+        if (username != null) {
+            val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            prefs.edit().putString(KEY_USERNAME, username).apply()
+            Log.d(TAG, "Saved username to SharedPreferences: $username")
+        }
 
         setContent {
             ChatPetTheme {
@@ -93,18 +106,38 @@ fun MainScreen(
 
     var inputText by remember { mutableStateOf("") }
     
-    // Get username and fetch pet info
+    // Get username from SharedPreferences (persists across activity recreations)
     val username = remember {
         if (context is MainActivity) {
-            context.intent.getStringExtra("username") ?: "user123"
+            val prefs = context.getSharedPreferences(MainActivity.PREFS_NAME, Context.MODE_PRIVATE)
+            val savedUsername = prefs.getString(MainActivity.KEY_USERNAME, null)
+            val intentUsername = context.intent.getStringExtra("username")
+            
+            // Use intent username if available, otherwise use saved username, or default
+            val finalUsername = intentUsername ?: savedUsername ?: "user123"
+            Log.d("MainActivity", "Using username: $finalUsername (intent: $intentUsername, saved: $savedUsername)")
+            finalUsername
         } else {
             "user123"
         }
     }
     
-    val petInfo = remember(username) {
-        val userRepository = UserRepository(context)
-        userRepository.getPetInfo(username)
+    // Use mutableState to allow refreshing pet info
+    var petInfo by remember { mutableStateOf<UserRepository.PetInfo?>(null) }
+    
+    // Refresh pet info when the composable is first created and when resumed
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                val userRepository = UserRepository(context)
+                petInfo = userRepository.getPetInfo(username)
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
     }
     
     // Determine which pet image to display
@@ -251,21 +284,15 @@ fun MainScreen(
             
             Button(
                 onClick = {
-                    // Get username from intent (passed from login/registration)
-                    val username = if (context is MainActivity) {
-                        context.intent.getStringExtra("username") ?: "user123"
-                    } else {
-                        "user123"
-                    }
-                    
+                    // Use the username from the outer scope (already loaded from SharedPreferences)
                     // Fetch pet information from database
                     val userRepository = UserRepository(context)
-                    val petInfo = userRepository.getPetInfo(username)
+                    val petInfoForIntent = userRepository.getPetInfo(username)
                     
                     val intent = Intent(context, PetActivity::class.java).apply {
                         putExtra(PetActivity.temp_user_id, username)
-                        putExtra(PetActivity.temp_pet_type, petInfo?.petType ?: "Unicorn")
-                        putExtra(PetActivity.temp_pet_name, petInfo?.petName ?: "Daisy")
+                        putExtra(PetActivity.temp_pet_type, petInfoForIntent?.petType ?: "Unicorn")
+                        putExtra(PetActivity.temp_pet_name, petInfoForIntent?.petName ?: "Daisy")
                     }
                     context.startActivity(intent)
                 },

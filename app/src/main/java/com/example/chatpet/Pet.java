@@ -2,6 +2,7 @@ package com.example.chatpet;
 
 public interface Pet {
     PetState.Meters getPetState();
+    PetState getPetStateObject();
     String getPetType();
     String getPetName();
     String getUserID();
