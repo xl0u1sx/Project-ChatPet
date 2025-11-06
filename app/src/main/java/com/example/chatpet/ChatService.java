@@ -123,6 +123,9 @@ public class ChatService {
                     }
                 }
                 
+                // Clear the XNNPack cache to prevent corruption issues
+                clearXNNPackCache(context);
+                
                 Log.d("ChatService", "Initializing LLM model...");
                 LlmInference.LlmInferenceOptions options =
                         LlmInference.LlmInferenceOptions.builder()
@@ -181,6 +184,24 @@ public class ChatService {
                 isLlmInitialized = false;
                 initializedModelPath = null;
             }
+        }
+    }
+    
+    // Clear XNNPack cache to prevent corruption issues
+    private void clearXNNPackCache(Context context) {
+        try {
+            java.io.File cacheDir = context.getCacheDir();
+            java.io.File xnnpackCache = new java.io.File(cacheDir, "gemma3-1b-it-int4.task.xnnpack_cache");
+            
+            if (xnnpackCache.exists()) {
+                boolean deleted = xnnpackCache.delete();
+                Log.d("ChatService", "XNNPack cache cleared: " + deleted);
+            } else {
+                Log.d("ChatService", "XNNPack cache file not found (this is fine for first run)");
+            }
+        } catch (Exception e) {
+            Log.e("ChatService", "Error clearing XNNPack cache: " + e.getMessage(), e);
+            // Continue anyway - the cache will be recreated
         }
     }
 
