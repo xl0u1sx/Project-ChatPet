@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -18,6 +19,9 @@ public class JournalViewModel extends ViewModel
 
     private final MutableLiveData<LlmUiState> _uiState = new MutableLiveData<>(LlmUiState.Idle.INSTANCE);
     private final LiveData<LlmUiState> uiState = _uiState;
+    
+    private final MutableLiveData<List<JournalEntry>> _journalHistory = new MutableLiveData<>(new ArrayList<>());
+    private final LiveData<List<JournalEntry>> journalHistory = _journalHistory;
 
     // Keep LlmInference instance if you plan to make multiple calls
     // Ensure it's closed properly in onCleared()
@@ -26,13 +30,35 @@ public class JournalViewModel extends ViewModel
     // ExecutorService for background operations (replacement for coroutines)
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
-    private final JournalService journalService = new JournalService();
+    private JournalService journalService;
 
     public LiveData<LlmUiState> getUiState() {
         return uiState;
     }
-    public void generateJournal(Context context, String modelPath)
+    
+    public LiveData<List<JournalEntry>> getJournalHistory() {
+        return journalHistory;
+    }
+    
+    public void initializeJournalService(Context context) {
+        if (journalService == null) {
+            journalService = new JournalService(context);
+        }
+    }
+    
+    public void loadJournalHistory(Context context, String username) {
+        initializeJournalService(context);
+        executorService.execute(() -> {
+            List<JournalEntry> entries = journalService.getAllJournals(username);
+            _journalHistory.postValue(entries);
+            Log.d(TAG, "Loaded " + entries.size() + " journal entries");
+        });
+    }
+    
+    public void generateJournal(Context context, String modelPath, String username)
     {
+        initializeJournalService(context);
+        
         LlmUiState currentState = _uiState.getValue();
         if (currentState instanceof LlmUiState.Loading) {
             Log.d(TAG, "Already loading, request ignored.");
@@ -45,7 +71,8 @@ public class JournalViewModel extends ViewModel
             try {
                 // new journal entry
                 JournalEntry newEntry = new JournalEntry();
-                String previousJournal = journalService.getLatestJournalText();
+                newEntry.setUsername(username);
+                String previousJournal = journalService.getLatestJournalText(username);
                 String prompt = journalService.formatPrompt(newEntry, previousJournal);
                 Log.i(TAG, "Starting LLM response generation for prompt: " + prompt);
 
@@ -67,11 +94,19 @@ public class JournalViewModel extends ViewModel
                 String journalText = llmInference.generateResponse(prompt);
 
                 if (journalText != null) {
-                    // save to JournalService.journalEntries
+                    // save to database
                     newEntry.setJournalText(journalText);
-                    journalService.addJournalEntry(newEntry);
-                    Log.i(TAG, "LLM journal entry: " + journalText);
-                    _uiState.postValue(new LlmUiState.Success(journalText));
+                    boolean saved = journalService.saveJournalEntry(username, newEntry);
+                    
+                    if (saved) {
+                        Log.i(TAG, "Journal entry saved successfully: " + journalText);
+                        _uiState.postValue(new LlmUiState.Success(journalText));
+                        // Reload history after saving
+                        loadJournalHistory(context, username);
+                    } else {
+                        Log.e(TAG, "Failed to save journal entry to database");
+                        _uiState.postValue(new LlmUiState.Error("Failed to save journal entry"));
+                    }
                 } else {
                     Log.e(TAG, "LLM journal entry was null");
                     _uiState.postValue(new LlmUiState.Error("LLM returned no journal entry."));
@@ -98,9 +133,7 @@ public class JournalViewModel extends ViewModel
             }
         });
     }
-    public List<JournalEntry> getJournalHistory() {
-        return journalService.getAllJournals();
-    }
+    
     @Override
     protected void onCleared() {
         executorService.shutdown();

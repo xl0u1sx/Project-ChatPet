@@ -6,6 +6,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class UserRepository {
     private static final String TAG = "UserRepository";
     private DatabaseHelper dbHelper;
@@ -286,6 +289,108 @@ public class UserRepository {
                 db.close();
             }
         }
+    }
+
+    /**
+     * Save a journal entry to the database
+     */
+    public boolean saveJournalEntry(String username, JournalEntry entry) {
+        SQLiteDatabase db = null;
+
+        try {
+            db = dbHelper.getWritableDatabase();
+
+            ContentValues values = new ContentValues();
+            values.put("journal_entry", entry.getJournalText());
+            values.put("date", entry.getDate());
+            values.put("time", entry.getTime());
+            values.put("username", username);
+
+            long result = db.insert("journal_service", null, values);
+
+            if (result != -1) {
+                Log.d(TAG, "Journal entry saved successfully for user: " + username);
+                return true;
+            } else {
+                Log.e(TAG, "Failed to save journal entry for user: " + username);
+                return false;
+            }
+
+        } catch (Exception e) {
+            Log.e(TAG, "Error saving journal entry", e);
+            return false;
+        } finally {
+            if (db != null) {
+                db.close();
+            }
+        }
+    }
+
+    /**
+     * Get all journal entries for a user, ordered by newest first
+     */
+    public List<JournalEntry> getJournalEntries(String username) {
+        SQLiteDatabase db = null;
+        Cursor cursor = null;
+        List<JournalEntry> entries = new ArrayList<>();
+
+        try {
+            db = dbHelper.getReadableDatabase();
+
+            String[] columns = {"entry_id", "journal_entry", "date", "time"};
+            String selection = "username = ?";
+            String[] selectionArgs = {username};
+            String orderBy = "entry_id DESC"; // Newest first
+
+            cursor = db.query(
+                "journal_service",
+                columns,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                orderBy
+            );
+
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    int entryId = cursor.getInt(cursor.getColumnIndexOrThrow("entry_id"));
+                    String journalText = cursor.getString(cursor.getColumnIndexOrThrow("journal_entry"));
+                    String date = cursor.getString(cursor.getColumnIndexOrThrow("date"));
+                    String time = cursor.getString(cursor.getColumnIndexOrThrow("time"));
+
+                    JournalEntry entry = new JournalEntry(entryId, journalText, date, time, username);
+                    entries.add(entry);
+                } while (cursor.moveToNext());
+                
+                Log.d(TAG, "Retrieved " + entries.size() + " journal entries for user: " + username);
+            } else {
+                Log.d(TAG, "No journal entries found for user: " + username);
+            }
+
+        } catch (Exception e) {
+            Log.e(TAG, "Error retrieving journal entries", e);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            if (db != null) {
+                db.close();
+            }
+        }
+
+        return entries;
+    }
+
+    /**
+     * Get the most recent journal entry for a user
+     */
+    public JournalEntry getLatestJournalEntry(String username) {
+        List<JournalEntry> entries = getJournalEntries(username);
+        if (!entries.isEmpty()) {
+            return entries.get(0); // Already ordered newest first
+        }
+        return null;
     }
 
     /**

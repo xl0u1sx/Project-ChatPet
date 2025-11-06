@@ -6,10 +6,12 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class JournalEntry {
-    String entryId;
+    int dbEntryId; // Database entry_id
+    String entryId; // UUID for temporary entries
     String date;
     String time;
     String journalText;
+    String username;
     int petLevel;
     String petType;
     String petName;
@@ -22,6 +24,7 @@ public class JournalEntry {
     int levelProgress;
     int expGained;
 
+    // Constructor for creating a new journal entry (for generation)
     public JournalEntry()
     {
         entryId = UUID.randomUUID().toString();
@@ -51,6 +54,23 @@ public class JournalEntry {
         petType = "Dragon";
         petName = "Fluffy";
 
+    }
+
+    // Constructor for loading from database
+    public JournalEntry(int dbEntryId, String journalText, String date, String time, String username) {
+        this.dbEntryId = dbEntryId;
+        this.journalText = journalText;
+        this.date = date;
+        this.time = time;
+        this.username = username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getUsername() {
+        return username;
     }
     public String getEntryId()
     {

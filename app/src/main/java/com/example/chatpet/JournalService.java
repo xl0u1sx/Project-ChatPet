@@ -10,27 +10,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JournalService {
-    // using temporary list to store journal entries until database implementation
-    private List<JournalEntry> journalEntries = new ArrayList<>();
+    private static final String TAG = "JournalService";
+    private final Context context;
+    private final UserRepository userRepository;
 
-    public void addJournalEntry(JournalEntry entry)
-    {
-        journalEntries.add(entry);
+    public JournalService(Context context) {
+        this.context = context;
+        this.userRepository = new UserRepository(context);
     }
 
-    public List<JournalEntry> getAllJournals()
-    {
-        return new ArrayList<>(journalEntries);
+    public boolean saveJournalEntry(String username, JournalEntry entry) {
+        return userRepository.saveJournalEntry(username, entry);
     }
 
-    public String getLatestJournalText()
-    {
-        if(journalEntries.isEmpty())
-        {
-            return "";
+    public List<JournalEntry> getAllJournals(String username) {
+        return userRepository.getJournalEntries(username);
+    }
+
+    public String getLatestJournalText(String username) {
+        JournalEntry latestEntry = userRepository.getLatestJournalEntry(username);
+        if (latestEntry != null) {
+            return latestEntry.getJournalText();
         }
-        JournalEntry lastJournalEntry = journalEntries.get(journalEntries.size() -1);
-        return lastJournalEntry.getJournalText();
+        return "";
     }
 
     @SuppressLint("DefaultLocale")
@@ -39,7 +41,7 @@ public class JournalService {
                 "You are a %s named %s at level %d, level progress %d, " +
                         "today's level experience gained %d. Today is %s, time is %s, " +
                         "and this was your previous journal entry %s.\n" +
-                        "Write a diary entry about your day.\n" +
+                        "Write a concise diary entry about your day. Keep it short and to the point.\n" +
                         "Today's Stats:\n" +
                         "- Happiness: %d/100\n" +
                         "- Energy: %d/100\n" +
@@ -49,11 +51,9 @@ public class JournalService {
                         "- Times tucked in: %d\n" +
                         "Write a journal entry from the pet's perspective about the day " +
                         "based on the information above:\n" +
-                        "Level 1 = infant\n" +
-                        "Level 2 = toddler\n" +
-                        "Level 3 = teen\n" +
-                        "Level 4 = young adult\n" +
-                        "Level 5 = adult.\n" +
+                        "Level 1 = teen\n" +
+                        "Level 2 = young adult\n" +
+                        "Level 3 = adult.\n" +
                         "Exclude any other statements than your current role as this pet, such as Okay here is your journal.\n" +
                         "Don't start the journal with Okay.",
                 entry.getPetType(), entry.getPetName(), entry.getPetLevel(), entry.getLevelProgress(),
