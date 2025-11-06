@@ -29,6 +29,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -179,7 +181,7 @@ fun MainScreen(
                     .padding(top = 24.dp, bottom = 16.dp)
             )
 
-            // Pet Response Area (takes up available space)
+            // Pet Response Area (takes up available space, scrollable for long responses)
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -187,16 +189,18 @@ fun MainScreen(
                     .padding(bottom = 16.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.Transparent)
             ) {
+                val scrollState = rememberScrollState()
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
+                        .verticalScroll(scrollState)
                         .padding(16.dp)
                         .background(
                             brush = Brush.linearGradient(
                                 colors = listOf(Color(0xFFFFD1DC), Color(0xFFFFD1DC))),
                             shape = RoundedCornerShape(10.dp)
-                ),
-                    verticalArrangement = Arrangement.Center,
+                        ),
+                    verticalArrangement = if (uiState is LlmUiState.Success) Arrangement.Top else Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     when (val state = uiState) {
@@ -216,7 +220,8 @@ fun MainScreen(
                         is LlmUiState.Success -> {
                             Text(
                                 state.resultText,
-                                style = androidx.compose.material3.MaterialTheme.typography.bodyLarge
+                                style = androidx.compose.material3.MaterialTheme.typography.bodyLarge,
+                                modifier = Modifier.padding(8.dp)
                             )
                         }
                         is LlmUiState.Error -> {
