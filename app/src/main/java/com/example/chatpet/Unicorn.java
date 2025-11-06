@@ -18,7 +18,7 @@ public class Unicorn implements Pet {
     public String chat(){
         petState.increaseHappiness(15);
         Log.d("Unicorn", "Chat - Happiness: "+petState.getHappinessMeter()+" Energy: "+petState.getEnergyMeter()+" Hunger: "+petState.getHungerMeter());
-        return petState.getPetName()+" sparkles with joy! Happiness increased by 15.";
+        return getChatMessage();
     }
     
     @Override
@@ -26,14 +26,54 @@ public class Unicorn implements Pet {
         petState.increaseHunger(30);
         petState.increaseEnergy(10);
         Log.d("Unicorn", "Feed - Happiness: "+petState.getHappinessMeter()+" Energy: "+petState.getEnergyMeter()+" Hunger: "+petState.getHungerMeter());
-        return petState.getPetName()+" munches on magical treats! Hunger increased by 30.";
+        return getFeedMessage();
     }
     
     @Override
     public String tuckIn(){
         petState.fillEnergy();
         Log.d("Unicorn", "Tuck-in - Happiness: "+petState.getHappinessMeter()+" Energy: "+petState.getEnergyMeter()+" Hunger: "+petState.getHungerMeter());
-        return petState.getPetName()+" nestles down in a bed of clouds. Energy fully restored!";
+        return getTuckInMessage();
+    }
+    
+    // Level-based personality messages
+    private String getChatMessage(){
+        switch(petState.getPetLevel()){
+            case 1:
+                return petState.getPetName()+" sparkles with joy! *prances around* Happiness +15";
+            case 2:
+                return petState.getPetName()+" glows warmly. \"I cherish our time together.\" Happiness +15";
+            case 3:
+                return petState.getPetName()+" radiates serenity: \"Your kindness enriches my spirit, dear companion.\" Happiness +15";
+            default:
+                return petState.getPetName()+" sparkles with joy! Happiness +15";
+        }
+    }
+    
+    private String getFeedMessage(){
+        switch(petState.getPetLevel()){
+            case 1:
+                return petState.getPetName()+" munches eagerly! *magical crumbs float away* Hunger +30, Energy +10";
+            case 2:
+                return petState.getPetName()+" eats delicately. \"These treats are wonderful.\" Hunger +30, Energy +10";
+            case 3:
+                return petState.getPetName()+" dines with elegance. \"Your generosity warms my heart.\" Hunger +30, Energy +10";
+            default:
+                return petState.getPetName()+" munches on treats! Hunger +30, Energy +10";
+        }
+    }
+    
+    private String getTuckInMessage(){
+        switch(petState.getPetLevel()){
+            case 1:
+                return petState.getPetName()+" nestles in clouds and giggles. *sparkles while sleeping* Energy restored!";
+            case 2:
+                return petState.getPetName()+" rests gracefully. \"Dreams await me in the starlight.\" Energy restored!";
+            case 3:
+                return petState.getPetName()+" slumbers peacefully. \"May my dreams be as beautiful as our friendship.\" Energy restored!";
+            default:
+                return petState.getPetName()+" nestles down. Energy restored!";
+        }
     }
     
     // @Override
@@ -67,6 +107,11 @@ public class Unicorn implements Pet {
     @Override
     public String getUserID(){
         return petState.getUserID();
+    }
+    
+    @Override
+    public int getPetLevel(){
+        return petState.getPetLevel();
     }
 
 

@@ -6,6 +6,7 @@ public interface Pet {
     String getPetType();
     String getPetName();
     String getUserID();
+    int getPetLevel();
     
     // Three main care actions
     String chat();

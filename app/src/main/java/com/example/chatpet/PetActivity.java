@@ -24,12 +24,14 @@ public class PetActivity extends AppCompatActivity {
     private TextView petTitle;
     private TextView petType;
     private TextView petName;
+    private TextView petLevel;
     private ProgressBar happinessProg;
     private ProgressBar energyProg;
     private ProgressBar hungerProg;
     private Button chatButton;
     private Button feedButton;
     private Button tuckInButton;
+    private Button upgradePetButton;
     private Button breatheFireButton;
     private Button tellStoryButton;
     private ImageView petImage;
@@ -49,6 +51,13 @@ public class PetActivity extends AppCompatActivity {
     private Handler meterDecayHandler;
     private Runnable meterDecayRunnable;
     private static final long DECAY_INTERVAL = 60 * 1000; // 1 minute in milliseconds
+    
+    // Handler for tracking happiness > 80 for upgrade eligibility
+    private Handler upgradeCheckHandler;
+    private Runnable upgradeCheckRunnable;
+    private long happinessAbove80StartTime = 0;
+    private boolean isHappinessAbove80 = false;
+    private static final long UPGRADE_REQUIREMENT_TIME = 60 * 1000; // 1 minute in milliseconds
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,12 +67,14 @@ public class PetActivity extends AppCompatActivity {
         petTitle = findViewById(R.id.petTitle);
         petType = findViewById(R.id.petType);
         petName = findViewById(R.id.petName);
+        petLevel = findViewById(R.id.petLevel);
         happinessProg = findViewById(R.id.happinessProg);
         energyProg = findViewById(R.id.energyProg);
         hungerProg = findViewById(R.id.hungerProg);
         chatButton = findViewById(R.id.chatButton);
         feedButton = findViewById(R.id.feedButton);
         tuckInButton = findViewById(R.id.tuckInButton);
+        upgradePetButton = findViewById(R.id.upgradePetButton);
         breatheFireButton = findViewById(R.id.breatheFireButton);
         tellStoryButton = findViewById(R.id.tellStoryButton);
         petImage = findViewById(R.id.petImage);
@@ -77,7 +88,9 @@ public class PetActivity extends AppCompatActivity {
         initFromIntent(getIntent());
         setupButtons();
         setupMeterDecay();
+        setupUpgradeCheck();
         refreshMeters();
+        updateLevelDisplay();
     }
 
 
@@ -191,6 +204,32 @@ public class PetActivity extends AppCompatActivity {
                 }
             });
         }
+        
+        // Upgrade pet button - increases level by 1 (appears when happiness > 80 for 1 minute)
+        if (upgradePetButton != null) {
+            upgradePetButton.setOnClickListener(v -> {
+                if (pet == null) return;
+                
+                PetState petStateObj = pet.getPetStateObject();
+                if (petStateObj.canLevelUp()) {
+                    petStateObj.levelUp();
+                    updateLevelDisplay();
+                    if (statusText != null) {
+                        statusText.setText("🎉 " + pet.getPetName() + " leveled up to Level " + 
+                                         pet.getPetLevel() + "! They've grown more mature!");
+                    }
+                    // Hide the button after upgrading
+                    upgradePetButton.setVisibility(View.GONE);
+                    // Reset happiness tracking
+                    isHappinessAbove80 = false;
+                    happinessAbove80StartTime = 0;
+                } else {
+                    if (statusText != null) {
+                        statusText.setText(pet.getPetName() + " has reached max level!");
+                    }
+                }
+            });
+        }
 
         // Special action buttons for each pet type
         if (breatheFireButton != null) {
@@ -222,6 +261,53 @@ public class PetActivity extends AppCompatActivity {
                 meterDecayHandler.postDelayed(this, DECAY_INTERVAL);
             }
         };
+    }
+    
+    private void setupUpgradeCheck() {
+        upgradeCheckHandler = new Handler(Looper.getMainLooper());
+        upgradeCheckRunnable = new Runnable() {
+            @Override
+            public void run() {
+                checkUpgradeEligibility();
+                // Check every second for responsiveness
+                upgradeCheckHandler.postDelayed(this, 1000);
+            }
+        };
+    }
+    
+    private void checkUpgradeEligibility() {
+        if (pet == null || upgradePetButton == null) return;
+        
+        PetState.Meters currentMeters = pet.getPetState();
+        long currentTime = System.currentTimeMillis();
+        
+        // Check if happiness is above 80
+        if (currentMeters.happiness > 80) {
+            if (!isHappinessAbove80) {
+                // Just crossed the threshold
+                isHappinessAbove80 = true;
+                happinessAbove80StartTime = currentTime;
+            } else {
+                // Check if it's been above 80 for 1 minute
+                long timeAbove80 = currentTime - happinessAbove80StartTime;
+                if (timeAbove80 >= UPGRADE_REQUIREMENT_TIME && pet.getPetStateObject().canLevelUp()) {
+                    upgradePetButton.setVisibility(View.VISIBLE);
+                }
+            }
+        } else {
+            // Happiness dropped below 80, reset
+            if (isHappinessAbove80) {
+                isHappinessAbove80 = false;
+                happinessAbove80StartTime = 0;
+                upgradePetButton.setVisibility(View.GONE);
+            }
+        }
+    }
+    
+    private void updateLevelDisplay() {
+        if (pet != null && petLevel != null) {
+            petLevel.setText("Level " + pet.getPetLevel());
+        }
     }
 
     private void applyMeterDecay() {
@@ -258,6 +344,10 @@ public class PetActivity extends AppCompatActivity {
         if (meterDecayHandler != null && meterDecayRunnable != null) {
             meterDecayHandler.postDelayed(meterDecayRunnable, DECAY_INTERVAL);
         }
+        // Start the upgrade check timer
+        if (upgradeCheckHandler != null && upgradeCheckRunnable != null) {
+            upgradeCheckHandler.postDelayed(upgradeCheckRunnable, 1000);
+        }
     }
 
     @Override
@@ -266,6 +356,10 @@ public class PetActivity extends AppCompatActivity {
         // Stop the meter decay timer when activity is not visible
         if (meterDecayHandler != null && meterDecayRunnable != null) {
             meterDecayHandler.removeCallbacks(meterDecayRunnable);
+        }
+        // Stop the upgrade check timer
+        if (upgradeCheckHandler != null && upgradeCheckRunnable != null) {
+            upgradeCheckHandler.removeCallbacks(upgradeCheckRunnable);
         }
     }
 }

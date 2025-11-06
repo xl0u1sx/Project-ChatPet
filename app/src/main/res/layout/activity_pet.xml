@@ -47,7 +47,18 @@
             android:textSize="16sp"
             android:textColor="@android:color/darker_gray"
             android:gravity="center"
-            android:layout_marginBottom="24dp" />
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/petLevel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Level 1"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/holo_purple"
+            android:gravity="center"
+            android:layout_marginBottom="16dp" />
         <TextView
             android:id="@+id/sectionTitleMeters"
             android:layout_width="match_parent"
@@ -161,6 +172,17 @@
             android:text="Tuck-in (Full Energy)"
             android:textSize="14sp"
             android:layout_marginBottom="8dp"
+            android:background="@drawable/custom_button3"/>
+
+        <Button
+            android:id="@+id/upgradePetButton"
+            android:layout_width="180dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="8dp"
+            android:text="⭐ Upgrade Pet ⭐"
+            android:textSize="14sp"
+            android:layout_marginBottom="8dp"
+            android:visibility="gone"
             android:background="@drawable/custom_button3"/>
 
         <Button

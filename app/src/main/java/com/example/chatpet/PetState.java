@@ -4,6 +4,7 @@ public class PetState {
     private int happinessMeter=100;
     private int energyMeter=100;
     private int hungerMeter=100;
+    private int petLevel=1; // Level starts at 1, max 3
     @NonNull private String petType;
     @NonNull private String userID;
     @NonNull private String  petName;
@@ -12,6 +13,24 @@ public class PetState {
         this.petType =petCategory;
         this.userID=userID;
         this.petName=petName;
+    }
+    
+    public int getPetLevel(){
+        return petLevel;
+    }
+    
+    public void setPetLevel(int level){
+        this.petLevel = clamp(level, 1, 3); // Level is between 1 and 3
+    }
+    
+    public boolean canLevelUp(){
+        return petLevel < 3;
+    }
+    
+    public void levelUp(){
+        if(canLevelUp()){
+            petLevel++;
+        }
     }
     public int getHappinessMeter(){
         return happinessMeter;
