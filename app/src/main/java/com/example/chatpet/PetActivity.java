@@ -31,7 +31,6 @@ public class PetActivity extends AppCompatActivity {
     private ProgressBar happinessProg;
     private ProgressBar energyProg;
     private ProgressBar hungerProg;
-    private Button chatButton;
     private Button feedButton;
     private Button tuckInButton;
     private Button upgradePetButton;
@@ -47,8 +46,7 @@ public class PetActivity extends AppCompatActivity {
     
     // SharedPreferences for tracking tuck-in cooldown and pet state
     private static final String PREFS_NAME = "PetActivityPrefs";
-    private static final String KEY_LAST_TUCK_IN = "lastTuckInTime";
-    private static final long TUCK_IN_COOLDOWN = 20 * 60 * 1000; // 20 minutes in milliseconds (for demo)
+    private static final long TUCK_IN_COOLDOWN = 2 * 60 * 1000; // 2 minutes in milliseconds (for demo)
     
     // Keys for persisting pet state (will be prefixed with username)
     private static final String KEY_HAPPINESS = "_happiness";
@@ -56,6 +54,7 @@ public class PetActivity extends AppCompatActivity {
     private static final String KEY_HUNGER = "_hunger";
     private static final String KEY_LEVEL = "_level";
     private static final String KEY_LAST_SAVE = "_lastSaveTime";
+    private static final String KEY_LAST_TUCK_IN = "_lastTuckInTime";
     
     private String currentUsername; // To track which user's pet we're managing
     
@@ -83,7 +82,6 @@ public class PetActivity extends AppCompatActivity {
         happinessProg = findViewById(R.id.happinessProg);
         energyProg = findViewById(R.id.energyProg);
         hungerProg = findViewById(R.id.hungerProg);
-        chatButton = findViewById(R.id.chatButton);
         feedButton = findViewById(R.id.feedButton);
         tuckInButton = findViewById(R.id.tuckInButton);
         upgradePetButton = findViewById(R.id.upgradePetButton);
@@ -166,17 +164,6 @@ public class PetActivity extends AppCompatActivity {
     }
 
     private void setupButtons() {
-        // Chat button - increases happiness by 15
-        if (chatButton != null) {
-            chatButton.setOnClickListener(v -> {
-                if (pet == null) return;
-                String msg = pet.chat();
-                if (statusText != null) statusText.setText(msg);
-                refreshMeters();
-                savePetState();
-            });
-        }
-
         // Feed button - increases hunger by 30, increase energy by 10
         if (feedButton != null) {
             feedButton.setOnClickListener(v -> {
@@ -188,20 +175,21 @@ public class PetActivity extends AppCompatActivity {
             });
         }
 
-        // Tuck-in button - fills energy to 100, but only once per 24 hours
+        // Tuck-in button - fills energy to 100, but only once per cooldown period
         if (tuckInButton != null) {
             tuckInButton.setOnClickListener(v -> {
-                if (pet == null) return;
+                if (pet == null || currentUsername == null) return;
                 
                 SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-                long lastTuckInTime = prefs.getLong(KEY_LAST_TUCK_IN, 0);
+                long lastTuckInTime = prefs.getLong(currentUsername + KEY_LAST_TUCK_IN, 0);
                 long currentTime = System.currentTimeMillis();
                 long timeSinceLastTuckIn = currentTime - lastTuckInTime;
                 
                 if (timeSinceLastTuckIn >= TUCK_IN_COOLDOWN) {
                     // Tuck-in is available
                     String msg = pet.tuckIn();
-                    prefs.edit().putLong(KEY_LAST_TUCK_IN, currentTime).apply();
+                    prefs.edit().putLong(currentUsername + KEY_LAST_TUCK_IN, currentTime).apply();
+                    Log.d(TAG, "Tuck-in used for user: " + currentUsername);
                     if (statusText != null) statusText.setText(msg);
                     refreshMeters();
                     savePetState();
@@ -210,9 +198,29 @@ public class PetActivity extends AppCompatActivity {
                     long remainingTime = TUCK_IN_COOLDOWN - timeSinceLastTuckIn;
                     long hoursRemaining = remainingTime / (60 * 60 * 1000);
                     long minutesRemaining = (remainingTime % (60 * 60 * 1000)) / (60 * 1000);
-                    String cooldownMsg = pet.getPetName() + " is still resting! Please wait " + 
-                                       hoursRemaining + " hours and " + minutesRemaining + " minutes.";
-                    if (statusText != null) statusText.setText(cooldownMsg);
+                    long secondsRemaining = (remainingTime % (60 * 1000)) / 1000;
+                    
+                    Log.d(TAG, "Tuck-in on cooldown for user: " + currentUsername + 
+                          " - Remaining: " + minutesRemaining + "m " + secondsRemaining + "s");
+                    
+                    // Build user-friendly cooldown message
+                    StringBuilder cooldownMsg = new StringBuilder(pet.getPetName() + " doesn't want to go to sleep yet! Please wait ");
+                    if (hoursRemaining > 0) {
+                        cooldownMsg.append(hoursRemaining).append(" hour").append(hoursRemaining > 1 ? "s" : "");
+                        if (minutesRemaining > 0) {
+                            cooldownMsg.append(" and ").append(minutesRemaining).append(" minute").append(minutesRemaining > 1 ? "s" : "");
+                        }
+                    } else if (minutesRemaining > 0) {
+                        cooldownMsg.append(minutesRemaining).append(" minute").append(minutesRemaining > 1 ? "s" : "");
+                        if (secondsRemaining > 0) {
+                            cooldownMsg.append(" and ").append(secondsRemaining).append(" second").append(secondsRemaining > 1 ? "s" : "");
+                        }
+                    } else {
+                        cooldownMsg.append(secondsRemaining).append(" second").append(secondsRemaining > 1 ? "s" : "");
+                    }
+                    cooldownMsg.append(".");
+                    
+                    if (statusText != null) statusText.setText(cooldownMsg.toString());
                 }
             });
         }

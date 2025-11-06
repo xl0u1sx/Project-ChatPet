@@ -250,6 +250,19 @@ fun MainScreen(
                                 val petType = petInfo?.petType ?: "Unicorn"
                                 val testPrompt = "You are a friendly $petType companion named $petName. Answer in a warm, caring way like a $petType pet would."
                                 chatViewModel.generateResponse(context, modelPath, inputText, testPrompt)
+                                
+                                // Increase happiness by 15 when sending a chat
+                                if (context is MainActivity) {
+                                    val prefs = context.getSharedPreferences("PetActivityPrefs", Context.MODE_PRIVATE)
+                                    val currentHappiness = prefs.getInt(username + "_happiness", 30)
+                                    val newHappiness = Math.min(100, currentHappiness + 15)
+                                    prefs.edit()
+                                        .putInt(username + "_happiness", newHappiness)
+                                        .putLong(username + "_lastSave", System.currentTimeMillis())
+                                        .apply()
+                                    Log.d("MainActivity", "Increased happiness for $username from $currentHappiness to $newHappiness")
+                                }
+                                
                                 inputText = "" // Clear input after sending
                             }
                         ) {

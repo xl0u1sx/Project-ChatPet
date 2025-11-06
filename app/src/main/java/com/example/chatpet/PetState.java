@@ -1,9 +1,9 @@
 package com.example.chatpet;
 import androidx.annotation.NonNull;
 public class PetState {
-    private int happinessMeter=100;
-    private int energyMeter=100;
-    private int hungerMeter=100;
+    private int happinessMeter=30;
+    private int energyMeter=10;
+    private int hungerMeter=10;
     private int petLevel=1; // Level starts at 1, max 3
     @NonNull private String petType;
     @NonNull private String userID;
