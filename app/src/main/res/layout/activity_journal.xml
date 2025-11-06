@@ -89,15 +89,42 @@
             android:padding="8dp"
             android:background="?android:attr/selectableItemBackground"/>
 
-        <Button
-            android:id="@+id/viewHistoryButton"
+        <!-- Divider before history section -->
+<!--        <View-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="2dp"-->
+<!--            android:background="?android:attr/listDivider"-->
+<!--            android:layout_marginVertical="16dp"/>-->
+
+        <!-- Journal History Section -->
+        <TextView
+            android:id="@+id/historyTitleTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="View Journal History"
+            android:text="Past Journal Entries"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="16dp"/>
+
+        <TextView
+            android:id="@+id/emptyHistoryTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="No journal entries yet.\nGenerate your first entry above!"
             android:textSize="14sp"
-            android:visibility="gone"
-            android:layout_marginTop="16dp"
-            style="?android:attr/borderlessButtonStyle"/>
+            android:textColor="@android:color/darker_gray"
+            android:gravity="center"
+            android:padding="16dp"
+            android:visibility="gone"/>
+
+        <!-- Container for dynamically added journal entries -->
+        <LinearLayout
+            android:id="@+id/journalEntriesContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="16dp"/>
 
     </LinearLayout>
 </ScrollView>

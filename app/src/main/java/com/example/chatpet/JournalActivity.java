@@ -1,6 +1,5 @@
 package com.example.chatpet;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -9,7 +8,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,7 +27,8 @@ public class JournalActivity extends AppCompatActivity {
     private TextView statusTextView;
     private TextView journalTitleTextView;
     private TextView journalContentTextView;
-    private Button viewHistoryButton;
+    private TextView emptyHistoryTextView;
+    private LinearLayout journalEntriesContainer;
 
     // ViewModel
     private JournalViewModel journalViewModel;
@@ -67,7 +66,8 @@ public class JournalActivity extends AppCompatActivity {
         statusTextView = findViewById(R.id.statusTextView);
         journalTitleTextView = findViewById(R.id.journalTitleTextView);
         journalContentTextView = findViewById(R.id.journalContentTextView);
-        viewHistoryButton = findViewById(R.id.viewHistoryButton);
+        emptyHistoryTextView = findViewById(R.id.emptyHistoryTextView);
+        journalEntriesContainer = findViewById(R.id.journalEntriesContainer);
     }
 
     private void setupButtonListeners() {
@@ -76,63 +76,6 @@ public class JournalActivity extends AppCompatActivity {
             String modelPath = getString(R.string.model_path);
             journalViewModel.generateJournal(getApplicationContext(), modelPath, username);
         });
-
-        viewHistoryButton.setOnClickListener(v -> {
-            Log.d(TAG, "View History button clicked");
-            showJournalHistoryDialog();
-        });
-    }
-    
-    private void showJournalHistoryDialog() {
-        List<JournalEntry> entries = journalViewModel.getJournalHistory().getValue();
-        
-        if (entries == null || entries.isEmpty()) {
-            new AlertDialog.Builder(this)
-                .setTitle("Journal History")
-                .setMessage("No journal entries yet. Generate one to get started!")
-                .setPositiveButton("OK", null)
-                .show();
-            return;
-        }
-        
-        // Create a scrollable view with all journal entries
-        ScrollView scrollView = new ScrollView(this);
-        LinearLayout layout = new LinearLayout(this);
-        layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setPadding(40, 40, 40, 40);
-        
-        for (JournalEntry entry : entries) {
-            // Date as header
-            TextView dateHeader = new TextView(this);
-            dateHeader.setText(entry.getDate() + " - " + entry.getTime());
-            dateHeader.setTextSize(16);
-            dateHeader.setTextColor(getResources().getColor(android.R.color.holo_purple, null));
-            dateHeader.setPadding(0, 20, 0, 10);
-            dateHeader.setTypeface(null, android.graphics.Typeface.BOLD);
-            layout.addView(dateHeader);
-            
-            // Journal content
-            TextView contentView = new TextView(this);
-            contentView.setText(entry.getJournalText());
-            contentView.setTextSize(14);
-            contentView.setPadding(0, 0, 0, 20);
-            layout.addView(contentView);
-            
-            // Divider
-            View divider = new View(this);
-            divider.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, 2));
-            divider.setBackgroundColor(getResources().getColor(android.R.color.darker_gray, null));
-            layout.addView(divider);
-        }
-        
-        scrollView.addView(layout);
-        
-        new AlertDialog.Builder(this)
-            .setTitle("📖 Journal History (" + entries.size() + " entries)")
-            .setView(scrollView)
-            .setPositiveButton("Close", null)
-            .show();
     }
 
     private void observeViewModel()
@@ -155,6 +98,11 @@ public class JournalActivity extends AppCompatActivity {
             {
                 handleErrorState((LlmUiState.Error) uiState);
             }
+        });
+        
+        // Observe journal history changes
+        journalViewModel.getJournalHistory().observe(this, entries -> {
+            displayJournalHistory(entries);
         });
     }
 
@@ -195,7 +143,6 @@ public class JournalActivity extends AppCompatActivity {
         journalTitleTextView.setVisibility(View.VISIBLE);
         journalContentTextView.setVisibility(View.VISIBLE);
         journalContentTextView.setText(successState.getResultText());
-        viewHistoryButton.setVisibility(View.VISIBLE);
     }
 
     private void handleErrorState(LlmUiState.Error errorState)
@@ -211,5 +158,61 @@ public class JournalActivity extends AppCompatActivity {
         statusTextView.setTextColor(getResources().getColor(android.R.color.holo_red_dark, null));
         journalTitleTextView.setVisibility(View.GONE);
         journalContentTextView.setVisibility(View.GONE);
+    }
+    
+    private void displayJournalHistory(List<JournalEntry> entries) {
+        Log.d(TAG, "Displaying " + (entries != null ? entries.size() : 0) + " journal entries");
+        
+        // Clear existing entries
+        journalEntriesContainer.removeAllViews();
+        
+        if (entries == null || entries.isEmpty()) {
+            // Show empty message
+            emptyHistoryTextView.setVisibility(View.VISIBLE);
+            return;
+        }
+        
+        // Hide empty message
+        emptyHistoryTextView.setVisibility(View.GONE);
+        
+        // Add each journal entry as a card
+        for (int i = entries.size() - 1; i >= 0; i--) { // Reverse order (newest first)
+            JournalEntry entry = entries.get(i);
+            
+            // Create a card for each entry
+            LinearLayout entryCard = new LinearLayout(this);
+            entryCard.setOrientation(LinearLayout.VERTICAL);
+            entryCard.setPadding(32, 24, 32, 24);
+            entryCard.setBackgroundResource(android.R.drawable.dialog_holo_light_frame);
+            
+            LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            cardParams.setMargins(0, 0, 0, 24);
+            entryCard.setLayoutParams(cardParams);
+            
+            // Date header
+            TextView dateHeader = new TextView(this);
+            dateHeader.setText("📅 " + entry.getDate() + " at " + entry.getTime());
+            dateHeader.setTextSize(14);
+            dateHeader.setTextColor(getResources().getColor(android.R.color.holo_purple, null));
+            dateHeader.setTypeface(null, android.graphics.Typeface.BOLD);
+            dateHeader.setPadding(0, 0, 0, 12);
+            entryCard.addView(dateHeader);
+            
+            // Journal content
+            TextView contentView = new TextView(this);
+            contentView.setText(entry.getJournalText());
+            contentView.setTextSize(15);
+            contentView.setLineSpacing(1.2f, 1.0f);
+            contentView.setTextColor(getResources().getColor(android.R.color.black, null));
+            entryCard.addView(contentView);
+            
+            // Add the card to the container
+            journalEntriesContainer.addView(entryCard);
+        }
+        
+        Log.d(TAG, "Journal history display updated");
     }
 }
