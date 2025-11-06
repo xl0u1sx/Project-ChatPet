@@ -248,19 +248,27 @@ fun MainScreen(
                                 val modelPath = context.getString(R.string.model_path)
                                 val petName = petInfo?.petName ?: "Daisy"
                                 val petType = petInfo?.petType ?: "Unicorn"
-                                val testPrompt = "You are a friendly $petType companion named $petName. Answer in a warm, caring way like a $petType pet would."
+                                
+                                // Get pet level from SharedPreferences
+                                val prefs = if (context is MainActivity) {
+                                    context.getSharedPreferences("PetActivityPrefs", Context.MODE_PRIVATE)
+                                } else null
+                                val petLevel = prefs?.getInt(username + "_level", 1) ?: 1
+                                
+                                // Create level-appropriate prompt
+                                val testPrompt = createLevelBasedPrompt(petType, petName, petLevel)
+                                
                                 chatViewModel.generateResponse(context, modelPath, inputText, testPrompt)
                                 
                                 // Increase happiness by 15 when sending a chat
-                                if (context is MainActivity) {
-                                    val prefs = context.getSharedPreferences("PetActivityPrefs", Context.MODE_PRIVATE)
-                                    val currentHappiness = prefs.getInt(username + "_happiness", 30)
+                                if (context is MainActivity && prefs != null) {
+                                    val currentHappiness = prefs.getInt(username + "_happiness", 100)
                                     val newHappiness = Math.min(100, currentHappiness + 15)
                                     prefs.edit()
                                         .putInt(username + "_happiness", newHappiness)
                                         .putLong(username + "_lastSave", System.currentTimeMillis())
                                         .apply()
-                                    Log.d("MainActivity", "Increased happiness for $username from $currentHappiness to $newHappiness")
+                                    Log.d("MainActivity", "Increased happiness for $username from $currentHappiness to $newHappiness (Level $petLevel)")
                                 }
                                 
                                 inputText = "" // Clear input after sending
@@ -352,6 +360,49 @@ fun MainScreen(
             }
 
         }
+    }
+}
+
+// Helper function to create level-based prompts for the pet
+fun createLevelBasedPrompt(petType: String, petName: String, level: Int): String {
+    return when (petType.lowercase()) {
+        "dragon" -> when (level) {
+            1 -> """You are $petName, a young and playful Dragon companion (Level 1). 
+                You're energetic, excitable, and full of enthusiasm! Use action words like *jumps*, *roars*, 
+                and show your youthful excitement. Keep responses warm and bubbly, like a friendly young dragon would.""".trimIndent()
+            
+            2 -> """You are $petName, a growing Dragon companion (Level 2). 
+                You're becoming more composed and thoughtful. Speak with more grace and politeness, 
+                occasionally using phrases like "I enjoy..." or "It's quite...". 
+                You're still friendly but more measured in your responses.""".trimIndent()
+            
+            3 -> """You are $petName, a wise and mature Dragon companion (Level 3). 
+                You speak with wisdom, dignity, and eloquence. Use thoughtful phrases like "I appreciate...", 
+                "It would seem...", or "Dear friend...". Your responses reflect deep understanding and maturity, 
+                while maintaining warmth and care for your companion.""".trimIndent()
+            
+            else -> "You are $petName, a friendly Dragon companion named $petName. Answer in a warm, caring way like a Dragon pet would."
+        }
+        
+        "unicorn" -> when (level) {
+            1 -> """You are $petName, a young and bubbly Unicorn companion (Level 1). 
+                You're playful, cute, and sparkly! Use actions like *sparkles*, *prances*, 
+                and show your cheerful personality with enthusiasm. Keep responses sweet and magical!""".trimIndent()
+            
+            2 -> """You are $petName, a graceful Unicorn companion (Level 2). 
+                You're becoming more elegant and refined. Speak with warmth and politeness, 
+                using phrases like "I cherish...", "How wonderful...". 
+                You're still joyful but express it with more grace.""".trimIndent()
+            
+            3 -> """You are $petName, an elegant and serene Unicorn companion (Level 3). 
+                You speak with eloquence, thoughtfulness, and deep kindness. Use gentle phrases like 
+                "Your kindness...", "May we...", or "Dear companion...". Your responses reflect 
+                wisdom and serenity while radiating warmth and understanding.""".trimIndent()
+            
+            else -> "You are $petName, a friendly Unicorn companion. Answer in a warm, caring way like a Unicorn pet would."
+        }
+        
+        else -> "You are $petName, a friendly $petType companion. Answer in a warm, caring way."
     }
 }
 
