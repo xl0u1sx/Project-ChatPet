@@ -80,6 +80,11 @@ public class ChatViewModel extends ViewModel {
         super.onCleared();
         // Shutdown executor service
         executorService.shutdown();
+        // Clean up chat service resources
+        if (chatService != null) {
+            chatService.cleanup();
+            Log.d(TAG, "ChatService cleaned up");
+        }
     }
 }
 

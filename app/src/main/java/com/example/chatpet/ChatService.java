@@ -15,6 +15,8 @@ public class ChatService {
     private LlmInference llm;
     private List<ChatMessage> conversationHistory;
     private String currentDate;
+    private boolean isLlmInitialized = false;
+    private String initializedModelPath = null;
 
     public ChatService() {
         /*
@@ -109,14 +111,32 @@ public class ChatService {
         Log.d("ChatService", "Full prompt with history: " + llm_prompt);
 
         try {
-            LlmInference.LlmInferenceOptions options =
-                    LlmInference.LlmInferenceOptions.builder()
-                            .setModelPath(modelPath)
-                            .setMaxTopK(64)
-                            .build();
+            // Initialize LLM only once to avoid cache corruption
+            if (!isLlmInitialized || !modelPath.equals(initializedModelPath)) {
+                // Close existing instance if model path changed
+                if (llm != null) {
+                    try {
+                        llm.close();
+                        Log.d("ChatService", "Closed previous LLM instance");
+                    } catch (Exception e) {
+                        Log.e("ChatService", "Error closing previous LLM: " + e.getMessage(), e);
+                    }
+                }
+                
+                Log.d("ChatService", "Initializing LLM model...");
+                LlmInference.LlmInferenceOptions options =
+                        LlmInference.LlmInferenceOptions.builder()
+                                .setModelPath(modelPath)
+                                .setMaxTopK(64)
+                                .build();
 
-            llm = LlmInference.createFromOptions(context, options);
-            Log.d("ChatService", "Llm created");
+                llm = LlmInference.createFromOptions(context, options);
+                isLlmInitialized = true;
+                initializedModelPath = modelPath;
+                Log.d("ChatService", "LLM initialized successfully");
+            } else {
+                Log.d("ChatService", "Reusing existing LLM instance");
+            }
 
             // Generate response — use the aggregated prompt that includes conversation history
             String result = llm.generateResponse(llm_prompt);
@@ -130,22 +150,10 @@ public class ChatService {
             
             return result;
 
-
         } catch (Exception e) {
             Log.e("ChatService", "Error generating response: " + e.getMessage(), e);
+            // Don't close LLM on error, keep it for reuse
             throw e;
-        } finally {
-            // Clean up llm
-            if (llm != null) {
-                try {
-                    llm.close();
-                } catch (Exception e) {
-                    Log.e("ChatService", "Error closing LlmInference: " + e.getMessage(), e);
-                } finally {
-                    llm = null;
-                }
-
-            }
         }
     }
     
@@ -158,6 +166,22 @@ public class ChatService {
     public void clearConversationHistory() {
         conversationHistory.clear();
         Log.d("ChatService", "Conversation history manually cleared");
+    }
+    
+    // Method to clean up resources when service is no longer needed
+    public void cleanup() {
+        if (llm != null) {
+            try {
+                llm.close();
+                Log.d("ChatService", "LLM instance closed during cleanup");
+            } catch (Exception e) {
+                Log.e("ChatService", "Error closing LLM during cleanup: " + e.getMessage(), e);
+            } finally {
+                llm = null;
+                isLlmInitialized = false;
+                initializedModelPath = null;
+            }
+        }
     }
 
 
