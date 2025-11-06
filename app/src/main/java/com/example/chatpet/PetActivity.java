@@ -17,7 +17,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class PetActivity extends AppCompatActivity {
-
+    
+    private static final String TAG = "PetActivity";
+    
     private final PetService petService = new PetService();
     @Nullable private Pet pet;
 
@@ -132,15 +134,8 @@ public class PetActivity extends AppCompatActivity {
             if (petName != null)     petName.setText(pet.getPetName());
         }
 
-        if (petImage != null) {
-            if (pet instanceof Dragon){
-                petImage.setImageResource(R.drawable.dragon);
-            }
-            else{
-                petImage.setImageResource(R.drawable.unicorn);
-            }
-
-        }
+        // Update pet image based on level
+        updatePetImage();
 
 
         if(pet!=null){
@@ -329,6 +324,48 @@ public class PetActivity extends AppCompatActivity {
         if (pet != null && petLevel != null) {
             petLevel.setText("Level " + pet.getPetLevel());
         }
+        // Also update the pet image when level changes
+        updatePetImage();
+    }
+    
+    private void updatePetImage() {
+        if (pet == null || petImage == null) return;
+        
+        int level = pet.getPetLevel();
+        int imageResource;
+        
+        if (pet instanceof Dragon) {
+            switch (level) {
+                case 1:
+                    imageResource = R.drawable.dragon_level1;
+                    break;
+                case 2:
+                    imageResource = R.drawable.dragon_level2;
+                    break;
+                case 3:
+                    imageResource = R.drawable.dragon_level3;
+                    break;
+                default:
+                    imageResource = R.drawable.dragon_level1;
+            }
+        } else { // Unicorn
+            switch (level) {
+                case 1:
+                    imageResource = R.drawable.unicorn_level1;
+                    break;
+                case 2:
+                    imageResource = R.drawable.unicorn_level2;
+                    break;
+                case 3:
+                    imageResource = R.drawable.unicorn_level3;
+                    break;
+                default:
+                    imageResource = R.drawable.unicorn_level1;
+            }
+        }
+        
+        petImage.setImageResource(imageResource);
+        Log.d(TAG, "Updated pet image to level " + level);
     }
     
     private void loadPetState() {
@@ -386,6 +423,14 @@ public class PetActivity extends AppCompatActivity {
             .putInt(currentUsername + KEY_LEVEL, pet.getPetLevel())
             .putLong(currentUsername + KEY_LAST_SAVE, System.currentTimeMillis())
             .apply();
+        
+        // Also save level to database so other activities can access it
+        UserRepository userRepository = new UserRepository(this);
+        userRepository.updatePetLevel(currentUsername, pet.getPetLevel());
+        
+        Log.d(TAG, "Saved pet state for " + currentUsername + 
+              " - Level: " + pet.getPetLevel() + ", Happiness: " + meters.happiness + 
+              ", Energy: " + meters.energy + ", Hunger: " + meters.hunger);
     }
 
     private void applyMeterDecay() {

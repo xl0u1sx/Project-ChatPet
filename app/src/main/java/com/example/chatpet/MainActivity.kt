@@ -140,12 +140,27 @@ fun MainScreen(
         }
     }
     
-    // Determine which pet image to display
-    val petImageRes = if (petInfo?.petType == "Dragon") {
-        R.drawable.dragon
-    } else {
-        R.drawable.unicorn
-    }
+    // Determine which pet image to display based on type and level
+    val petImageRes = petInfo?.let { info ->
+        when (info.petType) {
+            "Dragon" -> {
+                when (info.petLevel) {
+                    1 -> R.drawable.dragon_level1
+                    2 -> R.drawable.dragon_level2
+                    3 -> R.drawable.dragon_level3
+                    else -> R.drawable.dragon_level1
+                }
+            }
+            else -> { // Unicorn
+                when (info.petLevel) {
+                    1 -> R.drawable.unicorn_level1
+                    2 -> R.drawable.unicorn_level2
+                    3 -> R.drawable.unicorn_level3
+                    else -> R.drawable.unicorn_level1
+                }
+            }
+        }
+    } ?: R.drawable.unicorn_level1 // Default image if petInfo is null
 
     Scaffold(modifier = modifier.fillMaxSize()) { innerPadding ->
         Column(

@@ -253,7 +253,7 @@ public class UserRepository {
         try {
             db = dbHelper.getReadableDatabase();
 
-            String[] columns = {"pet_name", "pet_type"};
+            String[] columns = {"pet_name", "pet_type", "pet_level"};
             String selection = "username = ?";
             String[] selectionArgs = {username};
 
@@ -270,9 +270,10 @@ public class UserRepository {
             if (cursor != null && cursor.moveToFirst()) {
                 String petName = cursor.getString(cursor.getColumnIndexOrThrow("pet_name"));
                 String petType = cursor.getString(cursor.getColumnIndexOrThrow("pet_type"));
+                int petLevel = cursor.getInt(cursor.getColumnIndexOrThrow("pet_level"));
                 
-                Log.d(TAG, "Pet info retrieved for " + username + ": " + petName + " (" + petType + ")");
-                return new PetInfo(petName, petType);
+                Log.d(TAG, "Pet info retrieved for " + username + ": " + petName + " (" + petType + ") Level " + petLevel);
+                return new PetInfo(petName, petType, petLevel);
             } else {
                 Log.d(TAG, "No pet found for user: " + username);
                 return null;
@@ -394,15 +395,52 @@ public class UserRepository {
     }
 
     /**
+     * Update pet level in database
+     */
+    public boolean updatePetLevel(String username, int newLevel) {
+        SQLiteDatabase db = null;
+        try {
+            db = dbHelper.getWritableDatabase();
+            
+            ContentValues values = new ContentValues();
+            values.put("pet_level", newLevel);
+            
+            int rowsAffected = db.update(
+                "pet_services",
+                values,
+                "username = ?",
+                new String[]{username}
+            );
+            
+            if (rowsAffected > 0) {
+                Log.d(TAG, "Updated pet level to " + newLevel + " for user: " + username);
+                return true;
+            } else {
+                Log.e(TAG, "Failed to update pet level for user: " + username);
+                return false;
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error updating pet level", e);
+            return false;
+        } finally {
+            if (db != null) {
+                db.close();
+            }
+        }
+    }
+
+    /**
      * Simple class to hold pet information
      */
     public static class PetInfo {
         private final String petName;
         private final String petType;
+        private final int petLevel;
 
-        public PetInfo(String petName, String petType) {
+        public PetInfo(String petName, String petType, int petLevel) {
             this.petName = petName;
             this.petType = petType;
+            this.petLevel = petLevel;
         }
 
         public String getPetName() {
@@ -411,6 +449,10 @@ public class UserRepository {
 
         public String getPetType() {
             return petType;
+        }
+        
+        public int getPetLevel() {
+            return petLevel;
         }
     }
 }
