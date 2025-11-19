@@ -36,7 +36,7 @@ public class JournalService {
     }
 
     @SuppressLint("DefaultLocale")
-    String formatPrompt(JournalEntry entry, String previousJournal) {
+    static String formatPrompt(JournalEntry entry, String previousJournal) {
         return String.format(
                 "You are a %s named %s at level %d, level progress %d, " +
                         "today's level experience gained %d. Today is %s, time is %s, " +

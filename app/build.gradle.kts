@@ -65,4 +65,8 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.9.3") // For viewModelScope
 
     implementation("com.readystatesoftware.sqliteasset:sqliteassethelper:2.0.1") // for sqlite database
+
+    testImplementation("junit:junit:4.13.2") // testing
+    androidTestImplementation("androidx.test.ext:junit:1.1.3")
+    androidTestImplementation ("androidx.test.espresso:espresso-core:3.4.0")
 }

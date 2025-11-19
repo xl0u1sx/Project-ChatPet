@@ -73,7 +73,7 @@ public class JournalViewModel extends ViewModel
                 JournalEntry newEntry = new JournalEntry();
                 newEntry.setUsername(username);
                 String previousJournal = journalService.getLatestJournalText(username);
-                String prompt = journalService.formatPrompt(newEntry, previousJournal);
+                String prompt = JournalService.formatPrompt(newEntry, previousJournal);
                 Log.i(TAG, "Starting LLM response generation for prompt: " + prompt);
 
 
