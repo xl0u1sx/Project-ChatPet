@@ -28,11 +28,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "21"
     }
     buildFeatures {
         compose = true
@@ -66,7 +66,11 @@ dependencies {
 
     implementation("com.readystatesoftware.sqliteasset:sqliteassethelper:2.0.1") // for sqlite database
 
-    testImplementation("junit:junit:4.13.2") // testing
-    androidTestImplementation("androidx.test.ext:junit:1.1.3")
-    androidTestImplementation ("androidx.test.espresso:espresso-core:3.4.0")
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.mockito:mockito-core:5.12.0")
+    testImplementation("org.mockito:mockito-inline:5.2.0") // allows mocking final classes
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.3.1")
+}
+kotlin {
+    jvmToolchain(21)
 }
