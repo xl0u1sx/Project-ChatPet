@@ -88,7 +88,7 @@ public class JournalServiceTest {
     // White box test 3: Testing JournalEntry's default constructor
     @Test
     public void test_JournalEntry_Default_Constructor() {
-        System.out.println("\n=== TEST 3 STARTED: test_JournalEntry_ConstructorInitialization ===");
+        System.out.println("\n=== TEST 3 STARTED: test_JournalEntry_Default_Constructor ===");
 
         JournalEntry entry = new JournalEntry();
 
