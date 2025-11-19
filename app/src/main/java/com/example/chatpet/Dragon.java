@@ -23,10 +23,14 @@ public class Dragon implements Pet {
     
     @Override
     public String feed(){
-        petState.increaseHunger(30);
-        petState.increaseEnergy(10);
+        if(petState.getHungerMeter()>=100){
+            return petState.getPetName()+" is already full and can't eat more!";
+        }
+        int before=petState.getHungerMeter();
+        petState.increaseHunger(    10);
+        int after=petState.getHungerMeter();
         Log.d("Dragon", "Feed - Happiness: "+petState.getHappinessMeter()+" Energy: "+petState.getEnergyMeter()+" Hunger: "+petState.getHungerMeter());
-        return getFeedMessage();
+        return getFeedMessage(after-before);
     }
     
     @Override
@@ -50,16 +54,16 @@ public class Dragon implements Pet {
         }
     }
     
-    private String getFeedMessage(){
+    private String getFeedMessage(int hungerGained){
         switch(petState.getPetLevel()){
             case 1:
-                return petState.getPetName()+" devours the food messily! *crumbs everywhere* Hunger +30, Energy +10";
+                return petState.getPetName()+" devours the food messily! *crumbs everywhere* Hunger "+hungerGained;
             case 2:
-                return petState.getPetName()+" eats gracefully. \"This is quite delicious, thank you.\" Hunger +30, Energy +10";
+                return petState.getPetName()+" eats gracefully. \"This is quite delicious, thank you.\" Hunger "+hungerGained;
             case 3:
-                return petState.getPetName()+" savors the meal thoughtfully. \"Your care is much appreciated.\" Hunger +30, Energy +10";
+                return petState.getPetName()+" savors the meal thoughtfully. \"Your care is much appreciated.\" Hunger "+hungerGained;
             default:
-                return petState.getPetName()+" devours the food! Hunger +30, Energy +10";
+                return petState.getPetName()+" devours the food! Hunger "+hungerGained;
         }
     }
     

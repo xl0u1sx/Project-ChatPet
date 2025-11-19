@@ -165,15 +165,32 @@ public class PetActivity extends AppCompatActivity {
 
     private void setupButtons() {
         // Feed button - increases hunger by 30, increase energy by 10
+//        if (feedButton != null) {
+//            feedButton.setOnClickListener(v -> {
+//                if (pet == null) return;
+//                String msg = pet.feed();
+//                if (statusText != null) statusText.setText(msg);
+//                refreshMeters();
+//                savePetState();
+//            });
+//        }
         if (feedButton != null) {
             feedButton.setOnClickListener(v -> {
                 if (pet == null) return;
+
+                // Block feeding while pet is asleep
+                if (isPetSleeping()) {
+                    showSleepingMessage("feed them");
+                    return;
+                }
+
                 String msg = pet.feed();
                 if (statusText != null) statusText.setText(msg);
                 refreshMeters();
                 savePetState();
             });
         }
+
 
         // Tuck-in button - fills energy to 100, but only once per cooldown period
         if (tuckInButton != null) {
@@ -254,9 +271,25 @@ public class PetActivity extends AppCompatActivity {
         }
 
         // Special action buttons for each pet type
+//        if (breatheFireButton != null) {
+//            breatheFireButton.setOnClickListener(v -> {
+//                if (!(pet instanceof Dragon)) return;
+//                String msg = ((Dragon) pet).breatheFire();
+//                if (statusText != null) statusText.setText(msg);
+//                refreshMeters();
+//                savePetState();
+//            });
+//        }
         if (breatheFireButton != null) {
             breatheFireButton.setOnClickListener(v -> {
                 if (!(pet instanceof Dragon)) return;
+
+                // Block special action while asleep
+                if (isPetSleeping()) {
+                    showSleepingMessage("do that while they're asleep");
+                    return;
+                }
+
                 String msg = ((Dragon) pet).breatheFire();
                 if (statusText != null) statusText.setText(msg);
                 refreshMeters();
@@ -264,15 +297,33 @@ public class PetActivity extends AppCompatActivity {
             });
         }
 
+
+//        if (tellStoryButton != null) {
+//            tellStoryButton.setOnClickListener(v -> {
+//                if (!(pet instanceof Unicorn)) return;
+//                String msg = ((Unicorn) pet).tellMagicalStory();
+//                if (statusText != null) statusText.setText(msg);
+//                refreshMeters();
+//                savePetState();
+//            });
+//        }
         if (tellStoryButton != null) {
             tellStoryButton.setOnClickListener(v -> {
                 if (!(pet instanceof Unicorn)) return;
+
+                // Block special action while asleep
+                if (isPetSleeping()) {
+                    showSleepingMessage("hear a story while they're asleep");
+                    return;
+                }
+
                 String msg = ((Unicorn) pet).tellMagicalStory();
                 if (statusText != null) statusText.setText(msg);
                 refreshMeters();
                 savePetState();
             });
         }
+
     }
 
     private void setupMeterDecay() {
@@ -497,4 +548,26 @@ public class PetActivity extends AppCompatActivity {
             upgradeCheckHandler.removeCallbacks(upgradeCheckRunnable);
         }
     }
+    private boolean isPetSleeping() {
+        if (currentUsername == null) return false;
+
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        long lastTuckInTime = prefs.getLong(currentUsername + KEY_LAST_TUCK_IN, 0);
+        if (lastTuckInTime == 0) {
+            return false; // never tucked in
+        }
+
+        long elapsed = System.currentTimeMillis() - lastTuckInTime;
+        // While within the TUCK_IN_COOLDOWN window, we treat the pet as "asleep"
+        return elapsed < TUCK_IN_COOLDOWN;
+    }
+
+    private void showSleepingMessage(String actionPhrase) {
+        if (pet == null || statusText == null) return;
+        // Example: "Pet is asleep right now. You can't feed them until they wake up!"
+        statusText.setText(
+                pet.getPetName() + " is asleep right now. You can't " + actionPhrase + " until they wake up!"
+        );
+    }
+
 }

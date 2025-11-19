@@ -23,10 +23,15 @@ public class Unicorn implements Pet {
     
     @Override
     public String feed(){
-        petState.increaseHunger(30);
-        petState.increaseEnergy(10);
+        if (petState.getHungerMeter() >= 100) {
+            return petState.getPetName() + " is already full and can't eat more!";
+        }
+        int before=petState.getHungerMeter();
+        petState.increaseHunger(20);
+        int after=petState.getHungerMeter();
+
         Log.d("Unicorn", "Feed - Happiness: "+petState.getHappinessMeter()+" Energy: "+petState.getEnergyMeter()+" Hunger: "+petState.getHungerMeter());
-        return getFeedMessage();
+        return getFeedMessage(after-before);
     }
     
     @Override
@@ -50,16 +55,16 @@ public class Unicorn implements Pet {
         }
     }
     
-    private String getFeedMessage(){
+    private String getFeedMessage(int hungerGained){
         switch(petState.getPetLevel()){
             case 1:
-                return petState.getPetName()+" munches eagerly! *magical crumbs float away* Hunger +30, Energy +10";
+                return petState.getPetName()+" munches eagerly! *magical crumbs float away* Hunger "+hungerGained;
             case 2:
-                return petState.getPetName()+" eats delicately. \"These treats are wonderful.\" Hunger +30, Energy +10";
+                return petState.getPetName()+" eats delicately. \"These treats are wonderful.\" Hunger "+hungerGained;
             case 3:
-                return petState.getPetName()+" dines with elegance. \"Your generosity warms my heart.\" Hunger +30, Energy +10";
+                return petState.getPetName()+" dines with elegance. \"Your generosity warms my heart.\" Hunger "+hungerGained;
             default:
-                return petState.getPetName()+" munches on treats! Hunger +30, Energy +10";
+                return petState.getPetName()+" munches on treats! Hunger "+hungerGained;
         }
     }
     

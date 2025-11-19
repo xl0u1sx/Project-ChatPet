@@ -72,7 +72,7 @@ public class ChatTests {
         };
 
         // set up the compose ui with mock viewmodel
-        // src: https://developer.android.com/reference/kotlin/androidx/compose/ui/test/junit4/ComposeTestRule 
+        // src: https://developer.android.com/reference/kotlin/androidx/compose/ui/test/junit4/ComposeTestRule
         composeTestRule.setContent(() -> {
             ChatPetTheme.INSTANCE.invoke(false, null, content -> {
                 MainScreenKt.MainScreen(null, mockViewModel);
