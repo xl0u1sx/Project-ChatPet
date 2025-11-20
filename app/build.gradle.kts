@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.Packaging
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -40,6 +42,17 @@ android {
     testOptions {
         unitTests.isReturnDefaultValues = true
     }
+
+    packaging {
+        resources {
+            excludes += setOf("META-INF/LICENSE.md", "META-INF/NOTICE.md")
+            pickFirsts += setOf(
+                "META-INF/LICENSE-notice.md",
+                "META-INF/LICENSE.txt",
+                "META-INF/NOTICE.txt"
+            )
+        }
+    }
 }
 
 dependencies {
@@ -55,11 +68,19 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-livedata:1.7.6") // For observeAsState()
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.foundation)
+    implementation(libs.androidx.ui.test.junit4)
     testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
+//    androidTestImplementation(libs.androidx.junit)
+//    androidTestImplementation(libs.androidx.espresso.core)
+//    androidTestImplementation(platform(libs.androidx.compose.bom))
+//    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.0")
     androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.5.0")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.5.0")
+    androidTestImplementation("io.mockk:mockk:1.13.8")
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
@@ -73,6 +94,7 @@ dependencies {
     testImplementation("org.mockito:mockito-core:5.12.0")
     testImplementation("org.mockito:mockito-inline:5.2.0") // allows mocking final classes
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.3.1")
+    testImplementation("io.mockk:mockk:1.13.5")
 }
 kotlin {
     jvmToolchain(21)

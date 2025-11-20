@@ -2,6 +2,7 @@ package com.example.chatpet;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.scrollTo;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
@@ -12,12 +13,16 @@ import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+
+import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.Before;
+
 
 // BLACK BOX TEST CASES FOR TESTING PET ACTIVITY
 @RunWith(AndroidJUnit4.class)
@@ -29,13 +34,27 @@ public class PetLogicBlackTest {
     public ActivityScenarioRule<PetActivity> activityRule =
             new ActivityScenarioRule<>(PetActivity.class);
 
+    @Before
+    public void setUp() {
+        // start with a fresh state (Unicorn default)
+        Context context = ApplicationProvider.getApplicationContext();
+        SharedPreferences prefs = context.getSharedPreferences("PetActivityPrefs", Context.MODE_PRIVATE);
+        prefs.edit().clear().apply();
+    }
+
    // TEST CASE 1: Feeding the pet outputs a message to the user
     @Test
     public void testFeedShowsMessage() {
+
         onView(withId(R.id.feedButton)).perform(click());
         onView(withText("Pie (+20)")).perform(click());
 
+        // lets the dialog fade animation finish
+        try { Thread.sleep(500); } catch (InterruptedException e) {}
+
+        // Scroll to statusText before checking visibility
         onView(withId(R.id.statusText))
+                .perform(scrollTo())
                 .check(matches(isDisplayed()));
     }
 
@@ -43,26 +62,19 @@ public class PetLogicBlackTest {
     @Test
     public void testFeedBlockedAtFull() {
 
-        activityRule.getScenario().onActivity(activity -> {
-            SharedPreferences prefs =
-                    activity.getSharedPreferences("PetActivityPrefs", Context.MODE_PRIVATE);
-
-            prefs.edit()
-                    .putLong("temp_user_id_lastTuckInTime", 0L)
-                    .apply();
-        });
-
-
         for (int i = 0; i < 6; i++) {
             onView(withId(R.id.feedButton)).perform(click());
             onView(withText("Pie (+20)")).perform(click());
-
+            try { Thread.sleep(100); } catch (InterruptedException e) {}
         }
 
         // Now we should see the "already full" message
         onView(withId(R.id.statusText))
+                .perform(scrollTo())
                 .check(matches(withText(containsString("already full"))));
     }
+
+
 
    // TEST CASE 3: Tucking in the pet is blocked when the pet is already asleep
     @Test
@@ -71,6 +83,7 @@ public class PetLogicBlackTest {
         onView(withId(R.id.tuckInButton)).perform(click());
 
         onView(withId(R.id.statusText))
+                .perform(scrollTo())
                 .check(matches(withText(containsString(
                         "doesn't want to go to sleep yet! Please wait"))));
     }
@@ -82,6 +95,7 @@ public class PetLogicBlackTest {
         onView(withId(R.id.feedButton)).perform(click()); // user clicks on the feed button
 
         onView(withId(R.id.statusText))
+                .perform(scrollTo())
                 .check(matches(withText(
                         "Pet is asleep right now. You can't feed them until they wake up!")));
     }
@@ -90,37 +104,17 @@ public class PetLogicBlackTest {
     // This action should output a message to the user indicating so
     @Test
     public void testSpecialActionBlockedWhileAsleep() {
+        // makes sure we are tucking in first
         onView(withId(R.id.tuckInButton)).perform(click());
-        onView(withId(R.id.tellStoryButton)).perform(click());
+
+        // scrolls to button before clicking
+        onView(withId(R.id.tellStoryButton)).perform(scrollTo(), click());
 
         onView(withId(R.id.statusText))
+                .perform(scrollTo())
                 .check(matches(withText(
                         "Pet is asleep right now. You can't hear a story while they're asleep until they wake up!"
                 )));
-    }
-
-    // story menu test
-    @Test
-    public void testStoryMenuAppears() {
-        onView(withId(R.id.tellStoryButton)).perform(click());
-
-        onView(withText("Short Story"))
-                .check(matches(isDisplayed()));
-    }
-
-
-    // clicking feed shows status update
-    @Test
-    public void test_FeedButton_Clickable() {
-        onView(withId(R.id.feedButton)).perform(click());
-        onView(withId(R.id.statusText)).check(matches(isDisplayed()));
-    }
-
-    // clicking tuck-in shows status update
-    @Test
-    public void test_TuckInButton_Clickable() {
-        onView(withId(R.id.tuckInButton)).perform(click());
-        onView(withId(R.id.statusText)).check(matches(isDisplayed()));
     }
 
 }

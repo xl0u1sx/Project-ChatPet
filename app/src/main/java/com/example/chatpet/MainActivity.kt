@@ -61,6 +61,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.platform.testTag
 //import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
@@ -250,7 +251,7 @@ fun MainScreen(
                 value = inputText,
                 onValueChange = { inputText = it },
                 label = { Text("Chat with me!") },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().testTag("chatTextField"),
                 trailingIcon = {
                     if (uiState !is LlmUiState.Loading && inputText.isNotBlank()) {
                         Button(
@@ -258,18 +259,18 @@ fun MainScreen(
                                 val modelPath = context.getString(R.string.model_path)
                                 val petName = petInfo?.petName ?: "Daisy"
                                 val petType = petInfo?.petType ?: "Unicorn"
-                                
+
                                 // Get pet level from SharedPreferences
                                 val prefs = if (context is MainActivity) {
                                     context.getSharedPreferences("PetActivityPrefs", Context.MODE_PRIVATE)
                                 } else null
                                 val petLevel = prefs?.getInt(username + "_level", 1) ?: 1
-                                
+
                                 // Create level-appropriate prompt
                                 val testPrompt = createLevelBasedPrompt(petType, petName, petLevel)
-                                
+
                                 chatViewModel.generateResponse(context, modelPath, inputText, testPrompt)
-                                
+
                                 // Increase happiness by 15 when sending a chat
                                 if (context is MainActivity && prefs != null) {
                                     val currentHappiness = prefs.getInt(username + "_happiness", 100)
@@ -280,7 +281,7 @@ fun MainScreen(
                                         .apply()
                                     Log.d("MainActivity", "Increased happiness for $username from $currentHappiness to $newHappiness (Level $petLevel)")
                                 }
-                                
+
                                 inputText = "" // Clear input after sending
 
                             },
@@ -349,6 +350,7 @@ fun MainScreen(
                     .width(200.dp)
                     .height(70.dp)
                     .padding(start=10.dp, top=10.dp)
+                    .testTag("petScreenButton")
                     .background(
                         brush=Brush.linearGradient(
                             colors=listOf(Color(0xFFFFB6C1), Color(0xFFFFD1DC))

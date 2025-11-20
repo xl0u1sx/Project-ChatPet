@@ -10,6 +10,7 @@ import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
 //import androidx.lifecycle.AndroidViewModel;
 
 import com.google.mediapipe.tasks.genai.llminference.LlmInference;
@@ -26,13 +27,20 @@ public class ChatViewModel extends ViewModel {
     private final MutableLiveData<LlmUiState> _uiState = new MutableLiveData<>(LlmUiState.Idle.INSTANCE);
     private final LiveData<LlmUiState> uiState = _uiState;
     private final ExecutorService executorService = Executors.newSingleThreadExecutor();
-    
+    private UserRepository userRepository = null;
+
     public ChatViewModel() {
         // only create chatservice once
         if (chatService == null) {
             chatService = new ChatService();
             Log.d(TAG, "ChatService initialized");
         }
+    }
+
+    //for testing
+    public ChatViewModel(UserRepository userRepository) {
+        this(); // call default constructor to initialize ChatService
+        this.userRepository = userRepository;
     }
     public LiveData<LlmUiState> getUiState() {
         return uiState;

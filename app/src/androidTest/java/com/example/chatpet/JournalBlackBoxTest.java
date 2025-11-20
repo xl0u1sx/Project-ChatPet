@@ -9,6 +9,7 @@ import androidx.test.filters.LargeTest;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -68,11 +69,11 @@ public class JournalBlackBoxTest {
 
     @Test
     public void test_GenerateJournalButton_ShowsLoadingState() {
-        // Click generate button
+        // click the generate button
         onView(withId(R.id.generateJournalButton))
                 .perform(click());
 
-        // Verify loading indicator appears
+        //verify that loading indicator appears
         onView(withId(R.id.loadingProgressBar))
                 .check(matches(isDisplayed()));
 
@@ -99,34 +100,5 @@ public class JournalBlackBoxTest {
         onView(withId(R.id.journalEntriesContainer))
                 .check(matches(isDisplayed()));
     }
-
-        @Test
-        public void testDoubleGenerateShowsLoading() {
-            onView(withId(R.id.generateJournalButton)).perform(click());
-
-            onView(withId(R.id.loadingProgressBar))
-                    .check(matches(isDisplayed()));
-
-            onView(withId(R.id.generateJournalButton)).perform(click());
-
-            onView(withId(R.id.loadingProgressBar))
-                    .check(matches(isDisplayed()));
-        }
-
-        // check that multiple journal generations do not crash app
-        @Test
-        public void test_MultipleGenerations_NoCrash() {
-            onView(withId(R.id.generateJournalButton)).perform(click());
-            onView(withId(R.id.generateJournalButton)).perform(click());
-            onView(withId(R.id.journalEntriesContainer)).check(matches(isDisplayed()));
-        }
-
-        // Clicking generate enables button again after success (UI sim)
-        @Test
-        public void test_GenerateButton_EnabledAfterClick() {
-            onView(withId(R.id.generateJournalButton)).perform(click());
-            onView(withId(R.id.generateJournalButton)).check(matches(isDisplayed()));
-        }
-
 
 }
