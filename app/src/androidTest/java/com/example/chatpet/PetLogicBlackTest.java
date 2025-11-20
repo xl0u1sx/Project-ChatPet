@@ -99,7 +99,7 @@ public class PetLogicBlackTest {
                 )));
     }
 
-    //LL
+    // story menu test
     @Test
     public void testStoryMenuAppears() {
         onView(withId(R.id.tellStoryButton)).perform(click());

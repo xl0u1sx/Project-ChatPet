@@ -68,7 +68,7 @@ public class PetServiceTest {
         assertEquals("hunger should cap at 100", 100, hunger);
     }
 
-    //WB4
+    // makes sure type normalization works
     @Test
     public void test_CreatePet_TypeNormalization(){
         PetService service = new PetService();

@@ -78,7 +78,7 @@ public class ChatServiceTest {
             "Hmmm.. Could you say that again?", result);
     }
 
-    //WB5
+    // tests that conversation history is cleared
     @Test
     public void test_clearConvoHistory(){
         ChatService chat = new ChatService();

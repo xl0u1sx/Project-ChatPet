@@ -191,7 +191,7 @@ public class JournalServiceTest {
         assertFalse(prompt.trim().startsWith("Okay"));
     }
 
-    //WB2
+    //empty previous journal
     @Test
     public void testFormatPrompt_InsertsNoneForEmptyPreviousJournal() {
         JournalEntry entry = new JournalEntry();
