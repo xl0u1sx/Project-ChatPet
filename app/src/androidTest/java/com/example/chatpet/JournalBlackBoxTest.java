@@ -100,7 +100,7 @@ public class JournalBlackBoxTest {
                 .check(matches(isDisplayed()));
     }
 
-    public class Journal_DoubleGenerateShowsLoadingTest {
+
 
         @Rule
         public ActivityScenarioRule<JournalActivity> rule =
@@ -118,7 +118,15 @@ public class JournalBlackBoxTest {
             onView(withId(R.id.loadingProgressBar))
                     .check(matches(isDisplayed()));
         }
-    }
+
+        // check that multiple journal generations do not crash app
+        @Test
+        public void test_MultipleGenerations_NoCrash() {
+            onView(withId(R.id.generateJournalButton)).perform(click());
+            onView(withId(R.id.generateJournalButton)).perform(click());
+            onView(withId(R.id.journalEntriesContainer)).check(matches(isDisplayed()));
+        }
+
 
 
 }

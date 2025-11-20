@@ -108,5 +108,15 @@ public class PetLogicBlackTest {
                 .check(matches(isDisplayed()));
     }
 
+    @Test
+    public void test_AllPetUIElements_Visible() {
+        onView(withId(R.id.happinessMeter)).check(matches(isDisplayed()));
+        onView(withId(R.id.energyMeter)).check(matches(isDisplayed()));
+        onView(withId(R.id.hungerMeter)).check(matches(isDisplayed()));
+        onView(withId(R.id.feedButton)).check(matches(isDisplayed()));
+        onView(withId(R.id.tuckInButton)).check(matches(isDisplayed()));
+        onView(withId(R.id.chatButton)).check(matches(isDisplayed()));
+        onView(withId(R.id.statusText)).check(matches(isDisplayed()));
+    }
 
 }
