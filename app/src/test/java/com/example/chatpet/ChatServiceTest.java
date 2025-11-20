@@ -78,7 +78,18 @@ public class ChatServiceTest {
             "Hmmm.. Could you say that again?", result);
     }
 
-    
+    //WB5
+    @Test
+    public void test_clearConvoHistory(){
+        ChatService chat = new ChatService();
+
+        chat.getConversationHistory().add(new ChatService.ChatMessage("user", "hii", "time"));
+
+        chat.clearConversationHistory();
+
+        assertEquals(0, chat.getConversationHistory().size());
+    }
+
 
     
 }

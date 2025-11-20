@@ -3,6 +3,10 @@ package com.example.chatpet;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
+import static org.mockito.Mockito.*;
+import java.util.List;
+import java.util.ArrayList;
+
 public class JournalServiceTest {
 
     // White box test 1: Testing formatPrompt with valid data
@@ -163,4 +167,42 @@ public class JournalServiceTest {
 
         System.out.println("TEST 5 PASSED\n");
     }
+
+
+    //WB 1 - check for no "Okay" at start of entry
+    @Test
+    public void test_FormatPrompt_DoesNotStartWithOkay() {
+        JournalEntry entry = new JournalEntry();
+        entry.petType = "Unicorn";
+        entry.petName = "Grey";
+        entry.petLevel = 3;
+        entry.levelProgress = 55;
+        entry.expGained = 10;
+        entry.date = "Nov 19, 2025";
+        entry.time = "9:00 AM";
+        entry.happiness = 70;
+        entry.energy = 80;
+        entry.hunger = 90;
+        entry.timesChatted = 2;
+        entry.timesFed = 1;
+        entry.timesTuckedIn = 0;
+
+        String prompt = JournalService.formatPrompt(entry, "");
+        assertFalse(prompt.trim().startsWith("Okay"));
+    }
+
+    //WB2
+    @Test
+    public void testFormatPrompt_InsertsNoneForEmptyPreviousJournal() {
+        JournalEntry entry = new JournalEntry();
+
+        entry.petType = "Dog";
+        entry.petName = "Fido";
+
+        String result = JournalService.formatPrompt(entry, "");
+
+        assertTrue(result.contains("None"));
+    }
+
+
 }

@@ -7,6 +7,9 @@ import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
@@ -95,4 +98,15 @@ public class PetLogicBlackTest {
                         "Pet is asleep right now. You can't hear a story while they're asleep until they wake up!"
                 )));
     }
+
+    //LL
+    @Test
+    public void testStoryMenuAppears() {
+        onView(withId(R.id.tellStoryButton)).perform(click());
+
+        onView(withText("Short Story"))
+                .check(matches(isDisplayed()));
+    }
+
+
 }

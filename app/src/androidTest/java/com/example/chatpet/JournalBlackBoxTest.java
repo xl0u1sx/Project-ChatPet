@@ -19,6 +19,11 @@ import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
@@ -94,4 +99,26 @@ public class JournalBlackBoxTest {
         onView(withId(R.id.journalEntriesContainer))
                 .check(matches(isDisplayed()));
     }
+
+    public class Journal_DoubleGenerateShowsLoadingTest {
+
+        @Rule
+        public ActivityScenarioRule<JournalActivity> rule =
+                new ActivityScenarioRule<>(JournalActivity.class);
+
+        @Test
+        public void testDoubleGenerateShowsLoading() {
+            onView(withId(R.id.generateJournalButton)).perform(click());
+
+            onView(withId(R.id.loadingProgressBar))
+                    .check(matches(isDisplayed()));
+
+            onView(withId(R.id.generateJournalButton)).perform(click());
+
+            onView(withId(R.id.loadingProgressBar))
+                    .check(matches(isDisplayed()));
+        }
+    }
+
+
 }

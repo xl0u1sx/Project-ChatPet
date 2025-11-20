@@ -67,4 +67,14 @@ public class PetServiceTest {
         int hunger = petState.getHungerMeter();
         assertEquals("hunger should cap at 100", 100, hunger);
     }
+
+    //WB4
+    @Test
+    public void test_CreatePet_TypeNormalization(){
+        PetService service = new PetService();
+
+        Pet pet = service.createPet("DRAGON", "Darg", "testUser");
+
+        assertTrue("Type normalization should result in Dragon", pet instanceof Dragon);
+    }
 }

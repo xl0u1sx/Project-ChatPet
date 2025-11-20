@@ -2,6 +2,8 @@ package com.example.chatpet;
 
 import static com.example.chatpet.ComposeTestHelpers.*;
 
+import static org.junit.Assert.assertEquals;
+
 import android.content.Context;
 
 import androidx.compose.ui.test.SemanticsNodeInteraction;
@@ -189,4 +191,15 @@ public class ChatTests {
 
         // the ui prevents sending empty messages by not showing the send button
     }
+
+    //BB4
+    @Test
+    public void test_responseGeneration_EmptyMessage() throws Exception{
+        ChatService chat = new ChatService();
+
+        String result = chat.generateResponse(null, "path", "", "");
+
+        assertEquals("Hmmm.. Could you say that again?", result);
+    }
+
 }
