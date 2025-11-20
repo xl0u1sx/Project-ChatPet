@@ -1,23 +1,15 @@
 package com.example.chatpet;
 
-import static androidx.compose.ui.test.junit4.ComposeTestRule.*;
-import static androidx.test.espresso.matcher.ViewMatchers.assertThat;
+import static com.example.chatpet.ComposeTestHelpers.*;
 
 import android.content.Context;
-import android.content.Intent;
 
-import androidx.compose.ui.test.junit4.ComposeTestRule;
-import androidx.compose.ui.test.junit4.createComposeRule;
-import androidx.compose.ui.test.hasText;
-import androidx.compose.ui.test.onNodeWithText;
-import androidx.compose.ui.test.performClick;
-import androidx.compose.ui.test.performTextInput;
+import androidx.compose.ui.test.SemanticsNodeInteraction;
+import androidx.compose.ui.test.junit4.ComposeContentTestRule;
 import androidx.lifecycle.MutableLiveData;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
-
-import com.example.chatpet.ui.theme.ChatPetTheme;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -33,7 +25,7 @@ import org.junit.runner.RunWith;
 public class ChatTests {
 
     @Rule
-    public ComposeTestRule composeTestRule = createComposeRule();
+    public ComposeContentTestRule composeTestRule = createComposeTestRule();
 
     private Context context;
 
@@ -73,30 +65,25 @@ public class ChatTests {
 
         // set up the compose ui with mock viewmodel
         // src: https://developer.android.com/reference/kotlin/androidx/compose/ui/test/junit4/ComposeTestRule
-        composeTestRule.setContent(() -> {
-            ChatPetTheme.INSTANCE.invoke(false, null, content -> {
-                MainScreenKt.MainScreen(null, mockViewModel);
-                return null;
-            });
-        });
+        setMainScreenContent(composeTestRule, mockViewModel);
 
         // wait for the ui to be ready
         composeTestRule.waitForIdle();
 
         // find the text input field and enter a message
-        composeTestRule.onNodeWithText("Chat with me!")
-                .performTextInput("hello, nice to meet you");
+        SemanticsNodeInteraction textField = onNodeWithText(composeTestRule, "Chat with me!", false, false, false);
+        performTextInput(textField, "hello, nice to meet you");
 
         // click the send button
-        composeTestRule.onNodeWithText("Send")
-                .performClick();
+        SemanticsNodeInteraction sendButton = onNodeWithText(composeTestRule, "Send", false, false, false);
+        performClick(sendButton);
 
         // wait for the response to appear
         composeTestRule.waitForIdle();
 
         // verify the pet responded
-        composeTestRule.onNode(hasText("hello! nice to meet you too!", false))
-                .assertExists();
+        SemanticsNodeInteraction response = onNode(composeTestRule, hasText("hello! nice to meet you too!", true, false), false);
+        assertExists(response);
     }
 
     /**
@@ -140,36 +127,33 @@ public class ChatTests {
         };
 
         // set up the compose ui
-        composeTestRule.setContent(() -> {
-            ChatPetTheme.INSTANCE.invoke(false, null, content -> {
-                MainScreenKt.MainScreen(null, mockViewModel);
-                return null;
-            });
-        });
+        setMainScreenContent(composeTestRule, mockViewModel);
 
         composeTestRule.waitForIdle();
 
         // send first message to remember the word
-        composeTestRule.onNodeWithText("Chat with me!")
-                .performTextInput("remember the word banana");
-        composeTestRule.onNodeWithText("Send")
-                .performClick();
+        SemanticsNodeInteraction textField1 = onNodeWithText(composeTestRule, "Chat with me!", false, false, false);
+        performTextInput(textField1, "remember the word banana");
+
+        SemanticsNodeInteraction sendButton1 = onNodeWithText(composeTestRule, "Send", false, false, false);
+        performClick(sendButton1);
         composeTestRule.waitForIdle();
 
         // verify acknowledgment
-        composeTestRule.onNode(hasText("remember the word banana", false))
-                .assertExists();
+        SemanticsNodeInteraction ack = onNode(composeTestRule, hasText("remember the word banana", true, false), false);
+        assertExists(ack);
 
         // send second message to recall the word
-        composeTestRule.onNodeWithText("Chat with me!") // this is component where user chats
-                .performTextInput("what word did i ask you to remember?");
-        composeTestRule.onNodeWithText("Send")
-                .performClick();
+        SemanticsNodeInteraction textField2 = onNodeWithText(composeTestRule, "Chat with me!", false, false, false);
+        performTextInput(textField2, "what word did i ask you to remember?");
+
+        SemanticsNodeInteraction sendButton2 = onNodeWithText(composeTestRule, "Send", false, false, false);
+        performClick(sendButton2);
         composeTestRule.waitForIdle();
 
         // verify the pet recalls "banana"
-        composeTestRule.onNode(hasText("banana", false))
-                .assertExists();
+        SemanticsNodeInteraction recall = onNode(composeTestRule, hasText("banana", true, false), false);
+        assertExists(recall);
     }
 
     /**
@@ -195,18 +179,13 @@ public class ChatTests {
         };
 
         // set up the compose ui
-        composeTestRule.setContent(() -> {
-            ChatPetTheme.INSTANCE.invoke(false, null, content -> {
-                MainScreenKt.MainScreen(null, mockViewModel);
-                return null;
-            });
-        });
+        setMainScreenContent(composeTestRule, mockViewModel);
 
         composeTestRule.waitForIdle();
 
         // verify that the send button is not visible when input is empty
-        composeTestRule.onNodeWithText("Send")
-                .assertDoesNotExist();
+        SemanticsNodeInteraction sendButton = onNodeWithText(composeTestRule, "Send", false, false, false);
+        assertDoesNotExist(sendButton);
 
         // the ui prevents sending empty messages by not showing the send button
     }
