@@ -77,4 +77,16 @@ public class PetServiceTest {
 
         assertTrue("Type normalization should result in Dragon", pet instanceof Dragon);
     }
+
+    //tests that pet energy meter can't exceed max
+    @Test
+    public void test_PetState_MaximumMeterCap() {
+
+        PetState s = new PetState("Dragon", "1", "testUser");
+        s.setEnergyMeter(200);
+
+        assertEquals(100, s.getEnergyMeter());
+
+        System.out.println("WB6 PASSED\n");
+    }
 }
