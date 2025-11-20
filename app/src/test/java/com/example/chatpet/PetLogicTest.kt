@@ -4,13 +4,11 @@ import org.junit.Assert
 import org.junit.Test
 import java.util.Locale
 
-/**
- * White-box tests written by: Aakanksha Peeru
- */
+
 class PetLogicTest {
-    // ----------------------------------------------------------
-    // WHITE BOX TEST 1 — Feed only modifies hunger (Dragon)
-    // ----------------------------------------------------------
+
+    // TEST CASE 1: Feeding the pet should only alter the hunger meter, leaving energy and
+    // happiness meter unchanged
     @Test
     fun testFeedOnlyChangesHunger_Dragon() {
         val ps = PetState("Dragon", "u", "Draco")
@@ -27,51 +25,50 @@ class PetLogicTest {
         Assert.assertTrue(ps.getHungerMeter() > 30)
     }
 
-    // ----------------------------------------------------------
-    // WHITE BOX TEST 2 — Feed blocked when hunger = 100
-    // ----------------------------------------------------------
+
+
+    // TEST CASE 2: Feeding the pet is invalid when the hunger is already at maximum = 100
+
     @Test
     fun testFeedBlockedAtFull() {
-        val ps = PetState("Dragon", "u", "Pyro")
+        val ps = PetState("Dragon", "u1", "P123")
         val d = Dragon(ps)
 
         ps.setHungerMeter(100)
-        ps.setEnergyMeter(40)
-        ps.setHappinessMeter(60)
+        ps.setEnergyMeter(80)
+        ps.setHappinessMeter(80)
 
         val msg = d.feed()
 
         Assert.assertEquals(100, ps.getHungerMeter().toLong())
-        Assert.assertEquals(40, ps.getEnergyMeter().toLong())
-        Assert.assertEquals(60, ps.getHappinessMeter().toLong())
+        Assert.assertEquals(80, ps.getEnergyMeter().toLong())
+        Assert.assertEquals(80, ps.getHappinessMeter().toLong())
         Assert.assertTrue(msg.lowercase(Locale.getDefault()).contains("full"))
     }
 
-    // ----------------------------------------------------------
-    // WHITE BOX TEST 3 — tuckIn only modifies energy
-    // ----------------------------------------------------------
+    // TEST CASE 3: Tucking in the pet should only alter the energy meter,
+    // leaving happiness and hunger unchanged
     @Test
     fun testTuckInOnlyChangesEnergy() {
-        val ps = PetState("Unicorn", "u", "Luna")
+        val ps = PetState("Unicorn", "u2", "L123")
         val u = Unicorn(ps)
 
         ps.setEnergyMeter(20)
-        ps.setHappinessMeter(55)
-        ps.setHungerMeter(40)
+        ps.setHappinessMeter(50)
+        ps.setHungerMeter(50)
 
         u.tuckIn()
 
         Assert.assertEquals(100, ps.getEnergyMeter().toLong())
-        Assert.assertEquals(55, ps.getHappinessMeter().toLong())
-        Assert.assertEquals(40, ps.getHungerMeter().toLong())
+        Assert.assertEquals(50, ps.getHappinessMeter().toLong())
+        Assert.assertEquals(50, ps.getHungerMeter().toLong())
     }
 
-    // ----------------------------------------------------------
-    // WHITE BOX TEST 4 — tuck-in blocked when energy = 100
-    // ----------------------------------------------------------
+
+    // TEST CASE 4: Tucking in the pet is blocked when the energy is already at maximum = 100
     @Test
     fun testTuckInBlockedAtFullEnergy() {
-        val ps = PetState("Unicorn", "u", "Star")
+        val ps = PetState("Unicorn", "u3", "S123")
         val un = Unicorn(ps)
 
         ps.setEnergyMeter(100)
@@ -82,21 +79,19 @@ class PetLogicTest {
         Assert.assertTrue(msg.lowercase(Locale.getDefault()).contains("rest"))
     }
 
-    // ----------------------------------------------------------
-    // WHITE BOX TEST 5 — special action reduces energy + hunger
-    // ----------------------------------------------------------
+    // TEST CASE 5: The petAction button alters the hunger and energy meter by decrements
     @Test
     fun testSpecialActionConsumesMeters_Dragon() {
-        val ps = PetState("Dragon", "u", "Igneel")
+        val ps = PetState("Dragon", "u4", "I123")
         val d = Dragon(ps)
 
-        ps.setEnergyMeter(50)
-        ps.setHungerMeter(50)
+        ps.setEnergyMeter(100)
+        ps.setHungerMeter(100)
 
         d.breatheFire() // internally: -15 energy, -7 hunger
 
-        Assert.assertEquals(35, ps.getEnergyMeter().toLong())
-        Assert.assertEquals(43, ps.getHungerMeter().toLong())
+        Assert.assertEquals(85, ps.getEnergyMeter().toLong())
+        Assert.assertEquals(93, ps.getHungerMeter().toLong())
     }
 
 }

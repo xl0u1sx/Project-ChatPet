@@ -165,16 +165,7 @@ public class PetActivity extends AppCompatActivity {
     }
 
     private void setupButtons() {
-        // Feed button - increases hunger by 30, increase energy by 10
-//        if (feedButton != null) {
-//            feedButton.setOnClickListener(v -> {
-//                if (pet == null) return;
-//                String msg = pet.feed();
-//                if (statusText != null) statusText.setText(msg);
-//                refreshMeters();
-//                savePetState();
-//            });
-//        }
+
         if (feedButton != null) {
             feedButton.setOnClickListener(v -> {
                 if (pet == null) return;
@@ -185,10 +176,6 @@ public class PetActivity extends AppCompatActivity {
                     return;
                 }
 
-//                String msg = pet.feed();
-//                if (statusText != null) statusText.setText(msg);
-//                refreshMeters();
-//                savePetState();
                 showFoodChoice();
             });
         }
@@ -272,16 +259,7 @@ public class PetActivity extends AppCompatActivity {
             });
         }
 
-        // Special action buttons for each pet type
-//        if (breatheFireButton != null) {
-//            breatheFireButton.setOnClickListener(v -> {
-//                if (!(pet instanceof Dragon)) return;
-//                String msg = ((Dragon) pet).breatheFire();
-//                if (statusText != null) statusText.setText(msg);
-//                refreshMeters();
-//                savePetState();
-//            });
-//        }
+
         if (breatheFireButton != null) {
             breatheFireButton.setOnClickListener(v -> {
                 if (!(pet instanceof Dragon)) return;
@@ -300,15 +278,6 @@ public class PetActivity extends AppCompatActivity {
         }
 
 
-//        if (tellStoryButton != null) {
-//            tellStoryButton.setOnClickListener(v -> {
-//                if (!(pet instanceof Unicorn)) return;
-//                String msg = ((Unicorn) pet).tellMagicalStory();
-//                if (statusText != null) statusText.setText(msg);
-//                refreshMeters();
-//                savePetState();
-//            });
-//        }
         if (tellStoryButton != null) {
             tellStoryButton.setOnClickListener(v -> {
                 if (!(pet instanceof Unicorn)) return;
@@ -556,11 +525,11 @@ public class PetActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         long lastTuckInTime = prefs.getLong(currentUsername + KEY_LAST_TUCK_IN, 0);
         if (lastTuckInTime == 0) {
-            return false; // never tucked in
+            return false;
         }
 
         long elapsed = System.currentTimeMillis() - lastTuckInTime;
-        // While within the TUCK_IN_COOLDOWN window, we treat the pet as "asleep"
+
         return elapsed < TUCK_IN_COOLDOWN;
     }
 
@@ -589,7 +558,9 @@ public class PetActivity extends AppCompatActivity {
                 .show();
     }
     private void handleFoodSelection(int which) {
-        if (pet==null) return;
+        if (pet==null){
+            return;
+        }
         String msg;
 
         if (pet instanceof Dragon) {
@@ -621,7 +592,7 @@ public class PetActivity extends AppCompatActivity {
                     break;
             }
         } else {
-            // Fallback for any other Pet implementation
+
             msg = pet.feed();
         }
 

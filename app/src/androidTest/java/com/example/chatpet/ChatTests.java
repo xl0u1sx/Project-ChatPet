@@ -1,17 +1,14 @@
 package com.example.chatpet;
 
-import static androidx.compose.ui.test.junit4.ComposeTestRule.*;
-import static androidx.test.espresso.matcher.ViewMatchers.assertThat;
-
-import android.content.Context;
-import android.content.Intent;
-
-import androidx.compose.ui.test.junit4.ComposeTestRule;
-import androidx.compose.ui.test.junit4.createComposeRule;
+// CORRECTED IMPORTS
 import androidx.compose.ui.test.hasText;
+import androidx.compose.ui.test.junit4.ComposeTestRule;
+import androidx.compose.ui.test.junit4.createComposeRule; // Direct import
 import androidx.compose.ui.test.onNodeWithText;
 import androidx.compose.ui.test.performClick;
 import androidx.compose.ui.test.performTextInput;
+
+import android.content.Context;
 import androidx.lifecycle.MutableLiveData;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
