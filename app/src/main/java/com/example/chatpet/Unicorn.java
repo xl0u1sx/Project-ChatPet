@@ -23,15 +23,53 @@ public class Unicorn implements Pet {
     
     @Override
     public String feed(){
+        return feedMeal();
+    }
+    public String feedSnack() {
         if (petState.getHungerMeter() >= 100) {
             return petState.getPetName() + " is already full and can't eat more!";
         }
-        int before=petState.getHungerMeter();
-        petState.increaseHunger(20);
-        int after=petState.getHungerMeter();
+        int before = petState.getHungerMeter();
+        petState.increaseHunger(10);
+        int after = petState.getHungerMeter();
 
-        Log.d("Unicorn", "Feed - Happiness: "+petState.getHappinessMeter()+" Energy: "+petState.getEnergyMeter()+" Hunger: "+petState.getHungerMeter());
-        return getFeedMessage(after-before);
+        Log.d("Unicorn", "Snack - Happiness: " + petState.getHappinessMeter() +
+                " Energy: " + petState.getEnergyMeter() +
+                " Hunger: " + petState.getHungerMeter());
+
+        return getFeedMessage(after - before);
+    }
+
+
+    public String feedMeal() {
+        if (petState.getHungerMeter() >= 100) {
+            return petState.getPetName() + " is already full and can't eat more!";
+        }
+        int before = petState.getHungerMeter();
+        petState.increaseHunger(20);
+        int after = petState.getHungerMeter();
+
+        Log.d("Unicorn", "Meal - Happiness: " + petState.getHappinessMeter() +
+                " Energy: " + petState.getEnergyMeter() +
+                " Hunger: " + petState.getHungerMeter());
+
+        return getFeedMessage(after - before);
+    }
+
+
+    public String feedFeast() {
+        if (petState.getHungerMeter() >= 100) {
+            return petState.getPetName() + " is already full and can't eat more!";
+        }
+        int before = petState.getHungerMeter();
+        petState.increaseHunger(35);
+        int after = petState.getHungerMeter();
+
+        Log.d("Unicorn", "Feast - Happiness: " + petState.getHappinessMeter() +
+                " Energy: " + petState.getEnergyMeter() +
+                " Hunger: " + petState.getHungerMeter());
+
+        return getFeedMessage(after - before);
     }
     
     @Override
@@ -81,11 +119,7 @@ public class Unicorn implements Pet {
         }
     }
     
-    // @Override
-    // public String petAction(){
-    //     update(+12, -10, -5);
-    //     return petState.getPetName()+" walks around the magical forest with its magical unicorn horn!!!";
-    // }
+
     public String tellMagicalStory(){
         update(+10, -15, -7);
         return petState.getPetName()+" narrates a magical story with its magical unicorn horn!!!";

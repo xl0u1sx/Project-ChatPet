@@ -23,14 +23,52 @@ public class Dragon implements Pet {
     
     @Override
     public String feed(){
-        if(petState.getHungerMeter()>=100){
-            return petState.getPetName()+" is already full and can't eat more!";
+        return feedMeal();
+    }
+    public String feedSnack() {
+        if (petState.getHungerMeter() >= 100) {
+            return petState.getPetName() + " is already full and can't eat more!";
         }
-        int before=petState.getHungerMeter();
-        petState.increaseHunger(    10);
-        int after=petState.getHungerMeter();
-        Log.d("Dragon", "Feed - Happiness: "+petState.getHappinessMeter()+" Energy: "+petState.getEnergyMeter()+" Hunger: "+petState.getHungerMeter());
-        return getFeedMessage(after-before);
+        int before = petState.getHungerMeter();
+        petState.increaseHunger(10); // small snack
+        int after = petState.getHungerMeter();
+
+        Log.d("Dragon", "Snack - Happiness: " + petState.getHappinessMeter() +
+                " Energy: " + petState.getEnergyMeter() +
+                " Hunger: " + petState.getHungerMeter());
+
+        return getFeedMessage(after - before);
+    }
+
+    public String feedMeal() {
+        if (petState.getHungerMeter() >= 100) {
+            return petState.getPetName() + " is already full and can't eat more!";
+        }
+        int before = petState.getHungerMeter();
+        petState.increaseHunger(20);
+        int after = petState.getHungerMeter();
+
+        Log.d("Dragon", "Meal - Happiness: " + petState.getHappinessMeter() +
+                " Energy: " + petState.getEnergyMeter() +
+                " Hunger: " + petState.getHungerMeter());
+
+        return getFeedMessage(after - before);
+    }
+
+
+    public String feedFeast() {
+        if (petState.getHungerMeter() >= 100) {
+            return petState.getPetName() + " is already full and can't eat more!";
+        }
+        int before = petState.getHungerMeter();
+        petState.increaseHunger(35);
+        int after = petState.getHungerMeter();
+
+        Log.d("Dragon", "Feast - Happiness: " + petState.getHappinessMeter() +
+                " Energy: " + petState.getEnergyMeter() +
+                " Hunger: " + petState.getHungerMeter());
+
+        return getFeedMessage(after - before);
     }
     
     @Override
@@ -80,12 +118,7 @@ public class Dragon implements Pet {
         }
     }
     
-    // @Override
-    // public String petAction(){
-    //     update(15, -10, -5);
-    //     return petState.getPetName()+" flies through the air with its wings wide open!!!";
-    // }
-    
+
     public String breatheFire(){
         update(10, -15, -7);
         return petState.getPetName()+" breathes fire in the air!!!";

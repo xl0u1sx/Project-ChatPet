@@ -12,14 +12,15 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import androidx.appcompat.app.AlertDialog;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class PetActivity extends AppCompatActivity {
-    
+
     private static final String TAG = "PetActivity";
-    
+
     private final PetService petService = new PetService();
     @Nullable private Pet pet;
 
@@ -43,11 +44,11 @@ public class PetActivity extends AppCompatActivity {
     public static final String temp_user_id = "temp_user_id";
     public static final String temp_pet_name = "temp_pet_name";
     public static final String temp_pet_type = "temp_pet_type";
-    
+
     // SharedPreferences for tracking tuck-in cooldown and pet state
     private static final String PREFS_NAME = "PetActivityPrefs";
     private static final long TUCK_IN_COOLDOWN = 2 * 60 * 1000; // 2 minutes in milliseconds (for demo)
-    
+
     // Keys for persisting pet state (will be prefixed with username)
     private static final String KEY_HAPPINESS = "_happiness";
     private static final String KEY_ENERGY = "_energy";
@@ -55,14 +56,14 @@ public class PetActivity extends AppCompatActivity {
     private static final String KEY_LEVEL = "_level";
     private static final String KEY_LAST_SAVE = "_lastSaveTime";
     private static final String KEY_LAST_TUCK_IN = "_lastTuckInTime";
-    
+
     private String currentUsername; // To track which user's pet we're managing
-    
+
     // Handler for meter decay timer
     private Handler meterDecayHandler;
     private Runnable meterDecayRunnable;
     private static final long DECAY_INTERVAL = 60 * 1000; // 1 minute in milliseconds
-    
+
     // Handler for tracking happiness > 80 for upgrade eligibility
     private Handler upgradeCheckHandler;
     private Runnable upgradeCheckRunnable;
@@ -114,15 +115,15 @@ public class PetActivity extends AppCompatActivity {
             String intentType = intent.getStringExtra(temp_pet_type);
             String intentName = intent.getStringExtra(temp_pet_name);
             String intentUid = intent.getStringExtra(temp_user_id);
-            
+
             if(intentType != null) type = intentType;
             if(intentName != null) name = intentName;
             if(intentUid != null) uid = intentUid;
         }
-        
+
         currentUsername = uid;
         pet = petService.createPet(type, name, uid);
-        
+
         // Load saved pet state from SharedPreferences
         loadPetState();
 
@@ -184,10 +185,11 @@ public class PetActivity extends AppCompatActivity {
                     return;
                 }
 
-                String msg = pet.feed();
-                if (statusText != null) statusText.setText(msg);
-                refreshMeters();
-                savePetState();
+//                String msg = pet.feed();
+//                if (statusText != null) statusText.setText(msg);
+//                refreshMeters();
+//                savePetState();
+                showFoodChoice();
             });
         }
 
@@ -196,12 +198,12 @@ public class PetActivity extends AppCompatActivity {
         if (tuckInButton != null) {
             tuckInButton.setOnClickListener(v -> {
                 if (pet == null || currentUsername == null) return;
-                
+
                 SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
                 long lastTuckInTime = prefs.getLong(currentUsername + KEY_LAST_TUCK_IN, 0);
                 long currentTime = System.currentTimeMillis();
                 long timeSinceLastTuckIn = currentTime - lastTuckInTime;
-                
+
                 if (timeSinceLastTuckIn >= TUCK_IN_COOLDOWN) {
                     // Tuck-in is available
                     String msg = pet.tuckIn();
@@ -216,10 +218,10 @@ public class PetActivity extends AppCompatActivity {
                     long hoursRemaining = remainingTime / (60 * 60 * 1000);
                     long minutesRemaining = (remainingTime % (60 * 60 * 1000)) / (60 * 1000);
                     long secondsRemaining = (remainingTime % (60 * 1000)) / 1000;
-                    
-                    Log.d(TAG, "Tuck-in on cooldown for user: " + currentUsername + 
+
+                    Log.d(TAG, "Tuck-in on cooldown for user: " + currentUsername +
                           " - Remaining: " + minutesRemaining + "m " + secondsRemaining + "s");
-                    
+
                     // Build user-friendly cooldown message
                     StringBuilder cooldownMsg = new StringBuilder(pet.getPetName() + " doesn't want to go to sleep yet! Please wait ");
                     if (hoursRemaining > 0) {
@@ -236,23 +238,23 @@ public class PetActivity extends AppCompatActivity {
                         cooldownMsg.append(secondsRemaining).append(" second").append(secondsRemaining > 1 ? "s" : "");
                     }
                     cooldownMsg.append(".");
-                    
+
                     if (statusText != null) statusText.setText(cooldownMsg.toString());
                 }
             });
         }
-        
+
         // Upgrade pet button - increases level by 1 (appears when happiness > 80 for 1 minute)
         if (upgradePetButton != null) {
             upgradePetButton.setOnClickListener(v -> {
                 if (pet == null) return;
-                
+
                 PetState petStateObj = pet.getPetStateObject();
                 if (petStateObj.canLevelUp()) {
                     petStateObj.levelUp();
                     updateLevelDisplay();
                     if (statusText != null) {
-                        statusText.setText("🎉 " + pet.getPetName() + " leveled up to Level " + 
+                        statusText.setText("🎉 " + pet.getPetName() + " leveled up to Level " +
                                          pet.getPetLevel() + "! They've grown more mature!");
                     }
                     // Hide the button after upgrading
@@ -337,7 +339,7 @@ public class PetActivity extends AppCompatActivity {
             }
         };
     }
-    
+
     private void setupUpgradeCheck() {
         upgradeCheckHandler = new Handler(Looper.getMainLooper());
         upgradeCheckRunnable = new Runnable() {
@@ -349,13 +351,13 @@ public class PetActivity extends AppCompatActivity {
             }
         };
     }
-    
+
     private void checkUpgradeEligibility() {
         if (pet == null || upgradePetButton == null) return;
-        
+
         PetState.Meters currentMeters = pet.getPetState();
         long currentTime = System.currentTimeMillis();
-        
+
         // Check if happiness is above 80
         if (currentMeters.happiness > 80) {
             if (!isHappinessAbove80) {
@@ -378,7 +380,7 @@ public class PetActivity extends AppCompatActivity {
             }
         }
     }
-    
+
     private void updateLevelDisplay() {
         if (pet != null && petLevel != null) {
             petLevel.setText("Level " + pet.getPetLevel());
@@ -386,13 +388,13 @@ public class PetActivity extends AppCompatActivity {
         // Also update the pet image when level changes
         updatePetImage();
     }
-    
+
     private void updatePetImage() {
         if (pet == null || petImage == null) return;
-        
+
         int level = pet.getPetLevel();
         int imageResource;
-        
+
         if (pet instanceof Dragon) {
             switch (level) {
                 case 1:
@@ -422,59 +424,59 @@ public class PetActivity extends AppCompatActivity {
                     imageResource = R.drawable.unicorn_level1;
             }
         }
-        
+
         petImage.setImageResource(imageResource);
         Log.d(TAG, "Updated pet image to level " + level);
     }
-    
+
     private void loadPetState() {
         if (pet == null || currentUsername == null) return;
-        
+
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         PetState petStateObj = pet.getPetStateObject();
-        
+
         // Load saved values (use current values as defaults if nothing saved)
         int savedHappiness = prefs.getInt(currentUsername + KEY_HAPPINESS, petStateObj.getHappinessMeter());
         int savedEnergy = prefs.getInt(currentUsername + KEY_ENERGY, petStateObj.getEnergyMeter());
         int savedHunger = prefs.getInt(currentUsername + KEY_HUNGER, petStateObj.getHungerMeter());
         int savedLevel = prefs.getInt(currentUsername + KEY_LEVEL, petStateObj.getPetLevel());
         long lastSaveTime = prefs.getLong(currentUsername + KEY_LAST_SAVE, System.currentTimeMillis());
-        
+
         // Calculate time elapsed since last save
         long currentTime = System.currentTimeMillis();
         long timeElapsed = currentTime - lastSaveTime;
         long minutesElapsed = timeElapsed / (60 * 1000);
-        
+
         // Apply decay based on time elapsed
         if (minutesElapsed > 0) {
             // Happiness decays by 10 per minute, stops at 20
             savedHappiness = Math.max(20, savedHappiness - (int)(minutesElapsed * 10));
-            
+
             // Energy decays by 5 per minute, stops at 0
             savedEnergy = Math.max(0, savedEnergy - (int)(minutesElapsed * 5));
-            
+
             // Hunger decays by 5 per minute, stops at 1
             savedHunger = Math.max(1, savedHunger - (int)(minutesElapsed * 5));
         }
-        
+
         // Apply the loaded (and decayed) state
         petStateObj.setHappinessMeter(savedHappiness);
         petStateObj.setEnergyMeter(savedEnergy);
         petStateObj.setHungerMeter(savedHunger);
         petStateObj.setPetLevel(savedLevel);
-        
-        Log.d("PetActivity", "Loaded pet state for " + currentUsername + 
-              " - Level: " + savedLevel + ", Happiness: " + savedHappiness + 
+
+        Log.d("PetActivity", "Loaded pet state for " + currentUsername +
+              " - Level: " + savedLevel + ", Happiness: " + savedHappiness +
               ", Energy: " + savedEnergy + ", Hunger: " + savedHunger +
               " (Minutes elapsed: " + minutesElapsed + ")");
     }
-    
+
     private void savePetState() {
         if (pet == null || currentUsername == null) return;
-        
+
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         PetState.Meters meters = pet.getPetState();
-        
+
         prefs.edit()
             .putInt(currentUsername + KEY_HAPPINESS, meters.happiness)
             .putInt(currentUsername + KEY_ENERGY, meters.energy)
@@ -482,40 +484,40 @@ public class PetActivity extends AppCompatActivity {
             .putInt(currentUsername + KEY_LEVEL, pet.getPetLevel())
             .putLong(currentUsername + KEY_LAST_SAVE, System.currentTimeMillis())
             .apply();
-        
+
         // Also save level to database so other activities can access it
         UserRepository userRepository = new UserRepository(this);
         userRepository.updatePetLevel(currentUsername, pet.getPetLevel());
-        
-        Log.d(TAG, "Saved pet state for " + currentUsername + 
-              " - Level: " + pet.getPetLevel() + ", Happiness: " + meters.happiness + 
+
+        Log.d(TAG, "Saved pet state for " + currentUsername +
+              " - Level: " + pet.getPetLevel() + ", Happiness: " + meters.happiness +
               ", Energy: " + meters.energy + ", Hunger: " + meters.hunger);
     }
 
     private void applyMeterDecay() {
         if (pet == null) return;
-        
+
         PetState petStateObj = pet.getPetStateObject();
         PetState.Meters currentMeters = pet.getPetState();
-        
+
         // Decrease happiness by 10 per minute, stop at 20
         if (currentMeters.happiness > 20) {
             int newHappiness = Math.max(20, currentMeters.happiness - 10);
             petStateObj.setHappinessMeter(newHappiness);
         }
-        
+
         // Decrease energy by 5 per minute, stop at 0
         if (currentMeters.energy > 0) {
             int newEnergy = Math.max(0, currentMeters.energy - 5);
             petStateObj.setEnergyMeter(newEnergy);
         }
-        
+
         // Decrease hunger by 5 per minute, stop at 1
         if (currentMeters.hunger > 1) {
             int newHunger = Math.max(1, currentMeters.hunger - 5);
             petStateObj.setHungerMeter(newHunger);
         }
-        
+
         refreshMeters();
         savePetState();
     }
@@ -538,7 +540,7 @@ public class PetActivity extends AppCompatActivity {
         super.onPause();
         // Save current pet state before pausing
         savePetState();
-        
+
         // Stop the meter decay timer when activity is not visible
         if (meterDecayHandler != null && meterDecayRunnable != null) {
             meterDecayHandler.removeCallbacks(meterDecayRunnable);
@@ -568,6 +570,67 @@ public class PetActivity extends AppCompatActivity {
         statusText.setText(
                 pet.getPetName() + " is asleep right now. You can't " + actionPhrase + " until they wake up!"
         );
+    }
+    private void showFoodChoice() {
+        if (pet == null) return;
+
+        final String[] options = new String[] {
+                "Apple (+10)",
+                "Pie (+20)",
+                "Roast (+35)"
+        };
+
+        new AlertDialog.Builder(this)
+                .setTitle("Choose food for " + pet.getPetName())
+                .setItems(options, (dialog, which) -> {
+                    handleFoodSelection(which);
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+    private void handleFoodSelection(int which) {
+        if (pet==null) return;
+        String msg;
+
+        if (pet instanceof Dragon) {
+            Dragon d = (Dragon) pet;
+            switch (which) {
+                case 0:
+                    msg = d.feedSnack();
+                    break;
+                case 1:
+                    msg = d.feedMeal();
+                    break;
+                case 2:
+                default:
+                    msg = d.feedFeast();
+                    break;
+            }
+        } else if (pet instanceof Unicorn) {
+            Unicorn u = (Unicorn) pet;
+            switch (which) {
+                case 0:
+                    msg = u.feedSnack();
+                    break;
+                case 1:
+                    msg = u.feedMeal();
+                    break;
+                case 2:
+                default:
+                    msg = u.feedFeast();
+                    break;
+            }
+        } else {
+            // Fallback for any other Pet implementation
+            msg = pet.feed();
+        }
+
+        if (statusText != null) {
+            statusText.setText(msg);
+        }
+        refreshMeters();
+        savePetState();
+
     }
 
 }
