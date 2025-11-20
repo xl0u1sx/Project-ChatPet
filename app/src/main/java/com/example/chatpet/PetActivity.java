@@ -557,6 +557,7 @@ public class PetActivity extends AppCompatActivity {
                 .setNegativeButton("Cancel", null)
                 .show();
     }
+    // to handle food selections
     private void handleFoodSelection(int which) {
         if (pet==null){
             return;

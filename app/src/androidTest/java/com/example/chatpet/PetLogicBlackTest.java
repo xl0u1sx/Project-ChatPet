@@ -16,7 +16,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-
+// BLACK BOX TEST CASES FOR TESTING PET ACTIVITY
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class PetLogicBlackTest {

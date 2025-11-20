@@ -4,6 +4,7 @@ import org.junit.Assert
 import org.junit.Test
 import java.util.Locale
 
+// WHITE BOX TEST CASES FOR TESTING PET ACTIVITY
 
 class PetLogicTest {
 
