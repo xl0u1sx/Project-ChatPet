@@ -7,7 +7,7 @@ import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 public class DatabaseHelper extends SQLiteAssetHelper {
 
     private static final String DATABASE_NAME = "ChatPet.db";
-    private static final int DATABASE_VERSION = 1; // increment when updating .db file in assets
+    private static final int DATABASE_VERSION = 2; // increment when updating .db file in assets
 
 
     public DatabaseHelper(Context context) {
