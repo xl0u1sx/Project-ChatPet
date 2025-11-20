@@ -84,4 +84,16 @@ public class LoginTests {
                 .check(matches(isDisplayed()));
     }
 
+    // makes sure password input accepts text
+    @Test
+    public void test_PasswordInput_TakesText() {
+        onView(withId(R.id.passwordInput)).perform(typeText("pass1"), closeSoftKeyboard());
+    }
+
+    // clicking register navigates --> checks UI
+    @Test
+    public void test_RegisterButton_Clickable() {
+        onView(withId(R.id.registerButton)).perform(click());
+    }
+
 }

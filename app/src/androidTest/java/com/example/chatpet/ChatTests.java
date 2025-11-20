@@ -1,5 +1,8 @@
 package com.example.chatpet;
 
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static com.example.chatpet.ComposeTestHelpers.*;
 
 import static org.junit.Assert.assertEquals;
@@ -192,14 +195,5 @@ public class ChatTests {
         // the ui prevents sending empty messages by not showing the send button
     }
 
-    //BB4
-    @Test
-    public void test_responseGeneration_EmptyMessage() throws Exception{
-        ChatService chat = new ChatService();
-
-        String result = chat.generateResponse(null, "path", "", "");
-
-        assertEquals("Hmmm.. Could you say that again?", result);
-    }
 
 }

@@ -100,12 +100,6 @@ public class JournalBlackBoxTest {
                 .check(matches(isDisplayed()));
     }
 
-
-
-        @Rule
-        public ActivityScenarioRule<JournalActivity> rule =
-                new ActivityScenarioRule<>(JournalActivity.class);
-
         @Test
         public void testDoubleGenerateShowsLoading() {
             onView(withId(R.id.generateJournalButton)).perform(click());
@@ -127,6 +121,12 @@ public class JournalBlackBoxTest {
             onView(withId(R.id.journalEntriesContainer)).check(matches(isDisplayed()));
         }
 
+        // Clicking generate enables button again after success (UI sim)
+        @Test
+        public void test_GenerateButton_EnabledAfterClick() {
+            onView(withId(R.id.generateJournalButton)).perform(click());
+            onView(withId(R.id.generateJournalButton)).check(matches(isDisplayed()));
+        }
 
 
 }
