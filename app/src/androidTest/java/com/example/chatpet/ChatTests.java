@@ -1,14 +1,17 @@
 package com.example.chatpet;
 
-// CORRECTED IMPORTS
-import androidx.compose.ui.test.hasText;
+import static androidx.compose.ui.test.junit4.ComposeTestRule.*;
+import static androidx.test.espresso.matcher.ViewMatchers.assertThat;
+
+import android.content.Context;
+import android.content.Intent;
+
 import androidx.compose.ui.test.junit4.ComposeTestRule;
-import androidx.compose.ui.test.junit4.createComposeRule; // Direct import
+import androidx.compose.ui.test.junit4.createComposeRule;
+import androidx.compose.ui.test.hasText;
 import androidx.compose.ui.test.onNodeWithText;
 import androidx.compose.ui.test.performClick;
 import androidx.compose.ui.test.performTextInput;
-
-import android.content.Context;
 import androidx.lifecycle.MutableLiveData;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -54,7 +57,7 @@ public class ChatTests {
         // create a mock viewmodel with controlled responses
         ChatViewModel mockViewModel = new ChatViewModel() {
             private final MutableLiveData<LlmUiState> testUiState =
-                new MutableLiveData<>(LlmUiState.Idle.INSTANCE);
+                    new MutableLiveData<>(LlmUiState.Idle.INSTANCE);
 
             @Override
             public androidx.lifecycle.LiveData<LlmUiState> getUiState() {
@@ -82,18 +85,18 @@ public class ChatTests {
 
         // find the text input field and enter a message
         composeTestRule.onNodeWithText("Chat with me!")
-            .performTextInput("hello, nice to meet you");
+                .performTextInput("hello, nice to meet you");
 
         // click the send button
         composeTestRule.onNodeWithText("Send")
-            .performClick();
+                .performClick();
 
         // wait for the response to appear
         composeTestRule.waitForIdle();
 
         // verify the pet responded
         composeTestRule.onNode(hasText("hello! nice to meet you too!", false))
-            .assertExists();
+                .assertExists();
     }
 
     /**
@@ -110,7 +113,7 @@ public class ChatTests {
         // create a mock viewmodel that maintains conversation history
         ChatViewModel mockViewModel = new ChatViewModel() {
             private final MutableLiveData<LlmUiState> testUiState =
-                new MutableLiveData<>(LlmUiState.Idle.INSTANCE);
+                    new MutableLiveData<>(LlmUiState.Idle.INSTANCE);
             private String rememberedWord = null;
 
             @Override
@@ -148,25 +151,25 @@ public class ChatTests {
 
         // send first message to remember the word
         composeTestRule.onNodeWithText("Chat with me!")
-            .performTextInput("remember the word banana");
+                .performTextInput("remember the word banana");
         composeTestRule.onNodeWithText("Send")
-            .performClick();
+                .performClick();
         composeTestRule.waitForIdle();
 
         // verify acknowledgment
         composeTestRule.onNode(hasText("remember the word banana", false))
-            .assertExists();
+                .assertExists();
 
         // send second message to recall the word
         composeTestRule.onNodeWithText("Chat with me!") // this is component where user chats
-            .performTextInput("what word did i ask you to remember?");
+                .performTextInput("what word did i ask you to remember?");
         composeTestRule.onNodeWithText("Send")
-            .performClick();
+                .performClick();
         composeTestRule.waitForIdle();
 
         // verify the pet recalls "banana"
         composeTestRule.onNode(hasText("banana", false))
-            .assertExists();
+                .assertExists();
     }
 
     /**
@@ -183,7 +186,7 @@ public class ChatTests {
         // create a simple mock viewmodel
         ChatViewModel mockViewModel = new ChatViewModel() {
             private final MutableLiveData<LlmUiState> testUiState =
-                new MutableLiveData<>(LlmUiState.Idle.INSTANCE);
+                    new MutableLiveData<>(LlmUiState.Idle.INSTANCE);
 
             @Override
             public androidx.lifecycle.LiveData<LlmUiState> getUiState() {
@@ -203,7 +206,7 @@ public class ChatTests {
 
         // verify that the send button is not visible when input is empty
         composeTestRule.onNodeWithText("Send")
-            .assertDoesNotExist();
+                .assertDoesNotExist();
 
         // the ui prevents sending empty messages by not showing the send button
     }
