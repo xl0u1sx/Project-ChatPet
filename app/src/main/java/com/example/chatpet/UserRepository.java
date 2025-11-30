@@ -455,4 +455,166 @@ public class UserRepository {
             return petLevel;
         }
     }
+
+    /**
+     * Save a chat message to the existing chat_service table
+     */
+    public boolean saveChatMessage(String username, String role, String message, String timestamp, String chatDate) {
+        SQLiteDatabase db = null;
+
+        try {
+            db = dbHelper.getWritableDatabase();
+
+            ContentValues values = new ContentValues();
+            values.put("username", username);
+            values.put("message", message);
+            values.put("chat_date", chatDate);
+            values.put("role", role);  // NEW column
+            values.put("timestamp", timestamp);  // NEW column
+
+            long result = db.insert("chat_service", null, values);
+
+            if (result != -1) {
+                Log.d(TAG, "Chat message saved for user: " + username);
+                return true;
+            } else {
+                Log.e(TAG, "Failed to save chat message for user: " + username);
+                return false;
+            }
+
+        } catch (Exception e) {
+            Log.e(TAG, "Error saving chat message", e);
+            return false;
+        } finally {
+            if (db != null) {
+                db.close();
+            }
+        }
+    }
+    /**
+     * Get chat messages for a user on a specific date from chat_service table
+     */
+    public List<ChatMessageData> getChatMessages(String username, String chatDate) {
+        SQLiteDatabase db = null;
+        Cursor cursor = null;
+        List<ChatMessageData> messages = new ArrayList<>();
+
+        try {
+            db = dbHelper.getReadableDatabase();
+
+            String[] columns = {"message_id", "message", "role", "timestamp"};
+            String selection = "username = ? AND chat_date = ?";
+            String[] selectionArgs = {username, chatDate};
+            String orderBy = "message_id ASC"; // Oldest first to maintain conversation order
+
+            cursor = db.query(
+                    "chat_service",
+                    columns,
+                    selection,
+                    selectionArgs,
+                    null,
+                    null,
+                    orderBy
+            );
+
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    int messageId = cursor.getInt(cursor.getColumnIndexOrThrow("message_id"));
+                    String message = cursor.getString(cursor.getColumnIndexOrThrow("message"));
+
+                    // Handle nullable columns for backward compatibility
+                    int roleIndex = cursor.getColumnIndex("role");
+                    String role = (roleIndex != -1) ? cursor.getString(roleIndex) : "user";
+
+                    int timestampIndex = cursor.getColumnIndex("timestamp");
+                    String timestamp = (timestampIndex != -1) ? cursor.getString(timestampIndex) : "";
+
+                    ChatMessageData msgData = new ChatMessageData(messageId, role, message, timestamp);
+                    messages.add(msgData);
+                } while (cursor.moveToNext());
+
+                Log.d(TAG, "Retrieved " + messages.size() + " chat messages for user: " + username + " on date: " + chatDate);
+            } else {
+                Log.d(TAG, "No chat messages found for user: " + username + " on date: " + chatDate);
+            }
+
+        } catch (Exception e) {
+            Log.e(TAG, "Error retrieving chat messages", e);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            if (db != null) {
+                db.close();
+            }
+        }
+
+        return messages;
+    }
+
+    /**
+     * Clear chat messages for a specific date (optional - for cleanup)
+     */
+    public boolean clearChatMessagesForDate(String username, String chatDate) {
+        SQLiteDatabase db = null;
+
+        try {
+            db = dbHelper.getWritableDatabase();
+
+            int rowsDeleted = db.delete(
+                    "chat_service",
+                    "username = ? AND chat_date = ?",
+                    new String[]{username, chatDate}
+            );
+
+            if (rowsDeleted > 0) {
+                Log.d(TAG, "Cleared " + rowsDeleted + " chat messages for user: " + username + " on date: " + chatDate);
+                return true;
+            } else {
+                Log.d(TAG, "No chat messages to clear for user: " + username + " on date: " + chatDate);
+                return false;
+            }
+
+        } catch (Exception e) {
+            Log.e(TAG, "Error clearing chat messages", e);
+            return false;
+        } finally {
+            if (db != null) {
+                db.close();
+            }
+        }
+    }
+
+    /**
+     * Simple class to hold chat message data from database
+     */
+    public static class ChatMessageData {
+        private final int messageId;
+        private final String role;
+        private final String message;
+        private final String timestamp;
+
+        public ChatMessageData(int messageId, String role, String message, String timestamp) {
+            this.messageId = messageId;
+            this.role = role;
+            this.message = message;
+            this.timestamp = timestamp;
+        }
+
+        public int getMessageId() {
+            return messageId;
+        }
+
+        public String getRole() {
+            return role;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public String getTimestamp() {
+            return timestamp;
+        }
+    }
 }
