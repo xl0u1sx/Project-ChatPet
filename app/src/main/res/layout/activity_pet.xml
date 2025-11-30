@@ -126,6 +126,25 @@
             android:max="100"
             android:progressTint="@android:color/holo_red_light" />
 
+        <!-- Experience -->
+        <TextView
+            android:id="@+id/labelXP"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Experience"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginTop="8dp" />
+
+        <ProgressBar
+            android:id="@+id/xpProg"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:progress="0"
+            android:max="100"
+            android:progressTint="@android:color/holo_purple" />
+
         <!-- Divider -->
         <View
             android:layout_width="match_parent"

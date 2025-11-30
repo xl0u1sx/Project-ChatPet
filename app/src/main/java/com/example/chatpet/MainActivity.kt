@@ -271,15 +271,18 @@ fun MainScreen(
 
                                 chatViewModel.generateResponse(context, modelPath, inputText, testPrompt)
 
-                                // Increase happiness by 15 when sending a chat
+                                // Increase happiness by 15 and gain XP when sending a chat
                                 if (context is MainActivity && prefs != null) {
                                     val currentHappiness = prefs.getInt(username + "_happiness", 100)
                                     val newHappiness = Math.min(100, currentHappiness + 15)
+                                    val currentXP = prefs.getInt(username + "_xp", 0)
+                                    val newXP = Math.min(100, currentXP + 5)
                                     prefs.edit()
                                         .putInt(username + "_happiness", newHappiness)
+                                        .putInt(username + "_xp", newXP)
                                         .putLong(username + "_lastSave", System.currentTimeMillis())
                                         .apply()
-                                    Log.d("MainActivity", "Increased happiness for $username from $currentHappiness to $newHappiness (Level $petLevel)")
+                                    Log.d("MainActivity", "Increased happiness for $username from $currentHappiness to $newHappiness and XP from $currentXP to $newXP (Level $petLevel)")
                                 }
 
                                 inputText = "" // Clear input after sending

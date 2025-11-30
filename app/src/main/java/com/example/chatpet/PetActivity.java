@@ -32,6 +32,7 @@ public class PetActivity extends AppCompatActivity {
     private ProgressBar happinessProg;
     private ProgressBar energyProg;
     private ProgressBar hungerProg;
+    private ProgressBar xpProg;
     private Button feedButton;
     private Button tuckInButton;
     private Button upgradePetButton;
@@ -54,22 +55,20 @@ public class PetActivity extends AppCompatActivity {
     private static final String KEY_ENERGY = "_energy";
     private static final String KEY_HUNGER = "_hunger";
     private static final String KEY_LEVEL = "_level";
+    private static final String KEY_XP = "_xp";
     private static final String KEY_LAST_SAVE = "_lastSaveTime";
     private static final String KEY_LAST_TUCK_IN = "_lastTuckInTime";
 
     private String currentUsername; // To track which user's pet we're managing
+    
+    // XP tracking
+    private int currentXP = 0;
+    private static final int XP_FOR_LEVEL_UP = 100; // 100 XP required for level up
 
     // Handler for meter decay timer
     private Handler meterDecayHandler;
     private Runnable meterDecayRunnable;
     private static final long DECAY_INTERVAL = 60 * 1000; // 1 minute in milliseconds
-
-    // Handler for tracking happiness > 80 for upgrade eligibility
-    private Handler upgradeCheckHandler;
-    private Runnable upgradeCheckRunnable;
-    private long happinessAbove80StartTime = 0;
-    private boolean isHappinessAbove80 = false;
-    private static final long UPGRADE_REQUIREMENT_TIME = 60 * 1000; // 1 minute in milliseconds
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +82,7 @@ public class PetActivity extends AppCompatActivity {
         happinessProg = findViewById(R.id.happinessProg);
         energyProg = findViewById(R.id.energyProg);
         hungerProg = findViewById(R.id.hungerProg);
+        xpProg = findViewById(R.id.xpProg);
         feedButton = findViewById(R.id.feedButton);
         tuckInButton = findViewById(R.id.tuckInButton);
         upgradePetButton = findViewById(R.id.upgradePetButton);
@@ -95,11 +95,11 @@ public class PetActivity extends AppCompatActivity {
         if (happinessProg != null) happinessProg.setMax(100);
         if (energyProg != null)    energyProg.setMax(100);
         if (hungerProg != null)    hungerProg.setMax(100);
+        if (xpProg != null)        xpProg.setMax(XP_FOR_LEVEL_UP);
 
         initFromIntent(getIntent());
         setupButtons();
         setupMeterDecay();
-        setupUpgradeCheck();
         refreshMeters();
         updateLevelDisplay();
     }
@@ -162,6 +162,10 @@ public class PetActivity extends AppCompatActivity {
         if (happinessProg != null) happinessProg.setProgress(m.happiness);
         if (energyProg != null)    energyProg.setProgress(m.energy);
         if (hungerProg != null)    hungerProg.setProgress(m.hunger);
+        if (xpProg != null)        xpProg.setProgress(currentXP);
+        
+        // Check if XP bar is full and show level-up button
+        checkLevelUpEligibility();
     }
 
     private void setupButtons() {
@@ -197,6 +201,7 @@ public class PetActivity extends AppCompatActivity {
                     prefs.edit().putLong(currentUsername + KEY_LAST_TUCK_IN, currentTime).apply();
                     Log.d(TAG, "Tuck-in used for user: " + currentUsername);
                     if (statusText != null) statusText.setText(msg);
+                    gainXP(15); // Gain 15 XP for tucking in
                     refreshMeters();
                     savePetState();
                 } else {
@@ -231,7 +236,7 @@ public class PetActivity extends AppCompatActivity {
             });
         }
 
-        // Upgrade pet button - increases level by 1 (appears when happiness > 80 for 1 minute)
+        // Upgrade pet button - increases level by 1 (appears when XP bar is full)
         if (upgradePetButton != null) {
             upgradePetButton.setOnClickListener(v -> {
                 if (pet == null) return;
@@ -244,12 +249,12 @@ public class PetActivity extends AppCompatActivity {
                         statusText.setText("🎉 " + pet.getPetName() + " leveled up to Level " +
                                          pet.getPetLevel() + "! They've grown more mature!");
                     }
+                    // Reset XP to 0
+                    currentXP = 0;
+                    if (xpProg != null) xpProg.setProgress(0);
                     // Hide the button after upgrading
                     upgradePetButton.setVisibility(View.GONE);
-                    // Reset happiness tracking
-                    isHappinessAbove80 = false;
-                    happinessAbove80StartTime = 0;
-                    // Save the new level
+                    // Save the new level and XP
                     savePetState();
                 } else {
                     if (statusText != null) {
@@ -272,6 +277,7 @@ public class PetActivity extends AppCompatActivity {
 
                 String msg = ((Dragon) pet).breatheFire();
                 if (statusText != null) statusText.setText(msg);
+                gainXP(20); // Gain 20 XP for special ability
                 refreshMeters();
                 savePetState();
             });
@@ -290,6 +296,7 @@ public class PetActivity extends AppCompatActivity {
 
                 String msg = ((Unicorn) pet).tellMagicalStory();
                 if (statusText != null) statusText.setText(msg);
+                gainXP(20); // Gain 20 XP for special ability
                 refreshMeters();
                 savePetState();
             });
@@ -309,45 +316,35 @@ public class PetActivity extends AppCompatActivity {
         };
     }
 
-    private void setupUpgradeCheck() {
-        upgradeCheckHandler = new Handler(Looper.getMainLooper());
-        upgradeCheckRunnable = new Runnable() {
-            @Override
-            public void run() {
-                checkUpgradeEligibility();
-                // Check every second for responsiveness
-                upgradeCheckHandler.postDelayed(this, 1000);
-            }
-        };
-    }
-
-    private void checkUpgradeEligibility() {
+    private void checkLevelUpEligibility() {
         if (pet == null || upgradePetButton == null) return;
 
-        PetState.Meters currentMeters = pet.getPetState();
-        long currentTime = System.currentTimeMillis();
-
-        // Check if happiness is above 80
-        if (currentMeters.happiness > 80) {
-            if (!isHappinessAbove80) {
-                // Just crossed the threshold
-                isHappinessAbove80 = true;
-                happinessAbove80StartTime = currentTime;
-            } else {
-                // Check if it's been above 80 for 1 minute
-                long timeAbove80 = currentTime - happinessAbove80StartTime;
-                if (timeAbove80 >= UPGRADE_REQUIREMENT_TIME && pet.getPetStateObject().canLevelUp()) {
-                    upgradePetButton.setVisibility(View.VISIBLE);
-                }
-            }
+        // Show level-up button when XP bar is full and pet can level up
+        if (currentXP >= XP_FOR_LEVEL_UP && pet.getPetStateObject().canLevelUp()) {
+            upgradePetButton.setVisibility(View.VISIBLE);
         } else {
-            // Happiness dropped below 80, reset
-            if (isHappinessAbove80) {
-                isHappinessAbove80 = false;
-                happinessAbove80StartTime = 0;
-                upgradePetButton.setVisibility(View.GONE);
-            }
+            upgradePetButton.setVisibility(View.GONE);
         }
+    }
+
+    private void gainXP(int amount) {
+        if (pet == null) return;
+        
+        // Don't gain XP if already at max level
+        if (!pet.getPetStateObject().canLevelUp() && pet.getPetLevel() >= 3) {
+            return;
+        }
+        
+        currentXP = Math.min(XP_FOR_LEVEL_UP, currentXP + amount);
+        if (xpProg != null) {
+            xpProg.setProgress(currentXP);
+        }
+        
+        Log.d(TAG, "Gained " + amount + " XP. Current XP: " + currentXP + "/" + XP_FOR_LEVEL_UP);
+        
+        // Check if level-up button should be shown
+        checkLevelUpEligibility();
+        savePetState();
     }
 
     private void updateLevelDisplay() {
@@ -409,6 +406,7 @@ public class PetActivity extends AppCompatActivity {
         int savedEnergy = prefs.getInt(currentUsername + KEY_ENERGY, petStateObj.getEnergyMeter());
         int savedHunger = prefs.getInt(currentUsername + KEY_HUNGER, petStateObj.getHungerMeter());
         int savedLevel = prefs.getInt(currentUsername + KEY_LEVEL, petStateObj.getPetLevel());
+        currentXP = prefs.getInt(currentUsername + KEY_XP, 0);
         long lastSaveTime = prefs.getLong(currentUsername + KEY_LAST_SAVE, System.currentTimeMillis());
 
         // Calculate time elapsed since last save
@@ -451,6 +449,7 @@ public class PetActivity extends AppCompatActivity {
             .putInt(currentUsername + KEY_ENERGY, meters.energy)
             .putInt(currentUsername + KEY_HUNGER, meters.hunger)
             .putInt(currentUsername + KEY_LEVEL, pet.getPetLevel())
+            .putInt(currentUsername + KEY_XP, currentXP)
             .putLong(currentUsername + KEY_LAST_SAVE, System.currentTimeMillis())
             .apply();
 
@@ -498,10 +497,6 @@ public class PetActivity extends AppCompatActivity {
         if (meterDecayHandler != null && meterDecayRunnable != null) {
             meterDecayHandler.postDelayed(meterDecayRunnable, DECAY_INTERVAL);
         }
-        // Start the upgrade check timer
-        if (upgradeCheckHandler != null && upgradeCheckRunnable != null) {
-            upgradeCheckHandler.postDelayed(upgradeCheckRunnable, 1000);
-        }
     }
 
     @Override
@@ -513,10 +508,6 @@ public class PetActivity extends AppCompatActivity {
         // Stop the meter decay timer when activity is not visible
         if (meterDecayHandler != null && meterDecayRunnable != null) {
             meterDecayHandler.removeCallbacks(meterDecayRunnable);
-        }
-        // Stop the upgrade check timer
-        if (upgradeCheckHandler != null && upgradeCheckRunnable != null) {
-            upgradeCheckHandler.removeCallbacks(upgradeCheckRunnable);
         }
     }
     private boolean isPetSleeping() {
@@ -600,6 +591,7 @@ public class PetActivity extends AppCompatActivity {
         if (statusText != null) {
             statusText.setText(msg);
         }
+        gainXP(10); // Gain 10 XP for feeding
         refreshMeters();
         savePetState();
 
