@@ -72,9 +72,13 @@ public class LoginActivity extends AppCompatActivity {
             // Get pet information from database
             UserRepository.PetInfo petInfo = userRepository.getPetInfo(username);
 
-            // Go to chat page (MainActivity) after login
+            // Go to PetActivity after login
             Intent intent = new Intent(LoginActivity.this, PetActivity.class);
-            intent.putExtra("username", username);
+            intent.putExtra(PetActivity.temp_user_id, username);
+            if (petInfo != null) {
+                intent.putExtra(PetActivity.temp_pet_name, petInfo.getPetName());
+                intent.putExtra(PetActivity.temp_pet_type, petInfo.getPetType());
+            }
             startActivity(intent);
             finish();
         } else {

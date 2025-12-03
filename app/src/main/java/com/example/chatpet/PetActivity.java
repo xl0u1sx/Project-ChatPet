@@ -277,7 +277,7 @@ public class PetActivity extends AppCompatActivity {
                 if (currentUsername == null) return;
 
                 Intent intent = new Intent(PetActivity.this, ChatActivity.class);
-                intent.putExtra("username", currentUsername); // MainActivity expects "username"
+                intent.putExtra("username", currentUsername); // ChatActivity expects "username"
                 startActivity(intent);
             });
         }
