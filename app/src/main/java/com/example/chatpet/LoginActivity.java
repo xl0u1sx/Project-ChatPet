@@ -73,7 +73,7 @@ public class LoginActivity extends AppCompatActivity {
             UserRepository.PetInfo petInfo = userRepository.getPetInfo(username);
 
             // Go to chat page (MainActivity) after login
-            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            Intent intent = new Intent(LoginActivity.this, PetActivity.class);
             intent.putExtra("username", username);
             startActivity(intent);
             finish();
