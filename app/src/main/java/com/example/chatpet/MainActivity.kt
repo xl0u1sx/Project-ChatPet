@@ -295,6 +295,15 @@ fun MainScreen(
                                         return@Button
                                     }
 
+                                    // prevent chatting if happiness is full
+                                    val currentHappiness = prefs.getInt(username + "_happiness", 100)
+                                    val isHappinessFull = currentHappiness >= 100
+                                    if(isHappinessFull){
+                                        val name=petName.ifBlank { "your pet"  }
+                                        Toast.makeText(context, "$name is already at full happiness! They don't need more chatting right now.", Toast.LENGTH_SHORT).show()
+                                        return@Button
+                                    }
+
                                 }
                                 chatViewModel.generateResponse(context, modelPath, inputText, testPrompt)
 
