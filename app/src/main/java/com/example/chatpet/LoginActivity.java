@@ -18,7 +18,6 @@ public class LoginActivity extends AppCompatActivity {
     private Button registerButton;
     private TextView errorText;
     private UserRepository userRepository;
-    private PetState petState;
 
 
     @Override
@@ -70,19 +69,12 @@ public class LoginActivity extends AppCompatActivity {
             // https://developer.android.com/guide/topics/ui/notifiers/toasts
             Toast.makeText(this, "Welcome back, " + user.getFirstName() + "!", Toast.LENGTH_SHORT).show();
 
-            // go to main activity now pet activity..
-            Intent intent = new Intent(LoginActivity.this, PetActivity.class);
-//            intent.putExtra("username", username);
-//            startActivity(intent);
-//            finish();
-            // CHANGE: Intent points to PetActivity instead of MainActivity
-            // Pass the extras PetActivity expects
-            intent.putExtra(PetActivity.temp_user_id, username);
-            if (petState != null) {
-                intent.putExtra(PetActivity.temp_pet_name, petState.getPetName());
-                intent.putExtra(PetActivity.temp_pet_type, petState.getPetType());
-            }
+            // Get pet information from database
+            UserRepository.PetInfo petInfo = userRepository.getPetInfo(username);
 
+            // Go to chat page (MainActivity) after login
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            intent.putExtra("username", username);
             startActivity(intent);
             finish();
         } else {
