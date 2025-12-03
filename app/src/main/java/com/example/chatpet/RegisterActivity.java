@@ -1,17 +1,27 @@
 package com.example.chatpet;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -27,11 +37,19 @@ public class RegisterActivity extends AppCompatActivity {
     private RadioButton dragonRadio;
     private Button createAccountButton;
     private Button backToLoginButton;
+    private Button selectAvatarButton;
+    private ImageView avatarPreview;
     private TextView errorText;
     private UserRepository userRepository;
     
     // Track selected pet type explicitly
     private String selectedPetType = "Unicorn"; // Default to Unicorn
+    
+    // Track avatar image
+    private byte[] avatarImageData = null;
+    
+    // Activity result launcher for image picking
+    private ActivityResultLauncher<Intent> imagePickerLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,10 +67,25 @@ public class RegisterActivity extends AppCompatActivity {
         dragonRadio = findViewById(R.id.dragonRadio);
         createAccountButton = findViewById(R.id.createAccountButton);
         backToLoginButton = findViewById(R.id.backToLoginButton);
+        selectAvatarButton = findViewById(R.id.selectAvatarButton);
+        avatarPreview = findViewById(R.id.avatarPreview);
         errorText = findViewById(R.id.errorText);
 
         // Initialize repository
         userRepository = new UserRepository(this);
+
+        // Initialize image picker launcher
+        imagePickerLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                    Uri imageUri = result.getData().getData();
+                    if (imageUri != null) {
+                        handleImageSelection(imageUri);
+                    }
+                }
+            }
+        );
 
         // Set up radio button mutual exclusion manually
         // (needed because RadioButtons are nested in LinearLayouts)
@@ -68,6 +101,12 @@ public class RegisterActivity extends AppCompatActivity {
             dragonRadio.setChecked(true);
             unicornRadio.setChecked(false);
             Log.d(TAG, "Dragon selected");
+        });
+
+        // select avatar button
+        selectAvatarButton.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            imagePickerLauncher.launch(intent);
         });
 
         // create account buttong
@@ -124,8 +163,8 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
-        // Create user object
-        User newUser = new User(username, password, firstName, lastName);
+        // Create user object with avatar
+        User newUser = new User(username, password, firstName, lastName, avatarImageData);
 
         // Register user
         boolean userCreated = userRepository.registerUser(newUser);
@@ -151,5 +190,51 @@ public class RegisterActivity extends AppCompatActivity {
             errorText.setText("Couldn't register. try again");
             errorText.setVisibility(View.VISIBLE);
         }
+    }
+
+    private void handleImageSelection(Uri imageUri) {
+        try {
+            // Load the image as a bitmap
+            InputStream inputStream = getContentResolver().openInputStream(imageUri);
+            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+            
+            if (bitmap != null) {
+                // Resize the bitmap to a reasonable size (e.g., 300x300)
+                Bitmap resizedBitmap = resizeBitmap(bitmap, 300, 300);
+                
+                // Display the image in the preview
+                avatarPreview.setImageBitmap(resizedBitmap);
+                
+                // Convert to byte array for storage
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 80, stream);
+                avatarImageData = stream.toByteArray();
+                
+                Log.d(TAG, "Avatar image selected, size: " + avatarImageData.length + " bytes");
+                Toast.makeText(this, "Avatar photo selected!", Toast.LENGTH_SHORT).show();
+            }
+            
+            if (inputStream != null) {
+                inputStream.close();
+            }
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error selecting avatar image", e);
+            Toast.makeText(this, "Error loading image. Please try another.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private Bitmap resizeBitmap(Bitmap bitmap, int maxWidth, int maxHeight) {
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        
+        float scaleWidth = ((float) maxWidth) / width;
+        float scaleHeight = ((float) maxHeight) / height;
+        float scale = Math.min(scaleWidth, scaleHeight);
+        
+        int newWidth = Math.round(width * scale);
+        int newHeight = Math.round(height * scale);
+        
+        return Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true);
     }
 }

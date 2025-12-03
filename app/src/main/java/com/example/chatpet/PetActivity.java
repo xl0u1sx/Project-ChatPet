@@ -40,6 +40,7 @@ public class PetActivity extends AppCompatActivity {
     private Button breatheFireButton;
     private Button tellStoryButton;
     private Button chatButton;
+    private Button userProfileButton;
     private ImageView petImage;
     private TextView statusText;
 
@@ -91,6 +92,7 @@ public class PetActivity extends AppCompatActivity {
         breatheFireButton = findViewById(R.id.breatheFireButton);
         tellStoryButton = findViewById(R.id.tellStoryButton);
         chatButton = findViewById(R.id.chatButton);
+        userProfileButton = findViewById(R.id.userProfileButton);
         petImage = findViewById(R.id.petImage);
         statusText = findViewById(R.id.statusText);
 
@@ -278,6 +280,16 @@ public class PetActivity extends AppCompatActivity {
 
                 Intent intent = new Intent(PetActivity.this, ChatActivity.class);
                 intent.putExtra("username", currentUsername); // ChatActivity expects "username"
+                startActivity(intent);
+            });
+        }
+
+        if (userProfileButton != null) {
+            userProfileButton.setOnClickListener(v -> {
+                if (currentUsername == null) return;
+
+                Intent intent = new Intent(PetActivity.this, UserProfileActivity.class);
+                intent.putExtra(UserProfileActivity.EXTRA_USERNAME, currentUsername);
                 startActivity(intent);
             });
         }

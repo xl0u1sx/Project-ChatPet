@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFE5F0">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="User Profile"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textColor="#3E2723"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="24dp" />
+
+        <!-- User Avatar and Info -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:elevation="4dp"
+            android:radius="12dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp"
+                android:gravity="center_horizontal"
+                android:background="#FFFFFF">
+
+                <ImageView
+                    android:id="@+id/userAvatar"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:src="@android:drawable/ic_menu_camera"
+                    android:background="@android:color/white"
+                    android:padding="4dp"
+                    android:contentDescription="User avatar"
+                    android:scaleType="centerCrop"
+                    android:layout_marginBottom="16dp" />
+
+                <TextView
+                    android:id="@+id/usernameText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Username"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:textColor="#3E2723"
+                    android:layout_marginBottom="8dp" />
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Pet Info Section -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="My Pet"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#3E2723"
+            android:layout_marginBottom="16dp" />
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:elevation="4dp"
+            android:radius="12dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp"
+                android:gravity="center_horizontal"
+                android:background="#FFFFFF">
+
+                <ImageView
+                    android:id="@+id/petImage"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:src="@drawable/unicorn_level1"
+                    android:contentDescription="Pet image"
+                    android:scaleType="centerInside"
+                    android:layout_marginBottom="16dp" />
+
+                <TextView
+                    android:id="@+id/petNameText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Pet Name"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:textColor="#3E2723"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:id="@+id/petTypeText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Unicorn"
+                    android:textSize="16sp"
+                    android:textColor="#5D4037"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:id="@+id/petLevelText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Level 1"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="#FFB6C1"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:id="@+id/petStatusText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Awake"
+                    android:textSize="14sp"
+                    android:textColor="#999999"
+                    android:layout_marginBottom="16dp" />
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Experience Bar Section -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Experience Progress"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#3E2723"
+            android:layout_marginBottom="16dp" />
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:elevation="4dp"
+            android:radius="12dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp"
+                android:background="#FFFFFF">
+
+                <TextView
+                    android:id="@+id/xpText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0 / 100 XP"
+                    android:textSize="16sp"
+                    android:textColor="#3E2723"
+                    android:layout_marginBottom="12dp"
+                    android:layout_gravity="center" />
+
+                <ProgressBar
+                    android:id="@+id/xpProgressBar"
+                    style="@android:style/Widget.ProgressBar.Horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:max="100"
+                    android:progress="0"
+                    android:progressTint="#FFB6C1"
+                    android:progressBackgroundTint="#FFE5F0" />
+
+                <TextView
+                    android:id="@+id/xpNextLevelText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="100 XP needed for next level"
+                    android:textSize="14sp"
+                    android:textColor="#999999"
+                    android:layout_marginTop="8dp"
+                    android:layout_gravity="center" />
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Back Button -->
+        <Button
+            android:id="@+id/backButton"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="BACK"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:backgroundTint="#FFB6C1"
+            android:textColor="#3E2723"
+            android:layout_marginBottom="24dp" />
+
+    </LinearLayout>
+</ScrollView>
+

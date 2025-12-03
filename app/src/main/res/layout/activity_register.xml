@@ -39,6 +39,43 @@
             android:textColor="#3E2723"
             android:layout_marginBottom="16dp" />
 
+        <!-- Avatar Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginBottom="16dp">
+
+            <ImageView
+                android:id="@+id/avatarPreview"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:src="@android:drawable/ic_menu_camera"
+                android:background="@android:color/white"
+                android:padding="8dp"
+                android:contentDescription="Avatar preview"
+                android:scaleType="centerCrop" />
+
+            <Button
+                android:id="@+id/selectAvatarButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Select Avatar Photo"
+                android:textSize="14sp"
+                android:backgroundTint="#FFD1DC"
+                android:textColor="#3E2723"
+                android:layout_marginTop="8dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="(Optional)"
+                android:textSize="12sp"
+                android:textColor="#999999"
+                android:layout_marginTop="4dp" />
+        </LinearLayout>
+
         <EditText
             android:id="@+id/firstNameInput"
             android:layout_width="match_parent"

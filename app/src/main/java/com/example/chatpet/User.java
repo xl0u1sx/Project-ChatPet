@@ -6,12 +6,22 @@ public class User {
     private String password;
     private String firstName;
     private String lastName;
+    private byte[] avatarImage;
 
     public User(String username, String password, String firstName, String lastName) {
         this.username = username;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.avatarImage = null;
+    }
+
+    public User(String username, String password, String firstName, String lastName, byte[] avatarImage) {
+        this.username = username;
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.avatarImage = avatarImage;
     }
 
     public String getUsername() {
@@ -30,6 +40,9 @@ public class User {
         return lastName;
     }
 
+    public byte[] getAvatarImage() {
+        return avatarImage;
+    }
 
     public void setUsername(String username) {
         this.username = username;
@@ -45,5 +58,9 @@ public class User {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public void setAvatarImage(byte[] avatarImage) {
+        this.avatarImage = avatarImage;
     }
 }

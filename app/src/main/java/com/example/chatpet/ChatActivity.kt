@@ -404,6 +404,37 @@ fun MainScreen(
             ) {
                 Text(text="PET SCREEN", color = Color(0xFF3E2723), fontSize = 16.sp)
             }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Button(
+                onClick = {
+                    val intent = Intent(context, UserProfileActivity::class.java).apply {
+                        putExtra(UserProfileActivity.EXTRA_USERNAME, username)
+                    }
+                    context.startActivity(intent)
+                },
+                modifier = Modifier
+                    .width(200.dp)
+                    .height(70.dp)
+                    .padding(start=10.dp, top=10.dp)
+                    .background(
+                        brush=Brush.linearGradient(
+                            colors=listOf(Color(0xFFFFB6C1), Color(0xFFFFD1DC))
+                        ),
+                        shape=RoundedCornerShape(190.dp)
+                    )
+                    .border(
+                        width = 1.dp,
+                        color = Color.Black,
+                        shape = RoundedCornerShape(190.dp)
+                    ),
+                colors= ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                shape = RoundedCornerShape(190.dp),
+                contentPadding = PaddingValues(0.dp)
+            ) {
+                Text(text="USER PROFILE", color = Color(0xFF3E2723), fontSize = 16.sp)
+            }
         }
     }
 }

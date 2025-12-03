@@ -25,8 +25,6 @@ public class JournalActivity extends AppCompatActivity {
     private ProgressBar loadingProgressBar;
     private TextView loadingTextView;
     private TextView statusTextView;
-    private TextView journalTitleTextView;
-    private TextView journalContentTextView;
     private TextView emptyHistoryTextView;
     private LinearLayout journalEntriesContainer;
 
@@ -64,8 +62,6 @@ public class JournalActivity extends AppCompatActivity {
         loadingProgressBar = findViewById(R.id.loadingProgressBar);
         loadingTextView = findViewById(R.id.loadingTextView);
         statusTextView = findViewById(R.id.statusTextView);
-        journalTitleTextView = findViewById(R.id.journalTitleTextView);
-        journalContentTextView = findViewById(R.id.journalContentTextView);
         emptyHistoryTextView = findViewById(R.id.emptyHistoryTextView);
         journalEntriesContainer = findViewById(R.id.journalEntriesContainer);
     }
@@ -116,8 +112,6 @@ public class JournalActivity extends AppCompatActivity {
         statusTextView.setVisibility(View.VISIBLE);
         statusTextView.setText("Click button to generate journal entry");
         statusTextView.setTextColor(getResources().getColor(android.R.color.black, null));
-        journalTitleTextView.setVisibility(View.GONE);
-        journalContentTextView.setVisibility(View.GONE);
     }
 
     private void handleLoadingState()
@@ -127,9 +121,6 @@ public class JournalActivity extends AppCompatActivity {
         loadingProgressBar.setVisibility(View.VISIBLE);
         loadingTextView.setVisibility(View.VISIBLE);
         statusTextView.setVisibility(View.GONE);
-
-        journalTitleTextView.setVisibility(View.GONE);
-        journalContentTextView.setVisibility(View.GONE);
     }
 
     private void handleSuccessState(LlmUiState.Success successState)
@@ -138,11 +129,9 @@ public class JournalActivity extends AppCompatActivity {
         generateJournalButton.setEnabled(true);
         loadingProgressBar.setVisibility(View.GONE);
         loadingTextView.setVisibility(View.GONE);
-        statusTextView.setVisibility(View.GONE);
-
-        journalTitleTextView.setVisibility(View.VISIBLE);
-        journalContentTextView.setVisibility(View.VISIBLE);
-        journalContentTextView.setText(successState.getResultText());
+        statusTextView.setVisibility(View.VISIBLE);
+        statusTextView.setText("Journal entry generated successfully! See below.");
+        statusTextView.setTextColor(getResources().getColor(android.R.color.holo_green_dark, null));
     }
 
     private void handleErrorState(LlmUiState.Error errorState)
@@ -156,8 +145,6 @@ public class JournalActivity extends AppCompatActivity {
         statusTextView.setVisibility(View.VISIBLE);
         statusTextView.setText("Error: " + errorState.getErrorMessage());
         statusTextView.setTextColor(getResources().getColor(android.R.color.holo_red_dark, null));
-        journalTitleTextView.setVisibility(View.GONE);
-        journalContentTextView.setVisibility(View.GONE);
     }
     
     private void displayJournalHistory(List<JournalEntry> entries) {

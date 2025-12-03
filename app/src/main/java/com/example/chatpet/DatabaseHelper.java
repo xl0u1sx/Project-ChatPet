@@ -10,7 +10,7 @@ import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 public class DatabaseHelper extends SQLiteAssetHelper {
     private static final String TAG = "DatabaseHelper";
     private static final String DATABASE_NAME = "ChatPet.db";
-    private static final int DATABASE_VERSION = 4; // Incremented to trigger upgrade
+    private static final int DATABASE_VERSION = 5; // Incremented to trigger upgrade
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -48,6 +48,34 @@ public class DatabaseHelper extends SQLiteAssetHelper {
 
             } catch (Exception e) {
                 Log.e(TAG, "Error adding timestamp column: " + e.getMessage(), e);
+            }
+        }
+
+        if (oldVersion < 5) {
+            try {
+                android.database.Cursor cursor = db.rawQuery(
+                        "PRAGMA table_info(users)", null
+                );
+
+                boolean hasAvatar = false;
+                if (cursor != null && cursor.moveToFirst()) {
+                    do {
+                        @SuppressLint("Range") String columnName = cursor.getString(cursor.getColumnIndex("name"));
+                        if (columnName.equals("avatar_image")) {
+                            hasAvatar = true;
+                            break;
+                        }
+                    } while (cursor.moveToNext());
+                }
+                cursor.close();
+
+                if (!hasAvatar) {
+                    db.execSQL("ALTER TABLE users ADD COLUMN avatar_image BLOB");
+                    Log.d(TAG, "Added avatar_image column to users table");
+                }
+
+            } catch (Exception e) {
+                Log.e(TAG, "Error adding avatar_image column: " + e.getMessage(), e);
             }
         }
     }

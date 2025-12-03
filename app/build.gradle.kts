@@ -67,6 +67,7 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation("androidx.compose.runtime:runtime-livedata:1.7.6") // For observeAsState()
     implementation(libs.androidx.appcompat)
+    implementation("androidx.cardview:cardview:1.0.0") // For CardView widget
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.foundation)
     implementation(libs.androidx.ui.test.junit4)

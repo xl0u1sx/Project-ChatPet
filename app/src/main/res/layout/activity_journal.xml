@@ -69,34 +69,6 @@
             android:background="?android:attr/listDivider"
             android:layout_marginVertical="8dp"/>
 
-        <TextView
-            android:id="@+id/journalTitleTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Latest Journal Entry:"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:visibility="gone"
-            android:layout_marginBottom="8dp"/>
-
-        <TextView
-            android:id="@+id/journalContentTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text=""
-            android:textSize="16sp"
-            android:lineSpacingMultiplier="1.2"
-            android:visibility="gone"
-            android:padding="8dp"
-            android:background="?android:attr/selectableItemBackground"/>
-
-        <!-- Divider before history section -->
-<!--        <View-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="2dp"-->
-<!--            android:background="?android:attr/listDivider"-->
-<!--            android:layout_marginVertical="16dp"/>-->
-
         <!-- Journal History Section -->
         <TextView
             android:id="@+id/historyTitleTextView"

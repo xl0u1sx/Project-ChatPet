@@ -133,6 +133,11 @@ public class UserRepository {
             values.put("password", user.getPassword());
             values.put("first_name", user.getFirstName());
             values.put("last_name", user.getLastName());
+            
+            // Add avatar image if present
+            if (user.getAvatarImage() != null) {
+                values.put("avatar_image", user.getAvatarImage());
+            }
 
             long result = db.insert("users", null, values);
 
@@ -615,6 +620,52 @@ public class UserRepository {
 
         public String getTimestamp() {
             return timestamp;
+        }
+    }
+
+    /**
+     * Get user's avatar image
+     */
+    public byte[] getUserAvatar(String username) {
+        SQLiteDatabase db = null;
+        Cursor cursor = null;
+
+        try {
+            db = dbHelper.getReadableDatabase();
+
+            String[] columns = {"avatar_image"};
+            String selection = "username = ?";
+            String[] selectionArgs = {username};
+
+            cursor = db.query(
+                "users",
+                columns,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                null
+            );
+
+            if (cursor != null && cursor.moveToFirst()) {
+                int avatarIndex = cursor.getColumnIndex("avatar_image");
+                if (avatarIndex != -1 && !cursor.isNull(avatarIndex)) {
+                    return cursor.getBlob(avatarIndex);
+                }
+            }
+
+            return null;
+
+        } catch (Exception e) {
+            Log.e(TAG, "Error retrieving user avatar", e);
+            return null;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            if (db != null) {
+                db.close();
+            }
         }
     }
 }
