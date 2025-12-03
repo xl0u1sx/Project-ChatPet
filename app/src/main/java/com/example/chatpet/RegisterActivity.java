@@ -139,7 +139,7 @@ public class RegisterActivity extends AppCompatActivity {
                 Toast.makeText(this, "Account created! Welcome, " + firstName + "!", Toast.LENGTH_LONG).show();
 
                 // go to main activity
-                Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+                Intent intent = new Intent(RegisterActivity.this, ChatActivity.class);
                 intent.putExtra("username", username);
                 startActivity(intent);
                 finish(); // close activity

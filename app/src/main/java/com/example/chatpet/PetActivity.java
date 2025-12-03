@@ -62,7 +62,7 @@ public class PetActivity extends AppCompatActivity {
     private static final String KEY_LAST_TUCK_IN = "_lastTuckInTime";
 
     private String currentUsername; // To track which user's pet we're managing
-    
+
     // XP tracking
     private int currentXP = 0;
     private static final int XP_FOR_LEVEL_UP = 100; // 100 XP required for level up
@@ -166,7 +166,7 @@ public class PetActivity extends AppCompatActivity {
         if (energyProg != null)    energyProg.setProgress(m.energy);
         if (hungerProg != null)    hungerProg.setProgress(m.hunger);
         if (xpProg != null)        xpProg.setProgress(currentXP);
-        
+
         // Check if XP bar is full and show level-up button
         checkLevelUpEligibility();
     }
@@ -204,11 +204,11 @@ public class PetActivity extends AppCompatActivity {
                     prefs.edit().putLong(currentUsername + KEY_LAST_TUCK_IN, currentTime).apply();
                     Log.d(TAG, "Tuck-in used for user: " + currentUsername);
                     if (statusText != null) statusText.setText(msg);
-                    
+
                     // Show popup
                     String caption = pet.getPetName() + " falls asleep peacefully...";
                     showActionPopup("tuckin", null, caption);
-                    
+
                     gainXP(15); // Gain 15 XP for tucking in
                     refreshMeters();
                     savePetState();
@@ -220,7 +220,7 @@ public class PetActivity extends AppCompatActivity {
                     long secondsRemaining = (remainingTime % (60 * 1000)) / 1000;
 
                     Log.d(TAG, "Tuck-in on cooldown for user: " + currentUsername +
-                          " - Remaining: " + minutesRemaining + "m " + secondsRemaining + "s");
+                            " - Remaining: " + minutesRemaining + "m " + secondsRemaining + "s");
 
                     // Build user-friendly cooldown message
                     StringBuilder cooldownMsg = new StringBuilder(pet.getPetName() + " doesn't want to go to sleep yet! Please wait ");
@@ -255,7 +255,7 @@ public class PetActivity extends AppCompatActivity {
                     updateLevelDisplay();
                     if (statusText != null) {
                         statusText.setText("🎉 " + pet.getPetName() + " leveled up to Level " +
-                                         pet.getPetLevel() + "! They've grown more mature!");
+                                pet.getPetLevel() + "! They've grown more mature!");
                     }
                     // Reset XP to 0
                     currentXP = 0;
@@ -276,7 +276,7 @@ public class PetActivity extends AppCompatActivity {
             chatButton.setOnClickListener(v -> {
                 if (currentUsername == null) return;
 
-                Intent intent = new Intent(PetActivity.this, MainActivity.class);
+                Intent intent = new Intent(PetActivity.this, ChatActivity.class);
                 intent.putExtra("username", currentUsername); // MainActivity expects "username"
                 startActivity(intent);
             });
@@ -295,11 +295,11 @@ public class PetActivity extends AppCompatActivity {
 
                 String msg = ((Dragon) pet).breatheFire();
                 if (statusText != null) statusText.setText(msg);
-                
+
                 // Show popup
                 String caption = pet.getPetName() + " breathes fire!";
                 showActionPopup("breathfire", null, caption);
-                
+
                 gainXP(20); // Gain 20 XP for special ability
                 refreshMeters();
                 savePetState();
@@ -319,11 +319,11 @@ public class PetActivity extends AppCompatActivity {
 
                 String msg = ((Unicorn) pet).tellMagicalStory();
                 if (statusText != null) statusText.setText(msg);
-                
+
                 // Show popup
                 String caption = pet.getPetName() + " tells a magical story...";
                 showActionPopup("tellmagicalstory", null, caption);
-                
+
                 gainXP(20); // Gain 20 XP for special ability
                 refreshMeters();
                 savePetState();
@@ -357,19 +357,19 @@ public class PetActivity extends AppCompatActivity {
 
     private void gainXP(int amount) {
         if (pet == null) return;
-        
+
         // Don't gain XP if already at max level
         if (!pet.getPetStateObject().canLevelUp() && pet.getPetLevel() >= 3) {
             return;
         }
-        
+
         currentXP = Math.min(XP_FOR_LEVEL_UP, currentXP + amount);
         if (xpProg != null) {
             xpProg.setProgress(currentXP);
         }
-        
+
         Log.d(TAG, "Gained " + amount + " XP. Current XP: " + currentXP + "/" + XP_FOR_LEVEL_UP);
-        
+
         // Check if level-up button should be shown
         checkLevelUpEligibility();
         savePetState();
@@ -461,9 +461,9 @@ public class PetActivity extends AppCompatActivity {
         petStateObj.setPetLevel(savedLevel);
 
         Log.d("PetActivity", "Loaded pet state for " + currentUsername +
-              " - Level: " + savedLevel + ", Happiness: " + savedHappiness +
-              ", Energy: " + savedEnergy + ", Hunger: " + savedHunger +
-              " (Minutes elapsed: " + minutesElapsed + ")");
+                " - Level: " + savedLevel + ", Happiness: " + savedHappiness +
+                ", Energy: " + savedEnergy + ", Hunger: " + savedHunger +
+                " (Minutes elapsed: " + minutesElapsed + ")");
     }
 
     private void savePetState() {
@@ -473,21 +473,21 @@ public class PetActivity extends AppCompatActivity {
         PetState.Meters meters = pet.getPetState();
 
         prefs.edit()
-            .putInt(currentUsername + KEY_HAPPINESS, meters.happiness)
-            .putInt(currentUsername + KEY_ENERGY, meters.energy)
-            .putInt(currentUsername + KEY_HUNGER, meters.hunger)
-            .putInt(currentUsername + KEY_LEVEL, pet.getPetLevel())
-            .putInt(currentUsername + KEY_XP, currentXP)
-            .putLong(currentUsername + KEY_LAST_SAVE, System.currentTimeMillis())
-            .apply();
+                .putInt(currentUsername + KEY_HAPPINESS, meters.happiness)
+                .putInt(currentUsername + KEY_ENERGY, meters.energy)
+                .putInt(currentUsername + KEY_HUNGER, meters.hunger)
+                .putInt(currentUsername + KEY_LEVEL, pet.getPetLevel())
+                .putInt(currentUsername + KEY_XP, currentXP)
+                .putLong(currentUsername + KEY_LAST_SAVE, System.currentTimeMillis())
+                .apply();
 
         // Also save level to database so other activities can access it
         UserRepository userRepository = new UserRepository(this);
         userRepository.updatePetLevel(currentUsername, pet.getPetLevel());
 
         Log.d(TAG, "Saved pet state for " + currentUsername +
-              " - Level: " + pet.getPetLevel() + ", Happiness: " + meters.happiness +
-              ", Energy: " + meters.energy + ", Hunger: " + meters.hunger);
+                " - Level: " + pet.getPetLevel() + ", Happiness: " + meters.happiness +
+                ", Energy: " + meters.energy + ", Hunger: " + meters.hunger);
     }
 
     private void applyMeterDecay() {
@@ -638,11 +638,11 @@ public class PetActivity extends AppCompatActivity {
         if (statusText != null) {
             statusText.setText(msg);
         }
-        
+
         // Show popup
         String caption = pet.getPetName() + " is eating " + foodName + "...";
         showActionPopup("feed", foodType, caption);
-        
+
         gainXP(10); // Gain 10 XP for feeding
         refreshMeters();
         savePetState();
@@ -661,36 +661,36 @@ public class PetActivity extends AppCompatActivity {
         // Build the drawable resource name
         String petTypePrefix = (pet instanceof Dragon) ? "dragon" : "unicorn";
         int level = pet.getPetLevel();
-        
+
         String resourceName;
         if ("feed".equals(action) && foodType != null) {
             resourceName = petTypePrefix + "lv" + level + "_feed_" + foodType;
         } else {
             resourceName = petTypePrefix + "lv" + level + "_" + action;
         }
-        
+
         // Get the drawable resource ID
         int resourceId = getResources().getIdentifier(resourceName, "drawable", getPackageName());
-        
+
         if (resourceId == 0) {
             Log.e(TAG, "Could not find drawable resource: " + resourceName);
             return;
         }
-        
+
         // Create a dialog with custom layout
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View dialogView = LayoutInflater.from(this).inflate(R.layout.popup_pet_action, null);
-        
+
         ImageView popupImage = dialogView.findViewById(R.id.popupImage);
         TextView popupCaption = dialogView.findViewById(R.id.popupCaption);
-        
+
         popupImage.setImageResource(resourceId);
         popupCaption.setText(caption);
-        
+
         builder.setView(dialogView);
         AlertDialog dialog = builder.create();
         dialog.show();
-        
+
         // Dismiss after 2 seconds
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             if (dialog.isShowing()) {

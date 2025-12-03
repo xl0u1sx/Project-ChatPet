@@ -43,7 +43,7 @@
 
         <!-- Main Activity -->
         <activity
-            android:name=".MainActivity"
+            android:name=".ChatActivity"
             android:exported="false"
             android:label="Pet Chat"
             android:theme="@style/Theme.ChatPet"
@@ -56,7 +56,7 @@
             android:exported="false"
             android:label="Pet Journal"
             android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".ChatActivity">
         </activity>
 
     </application>

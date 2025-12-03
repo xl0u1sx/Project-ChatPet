@@ -66,9 +66,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 //import androidx.compose.ui.Modifier
 
-class MainActivity : ComponentActivity() {
+class ChatActivity : ComponentActivity() {
     companion object {
-        private const val TAG = "MainActivity"
+        private const val TAG = "ChatActivity"
         const val PREFS_NAME = "ChatPetPrefs"
         const val KEY_USERNAME = "username"
     }
@@ -120,13 +120,13 @@ fun MainScreen(
     }
 
     val username = remember {
-        if (context is MainActivity) {
-            val prefs = context.getSharedPreferences(MainActivity.PREFS_NAME, Context.MODE_PRIVATE)
-            val savedUsername = prefs.getString(MainActivity.KEY_USERNAME, null)
+        if (context is ChatActivity) {
+            val prefs = context.getSharedPreferences(ChatActivity.PREFS_NAME, Context.MODE_PRIVATE)
+            val savedUsername = prefs.getString(ChatActivity.KEY_USERNAME, null)
             val intentUsername = context.intent.getStringExtra("username")
 
             val finalUsername = intentUsername ?: savedUsername ?: "user123"
-            Log.d("MainActivity", "Using username: $finalUsername")
+            Log.d("ChatActivity", "Using username: $finalUsername")
             finalUsername
         } else {
             "user123"
@@ -138,7 +138,7 @@ fun MainScreen(
         chatViewModel.initializeChatService(context, username)
         // Load initial conversation history
         conversationHistory = chatViewModel.getConversationHistory()
-        Log.d("MainActivity", "ChatService initialized, loaded ${conversationHistory.size} messages")
+        Log.d("ChatActivity", "ChatService initialized, loaded ${conversationHistory.size} messages")
         onDispose { }
     }
 
@@ -177,6 +177,8 @@ fun MainScreen(
         }
     } ?: R.drawable.unicorn_level1
 
+    val petName = petInfo?.petName ?: "Pet"
+
     Scaffold(modifier = modifier.fillMaxSize()) { innerPadding ->
         Column(
             modifier = Modifier
@@ -191,6 +193,13 @@ fun MainScreen(
                 modifier = Modifier
                     .size(120.dp)
                     .padding(top = 24.dp, bottom = 16.dp)
+            )
+
+            Text(
+                text = petName,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 8.dp)
             )
 
             // Chat History Area
@@ -224,7 +233,6 @@ fun MainScreen(
                 ) {
                     // Show welcome message if no conversation history
                     if (conversationHistory.isEmpty() && uiState is LlmUiState.Idle) {
-                        val petName = petInfo?.petName ?: "your pet"
                         val petType = petInfo?.petType ?: "companion"
                         Text(
                             "Hi! I'm $petName, your $petType companion. Ask me anything!",
@@ -238,7 +246,8 @@ fun MainScreen(
                         ChatMessageBubble(
                             message = chatMessage.message,
                             isUser = chatMessage.role == "user",
-                            timestamp = chatMessage.timestamp
+                            timestamp = chatMessage.timestamp,
+                            petName = petName
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                     }
@@ -251,7 +260,7 @@ fun MainScreen(
                         ) {
                             CircularProgressIndicator(modifier = Modifier.size(24.dp))
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Thinking...")
+                            Text("$petName is thinking...")
                         }
                     }
 
@@ -270,27 +279,27 @@ fun MainScreen(
             OutlinedTextField(
                 value = inputText,
                 onValueChange = { inputText = it },
-                label = { Text("Chat with me!") },
+                label = { Text("Chat with $petName!") },
                 modifier = Modifier.fillMaxWidth().testTag("chatTextField"),
                 trailingIcon = {
                     if (uiState !is LlmUiState.Loading && inputText.isNotBlank()) {
                         Button(
                             onClick = {
                                 val modelPath = context.getString(R.string.model_path)
-                                val petName = petInfo?.petName ?: "Daisy"
+                                val currentPetName = petInfo?.petName ?: "Daisy"
                                 val petType = petInfo?.petType ?: "Unicorn"
 
-                                val prefs = if (context is MainActivity) {
+                                val prefs = if (context is ChatActivity) {
                                     context.getSharedPreferences("PetActivityPrefs", Context.MODE_PRIVATE)
                                 } else null
                                 val petLevel = prefs?.getInt(username + "_level", 1) ?: 1
 
-                                val testPrompt = createLevelBasedPrompt(petType, petName, petLevel)
+                                val testPrompt = createLevelBasedPrompt(petType, currentPetName, petLevel)
                                 if(prefs!=null){
                                     val lastTuck=prefs.getLong(username + "_lastTuckInTime", 0)
                                     val isSleeping= lastTuck!=0L && System.currentTimeMillis()-lastTuck<(2*60*1000L)
                                     if(isSleeping){
-                                        val name=petName.ifBlank { "your pet"  }
+                                        val name=currentPetName.ifBlank { "your pet"  }
                                         Toast.makeText(context, "$name is asleep right now. You can't chat until they wake up!", Toast.LENGTH_SHORT).show()
                                         return@Button
                                     }
@@ -299,7 +308,7 @@ fun MainScreen(
                                     val currentHappiness = prefs.getInt(username + "_happiness", 100)
                                     val isHappinessFull = currentHappiness >= 100
                                     if(isHappinessFull){
-                                        val name=petName.ifBlank { "your pet"  }
+                                        val name=currentPetName.ifBlank { "your pet"  }
                                         Toast.makeText(context, "$name is already at full happiness! They don't need more chatting right now.", Toast.LENGTH_SHORT).show()
                                         return@Button
                                     }
@@ -307,7 +316,7 @@ fun MainScreen(
                                 }
                                 chatViewModel.generateResponse(context, modelPath, inputText, testPrompt)
 
-                                if (context is MainActivity && prefs != null) {
+                                if (context is ChatActivity && prefs != null) {
                                     val currentHappiness = prefs.getInt(username + "_happiness", 100)
                                     val newHappiness = Math.min(100, currentHappiness + 15)
                                     val currentXP = prefs.getInt(username + "_xp", 0)
@@ -404,7 +413,8 @@ fun MainScreen(
 fun ChatMessageBubble(
     message: String,
     isUser: Boolean,
-    timestamp: String
+    timestamp: String,
+    petName: String = "Pet"
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -420,7 +430,7 @@ fun ChatMessageBubble(
         ) {
             Column(modifier = Modifier.padding(12.dp)) {
                 Text(
-                    text = if (isUser) "You" else "Pet",
+                    text = if (isUser) "You" else petName,
                     style = androidx.compose.material3.MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
                     color = if (isUser) Color(0xFF1976D2) else Color(0xFFE65100)
