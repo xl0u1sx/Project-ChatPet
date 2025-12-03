@@ -34,12 +34,20 @@
             android:parentActivityName=".LoginActivity">
         </activity>
 
+        <!-- Pet Activity -->
+        <activity android:name=".PetActivity"
+            android:exported="false"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
+            android:parentActivityName=".LoginActivity"/>
+
         <!-- Main Activity -->
         <activity
             android:name=".MainActivity"
             android:exported="false"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.ChatPet">
+            android:label="Pet Chat"
+            android:theme="@style/Theme.ChatPet"
+            android:parentActivityName=".PetActivity">
         </activity>
 
         <!-- Journal Activity -->
@@ -50,13 +58,6 @@
             android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
             android:parentActivityName=".MainActivity">
         </activity>
-
-        <!-- Pet Activity -->
-        <activity android:name=".PetActivity"
-            android:exported="false"
-            android:label="Pet Activity"
-            android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
-            android:parentActivityName=".MainActivity"/>
 
     </application>
 

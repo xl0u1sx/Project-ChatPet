@@ -22,7 +22,7 @@ public class LevelBasedPromptTest {
      */
     @Test
     public void testDragonLevel1Prompt() {
-        String prompt = MainActivityKt.createLevelBasedPrompt("Dragon", "Spike", 1);
+        String prompt = ChatActivityKt.createLevelBasedPrompt("Dragon", "Spike", 1);
         
         assertTrue("Level 1 Dragon prompt should mention 'young and playful'", 
                    prompt.contains("young and playful"));
@@ -41,7 +41,7 @@ public class LevelBasedPromptTest {
      */
     @Test
     public void testDragonLevel2Prompt() {
-        String prompt = MainActivityKt.createLevelBasedPrompt("Dragon", "Draco", 2);
+        String prompt = ChatActivityKt.createLevelBasedPrompt("Dragon", "Draco", 2);
         
         assertTrue("Level 2 Dragon prompt should mention 'growing'", 
                    prompt.contains("growing"));
@@ -58,7 +58,7 @@ public class LevelBasedPromptTest {
      */
     @Test
     public void testDragonLevel3Prompt() {
-        String prompt = MainActivityKt.createLevelBasedPrompt("Dragon", "Ancient", 3);
+        String prompt = ChatActivityKt.createLevelBasedPrompt("Dragon", "Ancient", 3);
         
         assertTrue("Level 3 Dragon prompt should mention 'wise and mature'", 
                    prompt.contains("wise") && prompt.contains("mature"));
@@ -75,15 +75,15 @@ public class LevelBasedPromptTest {
      */
     @Test
     public void testUnicornAllLevels() {
-        String level1 = MainActivityKt.createLevelBasedPrompt("Unicorn", "Sparkle", 1);
+        String level1 = ChatActivityKt.createLevelBasedPrompt("Unicorn", "Sparkle", 1);
         assertTrue("Level 1 Unicorn should be 'bubbly'", level1.contains("bubbly"));
         assertTrue("Level 1 Unicorn should mention sparkles", level1.contains("sparkles"));
         
-        String level2 = MainActivityKt.createLevelBasedPrompt("Unicorn", "Grace", 2);
+        String level2 = ChatActivityKt.createLevelBasedPrompt("Unicorn", "Grace", 2);
         assertTrue("Level 2 Unicorn should be 'graceful'", level2.contains("graceful"));
         assertTrue("Level 2 Unicorn should mention elegance", level2.contains("elegant"));
         
-        String level3 = MainActivityKt.createLevelBasedPrompt("Unicorn", "Serenity", 3);
+        String level3 = ChatActivityKt.createLevelBasedPrompt("Unicorn", "Serenity", 3);
         assertTrue("Level 3 Unicorn should be 'elegant and serene'", 
                    level3.contains("elegant") && level3.contains("serene"));
         assertTrue("Level 3 Unicorn should mention 'Dear companion'", 
@@ -98,18 +98,18 @@ public class LevelBasedPromptTest {
     @Test
     public void testCaseInsensitivityAndDefaults() {
         // Test case insensitivity
-        String upperDragon = MainActivityKt.createLevelBasedPrompt("DRAGON", "Test", 1);
-        String lowerDragon = MainActivityKt.createLevelBasedPrompt("dragon", "Test", 1);
+        String upperDragon = ChatActivityKt.createLevelBasedPrompt("DRAGON", "Test", 1);
+        String lowerDragon = ChatActivityKt.createLevelBasedPrompt("dragon", "Test", 1);
         assertTrue("Uppercase DRAGON should work", upperDragon.contains("Dragon"));
         assertTrue("Lowercase dragon should work", lowerDragon.contains("Dragon"));
         
         // Test invalid level (should use default)
-        String invalidLevel = MainActivityKt.createLevelBasedPrompt("Dragon", "Test", 5);
+        String invalidLevel = ChatActivityKt.createLevelBasedPrompt("Dragon", "Test", 5);
         assertTrue("Invalid level should return default prompt", 
                    invalidLevel.contains("friendly") || invalidLevel.contains("Dragon"));
         
         // Test unknown pet type
-        String unknownPet = MainActivityKt.createLevelBasedPrompt("Phoenix", "Blaze", 1);
+        String unknownPet = ChatActivityKt.createLevelBasedPrompt("Phoenix", "Blaze", 1);
         assertTrue("Unknown pet type should return generic prompt", 
                    unknownPet.contains("Phoenix") && unknownPet.contains("companion"));
     }

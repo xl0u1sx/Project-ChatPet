@@ -38,6 +38,7 @@ public class PetActivity extends AppCompatActivity {
     private Button upgradePetButton;
     private Button breatheFireButton;
     private Button tellStoryButton;
+    private Button chatButton;
     private ImageView petImage;
     private TextView statusText;
 
@@ -88,6 +89,7 @@ public class PetActivity extends AppCompatActivity {
         upgradePetButton = findViewById(R.id.upgradePetButton);
         breatheFireButton = findViewById(R.id.breatheFireButton);
         tellStoryButton = findViewById(R.id.tellStoryButton);
+        chatButton = findViewById(R.id.chatButton);
         petImage = findViewById(R.id.petImage);
         statusText = findViewById(R.id.statusText);
 
@@ -261,6 +263,16 @@ public class PetActivity extends AppCompatActivity {
                         statusText.setText(pet.getPetName() + " has reached max level!");
                     }
                 }
+            });
+        }
+
+        if (chatButton != null) {
+            chatButton.setOnClickListener(v -> {
+                if (currentUsername == null) return;
+
+                Intent intent = new Intent(PetActivity.this, MainActivity.class);
+                intent.putExtra("username", currentUsername); // MainActivity expects "username"
+                startActivity(intent);
             });
         }
 
