@@ -293,6 +293,23 @@ public class PetActivity extends AppCompatActivity {
                     return;
                 }
 
+                // Block special action if energy or hunger is 0
+                PetState.Meters meters = pet.getPetState();
+                if (meters.energy <= 0 || meters.hunger <= 0) {
+                    if (statusText != null) {
+                        String message = pet.getPetName() + " is too tired or hungry to breathe fire!";
+                        if (meters.energy <= 0 && meters.hunger <= 0) {
+                            message = pet.getPetName() + " needs energy and food before breathing fire!";
+                        } else if (meters.energy <= 0) {
+                            message = pet.getPetName() + " is too tired to breathe fire!";
+                        } else {
+                            message = pet.getPetName() + " is too hungry to breathe fire!";
+                        }
+                        statusText.setText(message);
+                    }
+                    return;
+                }
+
                 String msg = ((Dragon) pet).breatheFire();
                 if (statusText != null) statusText.setText(msg);
 
@@ -314,6 +331,23 @@ public class PetActivity extends AppCompatActivity {
                 // Block special action while asleep
                 if (isPetSleeping()) {
                     showSleepingMessage("hear a story while they're asleep");
+                    return;
+                }
+
+                // Block special action if energy or hunger is 0
+                PetState.Meters meters = pet.getPetState();
+                if (meters.energy <= 0 || meters.hunger <= 0) {
+                    if (statusText != null) {
+                        String message = pet.getPetName() + " is too tired or hungry to tell a story!";
+                        if (meters.energy <= 0 && meters.hunger <= 0) {
+                            message = pet.getPetName() + " needs energy and food before telling a story!";
+                        } else if (meters.energy <= 0) {
+                            message = pet.getPetName() + " is too tired to tell a story!";
+                        } else {
+                            message = pet.getPetName() + " is too hungry to tell a story!";
+                        }
+                        statusText.setText(message);
+                    }
                     return;
                 }
 
