@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
+import android.view.LayoutInflater;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -201,6 +202,11 @@ public class PetActivity extends AppCompatActivity {
                     prefs.edit().putLong(currentUsername + KEY_LAST_TUCK_IN, currentTime).apply();
                     Log.d(TAG, "Tuck-in used for user: " + currentUsername);
                     if (statusText != null) statusText.setText(msg);
+                    
+                    // Show popup
+                    String caption = pet.getPetName() + " falls asleep peacefully...";
+                    showActionPopup("tuckin", null, caption);
+                    
                     gainXP(15); // Gain 15 XP for tucking in
                     refreshMeters();
                     savePetState();
@@ -277,6 +283,11 @@ public class PetActivity extends AppCompatActivity {
 
                 String msg = ((Dragon) pet).breatheFire();
                 if (statusText != null) statusText.setText(msg);
+                
+                // Show popup
+                String caption = pet.getPetName() + " breathes fire!";
+                showActionPopup("breathfire", null, caption);
+                
                 gainXP(20); // Gain 20 XP for special ability
                 refreshMeters();
                 savePetState();
@@ -296,6 +307,11 @@ public class PetActivity extends AppCompatActivity {
 
                 String msg = ((Unicorn) pet).tellMagicalStory();
                 if (statusText != null) statusText.setText(msg);
+                
+                // Show popup
+                String caption = pet.getPetName() + " tells a magical story...";
+                showActionPopup("tellmagicalstory", null, caption);
+                
                 gainXP(20); // Gain 20 XP for special ability
                 refreshMeters();
                 savePetState();
@@ -554,6 +570,25 @@ public class PetActivity extends AppCompatActivity {
             return;
         }
         String msg;
+        String foodType;
+        String foodName;
+
+        // Determine food type and name based on selection
+        switch (which) {
+            case 0:
+                foodType = "apple";
+                foodName = "an apple";
+                break;
+            case 1:
+                foodType = "pie";
+                foodName = "a pie";
+                break;
+            case 2:
+            default:
+                foodType = "roast";
+                foodName = "a roast";
+                break;
+        }
 
         if (pet instanceof Dragon) {
             Dragon d = (Dragon) pet;
@@ -591,10 +626,65 @@ public class PetActivity extends AppCompatActivity {
         if (statusText != null) {
             statusText.setText(msg);
         }
+        
+        // Show popup
+        String caption = pet.getPetName() + " is eating " + foodName + "...";
+        showActionPopup("feed", foodType, caption);
+        
         gainXP(10); // Gain 10 XP for feeding
         refreshMeters();
         savePetState();
 
+    }
+
+    /**
+     * Shows a popup with an image and caption that disappears after 2 seconds
+     * @param action The action type: "tuckIn", "breathFire", "tellMagicalStory"
+     * @param foodType The food type for feeding: "apple", "pie", "roast" (null if not feeding)
+     * @param caption The caption to display below the image
+     */
+    private void showActionPopup(String action, String foodType, String caption) {
+        if (pet == null) return;
+
+        // Build the drawable resource name
+        String petTypePrefix = (pet instanceof Dragon) ? "dragon" : "unicorn";
+        int level = pet.getPetLevel();
+        
+        String resourceName;
+        if ("feed".equals(action) && foodType != null) {
+            resourceName = petTypePrefix + "lv" + level + "_feed_" + foodType;
+        } else {
+            resourceName = petTypePrefix + "lv" + level + "_" + action;
+        }
+        
+        // Get the drawable resource ID
+        int resourceId = getResources().getIdentifier(resourceName, "drawable", getPackageName());
+        
+        if (resourceId == 0) {
+            Log.e(TAG, "Could not find drawable resource: " + resourceName);
+            return;
+        }
+        
+        // Create a dialog with custom layout
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.popup_pet_action, null);
+        
+        ImageView popupImage = dialogView.findViewById(R.id.popupImage);
+        TextView popupCaption = dialogView.findViewById(R.id.popupCaption);
+        
+        popupImage.setImageResource(resourceId);
+        popupCaption.setText(caption);
+        
+        builder.setView(dialogView);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+        
+        // Dismiss after 2 seconds
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            if (dialog.isShowing()) {
+                dialog.dismiss();
+            }
+        }, 2000);
     }
 
 }
