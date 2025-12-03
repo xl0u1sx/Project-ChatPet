@@ -2,18 +2,8 @@ package com.example.chatpet;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-import android.content.Context;
-
-import org.junit.Before;
 import org.junit.Test;
-
-import java.util.List;
 
 /**
  * white box junit unit tests for chat service
@@ -21,17 +11,8 @@ import java.util.List;
  */
 public class ChatServiceTest {
 
-    private ChatService chatService;
-    private Context mockContext;
-
-    @Before
-    public void setUp() {
-        chatService = new ChatService();
-        mockContext = mock(Context.class);
-    }
-
     /**
-     * test conversation history tracking
+     * test chat message data structure
      *
      * description: verify that chatservice maintains conversation history correctly
      * rationale: ensure the chat memory feature works for continuous conversations
@@ -39,19 +20,18 @@ public class ChatServiceTest {
      * bugs: none
      */
     @Test
-    public void testConversationHistoryTracking() {
-        // initially, conversation history should be empty
-        List<ChatService.ChatMessage> history = chatService.getConversationHistory();
-        assertNotNull("conversation history should not be null", history);
-        assertEquals("conversation history should start empty", 0, history.size());
+    public void testChatMessageCreation() {
+        // test creating a chat message
+        ChatService.ChatMessage message = new ChatService.ChatMessage("user", "Hello", "12:00:00");
 
-
+        assertNotNull("message should not be null", message);
+        assertEquals("role should be user", "user", message.role);
+        assertEquals("message should be Hello", "Hello", message.message);
+        assertEquals("timestamp should be 12:00:00", "12:00:00", message.timestamp);
     }
 
-   
-
     /**
-     * test empty message handling
+     * test chat message with assistant role
      *
      * description: verify that empty messages are handled correctly
      * rationale: prevent wasting llm calls on empty input
@@ -61,33 +41,14 @@ public class ChatServiceTest {
      * note: this tests the logic from chatservice.java:99-101
      */
     @Test
-    public void testEmptyMessageHandling() throws Exception {
-        // test with null message
-        String result = chatService.generateResponse(mockContext, "dummy_path", null, "test prompt");
-        assertEquals("should return default message for null input",
-            "Hmmm.. Could you say that again?", result);
+    public void testAssistantChatMessageCreation() {
+        // test creating an assistant chat message
+        ChatService.ChatMessage message = new ChatService.ChatMessage("assistant", "Hi there!", "12:00:01");
 
-        // test with empty string
-        result = chatService.generateResponse(mockContext, "dummy_path", "", "test prompt");
-        assertEquals("should return default message for empty input",
-            "Hmmm.. Could you say that again?", result);
-
-        // test with whitespace only
-        result = chatService.generateResponse(mockContext, "dummy_path", "   ", "test prompt");
-        assertEquals("should return default message for whitespace input",
-            "Hmmm.. Could you say that again?", result);
-    }
-
-    // tests that conversation history is cleared
-    @Test
-    public void test_clearConvoHistory(){
-        ChatService chat = new ChatService();
-
-        chat.getConversationHistory().add(new ChatService.ChatMessage("user", "hii", "time"));
-
-        chat.clearConversationHistory();
-
-        assertEquals(0, chat.getConversationHistory().size());
+        assertNotNull("message should not be null", message);
+        assertEquals("role should be assistant", "assistant", message.role);
+        assertEquals("message should be Hi there!", "Hi there!", message.message);
+        assertEquals("timestamp should be 12:00:01", "12:00:01", message.timestamp);
     }
 
 

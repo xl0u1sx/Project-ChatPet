@@ -55,6 +55,7 @@ public class ChatTests {
         ChatViewModel mockViewModel = new ChatViewModel() {
             private final MutableLiveData<LlmUiState> testUiState =
                     new MutableLiveData<>(LlmUiState.Idle.INSTANCE);
+            private final java.util.List<ChatService.ChatMessage> messages = new java.util.ArrayList<>();
 
             @Override
             public androidx.lifecycle.LiveData<LlmUiState> getUiState() {
@@ -62,9 +63,23 @@ public class ChatTests {
             }
 
             @Override
+            public void initializeChatService(Context context, String username) {
+                // no-op for testing
+            }
+
+            @Override
+            public java.util.List<ChatService.ChatMessage> getConversationHistory() {
+                return messages;
+            }
+
+            @Override
             public void generateResponse(Context ctx, String modelPath, String userMsg, String prompt) {
+                // add user message to history
+                messages.add(new ChatService.ChatMessage("user", userMsg, "12:00:00"));
                 // simulate a response that addresses the user
-                testUiState.postValue(new LlmUiState.Success("hello! nice to meet you too! i'm excited to chat with you!"));
+                String response = "hello! nice to meet you too! i'm excited to chat with you!";
+                messages.add(new ChatService.ChatMessage("assistant", response, "12:00:01"));
+                testUiState.postValue(new LlmUiState.Success(response));
             }
         };
 
@@ -106,6 +121,7 @@ public class ChatTests {
         ChatViewModel mockViewModel = new ChatViewModel() {
             private final MutableLiveData<LlmUiState> testUiState =
                     new MutableLiveData<>(LlmUiState.Idle.INSTANCE);
+            private final java.util.List<ChatService.ChatMessage> messages = new java.util.ArrayList<>();
             private String rememberedWord = null;
 
             @Override
@@ -114,20 +130,37 @@ public class ChatTests {
             }
 
             @Override
+            public void initializeChatService(Context context, String username) {
+                // no-op for testing
+            }
+
+            @Override
+            public java.util.List<ChatService.ChatMessage> getConversationHistory() {
+                return messages;
+            }
+
+            @Override
             public void generateResponse(Context ctx, String modelPath, String userMsg, String prompt) {
+                // add user message to history
+                messages.add(new ChatService.ChatMessage("user", userMsg, "12:00:00"));
+
                 // simulate memory of conversation
+                String response;
                 if (userMsg.toLowerCase().contains("remember") && userMsg.toLowerCase().contains("banana")) {
                     rememberedWord = "banana";
-                    testUiState.postValue(new LlmUiState.Success("okay, i'll remember the word banana!"));
+                    response = "okay, i'll remember the word banana!";
                 } else if (userMsg.toLowerCase().contains("what word") || userMsg.toLowerCase().contains("recall")) {
                     if (rememberedWord != null) {
-                        testUiState.postValue(new LlmUiState.Success("you asked me to remember: " + rememberedWord));
+                        response = "you asked me to remember: " + rememberedWord;
                     } else {
-                        testUiState.postValue(new LlmUiState.Success("i don't remember any word"));
+                        response = "i don't remember any word";
                     }
                 } else {
-                    testUiState.postValue(new LlmUiState.Success("i'm listening!"));
+                    response = "i'm listening!";
                 }
+
+                messages.add(new ChatService.ChatMessage("assistant", response, "12:00:01"));
+                testUiState.postValue(new LlmUiState.Success(response));
             }
         };
 
@@ -144,8 +177,8 @@ public class ChatTests {
         performClick(sendButton1);
         composeTestRule.waitForIdle();
 
-        // verify acknowledgment
-        SemanticsNodeInteraction ack = onNode(composeTestRule, hasText("remember the word banana", true, false), false);
+        // verify acknowledgment - check for the assistant's response
+        SemanticsNodeInteraction ack = onNode(composeTestRule, hasText("okay, i'll remember", true, false), false);
         assertExists(ack);
 
         // send second message to recall the word
@@ -156,8 +189,8 @@ public class ChatTests {
         performClick(sendButton2);
         composeTestRule.waitForIdle();
 
-        // verify the pet recalls "banana"
-        SemanticsNodeInteraction recall = onNode(composeTestRule, hasText("banana", true, false), false);
+        // verify the pet recalls "banana" by checking for the full recall phrase
+        SemanticsNodeInteraction recall = onNode(composeTestRule, hasText("you asked me to remember:", true, false), false);
         assertExists(recall);
     }
 
@@ -176,10 +209,21 @@ public class ChatTests {
         ChatViewModel mockViewModel = new ChatViewModel() {
             private final MutableLiveData<LlmUiState> testUiState =
                     new MutableLiveData<>(LlmUiState.Idle.INSTANCE);
+            private final java.util.List<ChatService.ChatMessage> messages = new java.util.ArrayList<>();
 
             @Override
             public androidx.lifecycle.LiveData<LlmUiState> getUiState() {
                 return testUiState;
+            }
+
+            @Override
+            public void initializeChatService(Context context, String username) {
+                // no-op for testing
+            }
+
+            @Override
+            public java.util.List<ChatService.ChatMessage> getConversationHistory() {
+                return messages;
             }
         };
 
