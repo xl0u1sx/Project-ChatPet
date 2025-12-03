@@ -392,30 +392,30 @@ public class PetActivity extends AppCompatActivity {
         if (pet instanceof Dragon) {
             switch (level) {
                 case 1:
-                    imageResource = R.drawable.dragon_level1;
+                    imageResource = R.drawable.dragon_level1_transparent;
                     break;
                 case 2:
-                    imageResource = R.drawable.dragon_level2;
+                    imageResource = R.drawable.dragon_level2_transparent;
                     break;
                 case 3:
-                    imageResource = R.drawable.dragon_level3;
+                    imageResource = R.drawable.dragon_level3_transparent;
                     break;
                 default:
-                    imageResource = R.drawable.dragon_level1;
+                    imageResource = R.drawable.dragon_level1_transparent;
             }
         } else { // Unicorn
             switch (level) {
                 case 1:
-                    imageResource = R.drawable.unicorn_level1;
+                    imageResource = R.drawable.unicorn_level1_transparent;
                     break;
                 case 2:
-                    imageResource = R.drawable.unicorn_level2;
+                    imageResource = R.drawable.unicorn_level2_transparent;
                     break;
                 case 3:
-                    imageResource = R.drawable.unicorn_level3;
+                    imageResource = R.drawable.unicorn_level3_transparent;
                     break;
                 default:
-                    imageResource = R.drawable.unicorn_level1;
+                    imageResource = R.drawable.unicorn_level1_transparent;
             }
         }
 

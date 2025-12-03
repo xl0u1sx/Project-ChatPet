@@ -163,19 +163,19 @@ fun MainScreen(
     val petImageRes = petInfo?.let { info ->
         when (info.petType) {
             "Dragon" -> when (info.petLevel) {
-                1 -> R.drawable.dragon_level1
-                2 -> R.drawable.dragon_level2
-                3 -> R.drawable.dragon_level3
-                else -> R.drawable.dragon_level1
+                1 -> R.drawable.dragon_level1_transparent
+                2 -> R.drawable.dragon_level2_transparent
+                3 -> R.drawable.dragon_level3_transparent
+                else -> R.drawable.dragon_level1_transparent
             }
             else -> when (info.petLevel) {
-                1 -> R.drawable.unicorn_level1
-                2 -> R.drawable.unicorn_level2
-                3 -> R.drawable.unicorn_level3
-                else -> R.drawable.unicorn_level1
+                1 -> R.drawable.unicorn_level1_transparent
+                2 -> R.drawable.unicorn_level2_transparent
+                3 -> R.drawable.unicorn_level3_transparent
+                else -> R.drawable.unicorn_level1_transparent
             }
         }
-    } ?: R.drawable.unicorn_level1
+    } ?: R.drawable.unicorn_level1_transparent
 
     val petName = petInfo?.petName ?: "Pet"
 
