@@ -7,6 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import android.util.Log
+import android.widget.Toast
 import com.example.chatpet.ui.theme.ChatPetTheme // Ensure this import is correct
 
 // Import for MainScreen if it's in the same file or package,
@@ -285,6 +286,16 @@ fun MainScreen(
                                 val petLevel = prefs?.getInt(username + "_level", 1) ?: 1
 
                                 val testPrompt = createLevelBasedPrompt(petType, petName, petLevel)
+                                if(prefs!=null){
+                                    val lastTuck=prefs.getLong(username + "_lastTuckInTime", 0)
+                                    val isSleeping= lastTuck!=0L && System.currentTimeMillis()-lastTuck<(2*60*1000L)
+                                    if(isSleeping){
+                                        val name=petName.ifBlank { "your pet"  }
+                                        Toast.makeText(context, "$name is asleep right now. You can't chat until they wake up!", Toast.LENGTH_SHORT).show()
+                                        return@Button
+                                    }
+
+                                }
                                 chatViewModel.generateResponse(context, modelPath, inputText, testPrompt)
 
                                 if (context is MainActivity && prefs != null) {
