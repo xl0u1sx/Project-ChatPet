@@ -171,7 +171,7 @@
             android:orientation="vertical"
             android:gravity="center_horizontal">
 
-            <!-- First Row -->
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -200,7 +200,7 @@
                     android:textSize="14sp" />
             </LinearLayout>
 
-            <!-- Second Row -->
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -231,7 +231,7 @@
                     android:textSize="14sp" />
             </LinearLayout>
 
-            <!-- Third Row -->
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -261,7 +261,7 @@
                     android:textSize="14sp" />
             </LinearLayout>
 
-            <!-- Fourth Row -->
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -279,7 +279,7 @@
                     android:text="👤 User Profile"
                     android:textSize="14sp" />
 
-                <!-- Placeholder so grid stays even -->
+
                 <View
                     android:layout_width="0dp"
                     android:layout_height="0dp"
@@ -288,7 +288,7 @@
 
         </LinearLayout>
 
-        <!-- Status Text -->
+
         <TextView
             android:id="@+id/statusText"
             android:layout_width="match_parent"
