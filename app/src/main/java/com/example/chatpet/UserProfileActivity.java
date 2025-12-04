@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -34,6 +35,7 @@ public class UserProfileActivity extends AppCompatActivity {
     private TextView xpText;
     private ProgressBar xpProgressBar;
     private TextView xpNextLevelText;
+    private TextView maxLevelReachedText;
     private Button backButton;
 
     private String currentUsername;
@@ -55,6 +57,7 @@ public class UserProfileActivity extends AppCompatActivity {
         xpText = findViewById(R.id.xpText);
         xpProgressBar = findViewById(R.id.xpProgressBar);
         xpNextLevelText = findViewById(R.id.xpNextLevelText);
+        maxLevelReachedText = findViewById(R.id.maxLevelReachedText);
         backButton = findViewById(R.id.backButton);
 
         // Initialize repository
@@ -114,18 +117,32 @@ public class UserProfileActivity extends AppCompatActivity {
 
             // Load XP data
             int currentXP = prefs.getInt(currentUsername + "_xp", 0);
-            xpProgressBar.setMax(XP_FOR_LEVEL_UP);
-            xpProgressBar.setProgress(currentXP);
-            xpText.setText(currentXP + " / " + XP_FOR_LEVEL_UP + " XP");
-
-            // Calculate remaining XP needed
-            int xpNeeded = XP_FOR_LEVEL_UP - currentXP;
-            if (currentXP >= XP_FOR_LEVEL_UP && petLevel < 3) {
-                xpNextLevelText.setText("Ready to level up!");
-            } else if (petLevel >= 3) {
-                xpNextLevelText.setText("Max level reached!");
+            
+            // Check if pet is at max level
+            if (petLevel >= 3) {
+                // Max level reached - hide progress bar and XP text, show max level message
+                xpProgressBar.setVisibility(View.GONE);
+                xpText.setVisibility(View.GONE);
+                xpNextLevelText.setVisibility(View.GONE);
+                maxLevelReachedText.setVisibility(View.VISIBLE);
             } else {
-                xpNextLevelText.setText(xpNeeded + " XP needed for next level");
+                // Still leveling - show progress bar and XP text, hide max level message
+                xpProgressBar.setVisibility(View.VISIBLE);
+                xpText.setVisibility(View.VISIBLE);
+                xpNextLevelText.setVisibility(View.VISIBLE);
+                maxLevelReachedText.setVisibility(View.GONE);
+                
+                xpProgressBar.setMax(XP_FOR_LEVEL_UP);
+                xpProgressBar.setProgress(currentXP);
+                xpText.setText(currentXP + " / " + XP_FOR_LEVEL_UP + " XP");
+
+                // Calculate remaining XP needed
+                int xpNeeded = XP_FOR_LEVEL_UP - currentXP;
+                if (currentXP >= XP_FOR_LEVEL_UP) {
+                    xpNextLevelText.setText("Ready to level up!");
+                } else {
+                    xpNextLevelText.setText(xpNeeded + " XP needed for next level");
+                }
             }
         } else {
             petNameText.setText("No pet");

@@ -190,6 +190,18 @@
                     android:layout_marginTop="8dp"
                     android:layout_gravity="center" />
 
+                <TextView
+                    android:id="@+id/maxLevelReachedText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⭐ Max Level Reached! ⭐"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="#FFB6C1"
+                    android:layout_marginTop="8dp"
+                    android:layout_gravity="center"
+                    android:visibility="gone" />
+
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 

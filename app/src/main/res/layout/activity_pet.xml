@@ -147,6 +147,18 @@
             android:max="100"
             android:progressTint="@android:color/holo_purple" />
 
+        <TextView
+            android:id="@+id/maxLevelText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="⭐ Max Level Reached! ⭐"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/holo_orange_dark"
+            android:gravity="center"
+            android:padding="8dp"
+            android:visibility="gone" />
+
         <!-- Divider -->
         <View
             android:layout_width="match_parent"

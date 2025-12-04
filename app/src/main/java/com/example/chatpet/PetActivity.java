@@ -34,6 +34,7 @@ public class PetActivity extends AppCompatActivity {
     private ProgressBar energyProg;
     private ProgressBar hungerProg;
     private ProgressBar xpProg;
+    private TextView maxLevelText;
     private Button feedButton;
     private Button tuckInButton;
     private Button upgradePetButton;
@@ -86,6 +87,7 @@ public class PetActivity extends AppCompatActivity {
         energyProg = findViewById(R.id.energyProg);
         hungerProg = findViewById(R.id.hungerProg);
         xpProg = findViewById(R.id.xpProg);
+        maxLevelText = findViewById(R.id.maxLevelText);
         feedButton = findViewById(R.id.feedButton);
         tuckInButton = findViewById(R.id.tuckInButton);
         upgradePetButton = findViewById(R.id.upgradePetButton);
@@ -167,8 +169,22 @@ public class PetActivity extends AppCompatActivity {
         if (happinessProg != null) happinessProg.setProgress(m.happiness);
         if (energyProg != null)    energyProg.setProgress(m.energy);
         if (hungerProg != null)    hungerProg.setProgress(m.hunger);
-        if (xpProg != null)        xpProg.setProgress(currentXP);
-
+        
+        // Check if pet is at max level
+        int petLevel = pet.getPetLevel();
+        if (petLevel >= 3) {
+            // Max level reached - hide progress bar, show text
+            if (xpProg != null) xpProg.setVisibility(View.GONE);
+            if (maxLevelText != null) maxLevelText.setVisibility(View.VISIBLE);
+        } else {
+            // Still leveling - show progress bar, hide text
+            if (xpProg != null) {
+                xpProg.setVisibility(View.VISIBLE);
+                xpProg.setProgress(currentXP);
+            }
+            if (maxLevelText != null) maxLevelText.setVisibility(View.GONE);
+        }
+        
         // Check if XP bar is full and show level-up button
         checkLevelUpEligibility();
     }
