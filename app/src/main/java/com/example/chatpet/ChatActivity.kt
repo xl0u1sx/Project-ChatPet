@@ -17,6 +17,7 @@ import com.example.chatpet.ui.theme.ChatPetTheme // Ensure this import is correc
 // UI related imports should ideally be within the Composable files that use them,
 // but if MainScreen is in this file, they would be here.
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -110,6 +111,7 @@ fun MainScreen(
     val uiState: LlmUiState by chatViewModel.uiState.observeAsState(LlmUiState.Idle.INSTANCE as LlmUiState)
 
     var inputText by remember { mutableStateOf("") }
+    var optionsExpanded by remember { mutableStateOf(true) }
 
     // Get conversation history and refresh when UI state changes
     var conversationHistory by remember { mutableStateOf<List<ChatService.ChatMessage>>(emptyList()) }
@@ -179,34 +181,41 @@ fun MainScreen(
 
     val petName = petInfo?.petName ?: "Pet"
 
-    Scaffold(modifier = modifier.fillMaxSize()) { innerPadding ->
+    Box(modifier = modifier.fillMaxSize()) {
+        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(16.dp)
         ) {
-            Image(
-                painter = painterResource(id = petImageRes),
-                contentDescription = "Pet Image",
+            // Pet info in horizontal layout (top-left)
+            Row(
                 modifier = Modifier
-                    .size(120.dp)
-                    .padding(top = 24.dp, bottom = 16.dp)
-            )
+                    .fillMaxWidth()
+                    .padding(top = 8.dp, bottom = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    painter = painterResource(id = petImageRes),
+                    contentDescription = "Pet Image",
+                    modifier = Modifier.size(60.dp)
+                )
+                
+                Spacer(modifier = Modifier.width(12.dp))
+                
+                Text(
+                    text = petName,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
 
-            Text(
-                text = petName,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-
-            // Chat History Area
+            // Chat History Area (bigger)
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
+                    .weight(1.5f)
                     .padding(bottom = 16.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.Transparent)
             ) {
@@ -275,49 +284,83 @@ fun MainScreen(
                 }
             }
 
-            // User Input Area
-            OutlinedTextField(
-                value = inputText,
-                onValueChange = { inputText = it },
-                label = { Text("Chat with $petName!") },
-                modifier = Modifier.fillMaxWidth().testTag("chatTextField"),
-                trailingIcon = {
-                    if (uiState !is LlmUiState.Loading && inputText.isNotBlank()) {
+            // Chat Options Area - Collapsible
+            // Get chat options based on pet status
+            val prefs = if (context is ChatActivity) {
+                context.getSharedPreferences("PetActivityPrefs", Context.MODE_PRIVATE)
+            } else null
+            
+            val lastTuck = prefs?.getLong(username + "_lastTuckInTime", 0) ?: 0
+            val isSleeping = lastTuck != 0L && System.currentTimeMillis() - lastTuck < (2 * 60 * 1000L)
+            val currentHappiness = prefs?.getInt(username + "_happiness", 100) ?: 100
+            val currentEnergy = prefs?.getInt(username + "_energy", 100) ?: 100
+            val currentHunger = prefs?.getInt(username + "_hunger", 100) ?: 100
+
+            val chatOptions = generateChatOptions(
+                petInfo?.petType ?: "Unicorn",
+                petInfo?.petName ?: "Pet",
+                isSleeping,
+                currentHappiness,
+                currentEnergy,
+                currentHunger,
+                conversationHistory
+            )
+
+            // Toggle button for chat options
+            Button(
+                onClick = { optionsExpanded = !optionsExpanded },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFD1DC)),
+                shape = RoundedCornerShape(4.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Chat Options",
+                        color = Color(0xFF3E2723),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = if (optionsExpanded) "▼" else "▶",
+                        color = Color(0xFF3E2723),
+                        fontSize = 16.sp
+                    )
+                }
+            }
+
+            // Show options only when expanded
+            if (optionsExpanded) {
+                if (isSleeping) {
+                    Text(
+                        text = "$petName is sleeping... 😴",
+                        color = Color.Gray,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                } else if (currentHappiness >= 100) {
+                    Text(
+                        text = "$petName is at full happiness! 😊",
+                        color = Color(0xFF4CAF50),
+                        modifier = Modifier.padding(16.dp)
+                    )
+                } else if (uiState !is LlmUiState.Loading) {
+                    chatOptions.forEach { option ->
                         Button(
                             onClick = {
                                 val modelPath = context.getString(R.string.model_path)
                                 val currentPetName = petInfo?.petName ?: "Daisy"
                                 val petType = petInfo?.petType ?: "Unicorn"
-
-                                val prefs = if (context is ChatActivity) {
-                                    context.getSharedPreferences("PetActivityPrefs", Context.MODE_PRIVATE)
-                                } else null
                                 val petLevel = prefs?.getInt(username + "_level", 1) ?: 1
 
                                 val testPrompt = createLevelBasedPrompt(petType, currentPetName, petLevel)
-                                if(prefs!=null){
-                                    val lastTuck=prefs.getLong(username + "_lastTuckInTime", 0)
-                                    val isSleeping= lastTuck!=0L && System.currentTimeMillis()-lastTuck<(2*60*1000L)
-                                    if(isSleeping){
-                                        val name=currentPetName.ifBlank { "your pet"  }
-                                        Toast.makeText(context, "$name is asleep right now. You can't chat until they wake up!", Toast.LENGTH_SHORT).show()
-                                        return@Button
-                                    }
-
-                                    // prevent chatting if happiness is full
-                                    val currentHappiness = prefs.getInt(username + "_happiness", 100)
-                                    val isHappinessFull = currentHappiness >= 100
-                                    if(isHappinessFull){
-                                        val name=currentPetName.ifBlank { "your pet"  }
-                                        Toast.makeText(context, "$name is already at full happiness! They don't need more chatting right now.", Toast.LENGTH_SHORT).show()
-                                        return@Button
-                                    }
-
-                                }
-                                chatViewModel.generateResponse(context, modelPath, inputText, testPrompt)
+                                chatViewModel.generateResponse(context, modelPath, option, testPrompt)
 
                                 if (context is ChatActivity && prefs != null) {
-                                    val currentHappiness = prefs.getInt(username + "_happiness", 100)
                                     val newHappiness = Math.min(100, currentHappiness + 15)
                                     val currentXP = prefs.getInt(username + "_xp", 0)
                                     val newXP = Math.min(100, currentXP + 5)
@@ -327,20 +370,31 @@ fun MainScreen(
                                         .putLong(username + "_lastSave", System.currentTimeMillis())
                                         .apply()
                                 }
-
-                                inputText = ""
                             },
-                            modifier = Modifier.padding(end = 7.dp)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFB6C1)),
+                            shape = RoundedCornerShape(4.dp)
                         ) {
-                            Text("Send")
+                            Text(
+                                text = option,
+                                color = Color(0xFF3E2723),
+                                fontSize = 14.sp,
+                                modifier = Modifier.padding(8.dp)
+                            )
                         }
                     }
                 }
-            )
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Navigation Buttons
+            // Navigation Buttons (centered)
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
             Button(
                 onClick = {
                     val intent = Intent(context, JournalActivity::class.java)
@@ -348,24 +402,16 @@ fun MainScreen(
                 },
                 modifier = Modifier
                     .width(200.dp)
-                    .height(70.dp)
-                    .padding(start=10.dp, top=10.dp)
-                    .background(
-                        brush=Brush.linearGradient(
-                            colors=listOf(Color(0xFFFFB6C1), Color(0xFFFFD1DC))
-                        ),
-                        shape=RoundedCornerShape(190.dp)
-                    )
-                    .border(
-                        width = 1.dp,
-                        color = Color.Black,
-                        shape = RoundedCornerShape(190.dp)
-                    ),
-                colors= ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                shape = RoundedCornerShape(190.dp),
-                contentPadding = PaddingValues(0.dp)
+                    .height(50.dp),
+                colors= ButtonDefaults.buttonColors(containerColor = Color(0xFFFFB6C1)),
+                shape = RoundedCornerShape(4.dp)
             ) {
-                Text(text = "PET JOURNAL", color = Color(0xFF3E2723), fontSize = 16.sp)
+                Text(
+                    text = "PET JOURNAL",
+                    color = Color(0xFF3E2723),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -384,57 +430,44 @@ fun MainScreen(
                 },
                 modifier = Modifier
                     .width(200.dp)
-                    .height(70.dp)
-                    .padding(start=10.dp, top=10.dp)
-                    .testTag("petScreenButton")
-                    .background(
-                        brush=Brush.linearGradient(
-                            colors=listOf(Color(0xFFFFB6C1), Color(0xFFFFD1DC))
-                        ),
-                        shape=RoundedCornerShape(190.dp)
-                    )
-                    .border(
-                        width = 1.dp,
-                        color = Color.Black,
-                        shape = RoundedCornerShape(190.dp)
-                    ),
-                colors= ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                shape = RoundedCornerShape(190.dp),
-                contentPadding = PaddingValues(0.dp)
+                    .height(50.dp)
+                    .testTag("petScreenButton"),
+                colors= ButtonDefaults.buttonColors(containerColor = Color(0xFFFFB6C1)),
+                shape = RoundedCornerShape(4.dp)
             ) {
-                Text(text="PET SCREEN", color = Color(0xFF3E2723), fontSize = 16.sp)
+                Text(
+                    text="PET SCREEN",
+                    color = Color(0xFF3E2723),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+        }
+    }
 
-            Button(
-                onClick = {
-                    val intent = Intent(context, UserProfileActivity::class.java).apply {
-                        putExtra(UserProfileActivity.EXTRA_USERNAME, username)
-                    }
-                    context.startActivity(intent)
-                },
-                modifier = Modifier
-                    .width(200.dp)
-                    .height(70.dp)
-                    .padding(start=10.dp, top=10.dp)
-                    .background(
-                        brush=Brush.linearGradient(
-                            colors=listOf(Color(0xFFFFB6C1), Color(0xFFFFD1DC))
-                        ),
-                        shape=RoundedCornerShape(190.dp)
-                    )
-                    .border(
-                        width = 1.dp,
-                        color = Color.Black,
-                        shape = RoundedCornerShape(190.dp)
-                    ),
-                colors= ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                shape = RoundedCornerShape(190.dp),
-                contentPadding = PaddingValues(0.dp)
-            ) {
-                Text(text="USER PROFILE", color = Color(0xFF3E2723), fontSize = 16.sp)
-            }
+        // Floating Profile Button in Top Right
+        Button(
+            onClick = {
+                val intent = Intent(context, UserProfileActivity::class.java).apply {
+                    putExtra(UserProfileActivity.EXTRA_USERNAME, username)
+                }
+                context.startActivity(intent)
+            },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(16.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFB6C1)),
+            shape = RoundedCornerShape(4.dp),
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+        ) {
+            Text(
+                text = "PROFILE",
+                color = Color(0xFF3E2723),
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 }
@@ -482,6 +515,64 @@ fun ChatMessageBubble(
             }
         }
     }
+}
+
+// Helper function to generate chat options based on pet status and context
+fun generateChatOptions(
+    petType: String,
+    petName: String,
+    isSleeping: Boolean,
+    happiness: Int,
+    energy: Int,
+    hunger: Int,
+    conversationHistory: List<ChatService.ChatMessage>
+): List<String> {
+    if (isSleeping) {
+        return emptyList()
+    }
+
+    val options = mutableListOf<String>()
+    
+    // Context-aware options based on pet status
+    when {
+        happiness < 30 -> {
+            options.add("Are you okay, $petName? You seem sad...")
+            options.add("What's bothering you today?")
+            options.add("Tell me what would make you happy!")
+        }
+        energy < 30 -> {
+            options.add("You look tired, $petName. Need some rest?")
+            options.add("How are you feeling today?")
+            options.add("Want to talk about something relaxing?")
+        }
+        hunger < 30 -> {
+            options.add("Are you hungry, $petName?")
+            options.add("What's your favorite food?")
+            options.add("Tell me about your day so far!")
+        }
+        else -> {
+            // Happy pet - varied conversation topics
+            if (petType.lowercase() == "dragon") {
+                options.add("Tell me about your dragon adventures!")
+                options.add("What's the coolest thing you can do?")
+                options.add("Want to share a story?")
+            } else {
+                options.add("Tell me a magical story!")
+                options.add("What makes you special?")
+                options.add("What's your favorite thing to do?")
+            }
+        }
+    }
+
+    // Add variety based on recent conversation
+    if (conversationHistory.size >= 3) {
+        val recentMessage = conversationHistory.lastOrNull()?.message ?: ""
+        if (recentMessage.contains("?")) {
+            options[2] = "That's interesting! Tell me more!"
+        }
+    }
+
+    return options.take(3) // Always return exactly 3 options
 }
 
 // Helper function to create level-based prompts for the pet

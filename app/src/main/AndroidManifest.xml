@@ -60,7 +60,7 @@
             android:name=".JournalActivity"
             android:exported="false"
             android:label="Pet Journal"
-            android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
             android:parentActivityName=".ChatActivity">
         </activity>
 

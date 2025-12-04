@@ -187,6 +187,9 @@ public class PetActivity extends AppCompatActivity {
         
         // Check if XP bar is full and show level-up button
         checkLevelUpEligibility();
+        
+        // Update pet image based on sleeping status
+        updatePetImage();
     }
 
     private void setupButtons() {
@@ -450,39 +453,51 @@ public class PetActivity extends AppCompatActivity {
 
         int level = pet.getPetLevel();
         int imageResource;
+        boolean isSleeping = isPetSleeping();
 
+        // If pet is sleeping, show tuckin image
+        if (isSleeping) {
+            String petTypePrefix = (pet instanceof Dragon) ? "dragon" : "unicorn";
+            String resourceName = petTypePrefix + "lv" + level + "_tuckin_transparent";
+            imageResource = getResources().getIdentifier(resourceName, "drawable", getPackageName());
+            
+            // Fallback to regular image if tuckin not found
+            if (imageResource == 0) {
+                imageResource = getDefaultPetImage(level);
+            }
+            Log.d(TAG, "Pet is sleeping - showing tuckin image");
+        } else {
+            imageResource = getDefaultPetImage(level);
+        }
+
+        petImage.setImageResource(imageResource);
+        Log.d(TAG, "Updated pet image to level " + level + (isSleeping ? " (sleeping)" : " (awake)"));
+    }
+
+    private int getDefaultPetImage(int level) {
         if (pet instanceof Dragon) {
             switch (level) {
                 case 1:
-                    imageResource = R.drawable.dragon_level1_transparent;
-                    break;
+                    return R.drawable.dragon_level1_transparent;
                 case 2:
-                    imageResource = R.drawable.dragon_level2_transparent;
-                    break;
+                    return R.drawable.dragon_level2_transparent;
                 case 3:
-                    imageResource = R.drawable.dragon_level3_transparent;
-                    break;
+                    return R.drawable.dragon_level3_transparent;
                 default:
-                    imageResource = R.drawable.dragon_level1_transparent;
+                    return R.drawable.dragon_level1_transparent;
             }
         } else { // Unicorn
             switch (level) {
                 case 1:
-                    imageResource = R.drawable.unicorn_level1_transparent;
-                    break;
+                    return R.drawable.unicorn_level1_transparent;
                 case 2:
-                    imageResource = R.drawable.unicorn_level2_transparent;
-                    break;
+                    return R.drawable.unicorn_level2_transparent;
                 case 3:
-                    imageResource = R.drawable.unicorn_level3_transparent;
-                    break;
+                    return R.drawable.unicorn_level3_transparent;
                 default:
-                    imageResource = R.drawable.unicorn_level1_transparent;
+                    return R.drawable.unicorn_level1_transparent;
             }
         }
-
-        petImage.setImageResource(imageResource);
-        Log.d(TAG, "Updated pet image to level " + level);
     }
 
     private void loadPetState() {

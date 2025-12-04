@@ -22,6 +22,7 @@ public class JournalActivity extends AppCompatActivity {
 
     // UI Components
     private Button generateJournalButton;
+    private Button backButton;
     private ProgressBar loadingProgressBar;
     private TextView loadingTextView;
     private TextView statusTextView;
@@ -59,6 +60,7 @@ public class JournalActivity extends AppCompatActivity {
 
     private void initializeViews() {
         generateJournalButton = findViewById(R.id.generateJournalButton);
+        backButton = findViewById(R.id.backButton);
         loadingProgressBar = findViewById(R.id.loadingProgressBar);
         loadingTextView = findViewById(R.id.loadingTextView);
         statusTextView = findViewById(R.id.statusTextView);
@@ -71,6 +73,10 @@ public class JournalActivity extends AppCompatActivity {
             Log.d(TAG, "Generate Journal button clicked");
             String modelPath = getString(R.string.model_path);
             journalViewModel.generateJournal(getApplicationContext(), modelPath, username);
+        });
+        
+        backButton.setOnClickListener(v -> {
+            finish(); // Close activity and return to previous screen
         });
     }
 
