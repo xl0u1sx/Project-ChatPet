@@ -407,7 +407,8 @@ fun MainScreen(
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 4.dp),
+                                .padding(vertical = 4.dp)
+                                .testTag("chatOptionButton"),
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE0E0E0)),
                             shape = RoundedCornerShape(4.dp)
                         ) {

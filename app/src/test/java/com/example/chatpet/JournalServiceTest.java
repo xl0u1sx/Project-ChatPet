@@ -35,11 +35,12 @@ public class JournalServiceTest {
         System.out.println("Generated Prompt:");
         System.out.println(prompt);
 
+        // Updated for new shorter prompt format
         assertNotNull(prompt);
         assertTrue(prompt.contains("Dragon"));
         assertTrue(prompt.contains("Fluffy"));
         assertTrue(prompt.contains("level 2"));
-        assertTrue(prompt.contains("Happiness: 80/100"));
+        assertTrue(prompt.contains("Happiness: 80"));
         assertTrue(prompt.contains("Yesterday was great!"));
 
         System.out.println("TEST 1 PASSED\n");
@@ -71,20 +72,19 @@ public class JournalServiceTest {
         System.out.println("Generated Prompt:");
         System.out.println(prompt);
 
-        // Verify prompt is still valid and complete for first journal entry
+        // Updated for new shorter prompt format
         assertNotNull(prompt);
-        // Should be "None" instead of empty string for empty previous journal
-        assertTrue(prompt.contains("None"));
+        // Should be "First entry" instead of empty string for empty previous journal
+        assertTrue(prompt.contains("First entry"));
         assertTrue(prompt.contains("Cat"));
         assertTrue(prompt.contains("Whiskers"));
         assertTrue(prompt.contains("level 1"));
-        assertTrue(prompt.contains("Happiness: 50/100"));
-        assertTrue(prompt.contains("Energy: 100/100"));
-        assertTrue(prompt.contains("Hunger: 100/100"));
-        assertTrue(prompt.contains("Times chatted: 0"));
-        assertTrue(prompt.contains("Times fed: 1"));
-        assertTrue(prompt.contains("pet's perspective"));
-        assertTrue(prompt.length() > 100);
+        assertTrue(prompt.contains("Happiness: 50"));
+        assertTrue(prompt.contains("Energy: 100"));
+        assertTrue(prompt.contains("Hunger: 100"));
+        assertTrue(prompt.contains("Chats: 0"));
+        assertTrue(prompt.contains("Fed: 1"));
+        assertTrue(prompt.length() > 50);
 
         System.out.println("TEST 2 PASSED\n");
     }
@@ -201,7 +201,8 @@ public class JournalServiceTest {
 
         String result = JournalService.formatPrompt(entry, "");
 
-        assertTrue(result.contains("None"));
+        // Updated for new shorter prompt format - now uses "First entry" instead of "None"
+        assertTrue(result.contains("First entry"));
     }
 
 

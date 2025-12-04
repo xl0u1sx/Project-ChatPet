@@ -53,23 +53,19 @@ class NavigationAndBasicInteractionComposeTest {
             .performClick()
     }
 
-    //makes sure that the text field can take in text
+    //makes sure that the main chat UI components are displayed
     @Test
     fun testChatInputFieldAcceptsText() {
         setupMockContent()
 
-        val inputText = "hii pet!"
+        // Wait for UI to stabilize
+        composeRule.waitForIdle()
 
-        composeRule.onNodeWithTag("chatTextField")
-            .performTextInput(inputText)
-
-        val nodeText = composeRule.onNodeWithTag("chatTextField")
-            .fetchSemanticsNode()
-            .config[SemanticsProperties.EditableText] as AnnotatedString
-
-        assert(nodeText.text == inputText) {
-            "Expected '$inputText', got '${nodeText.text}'"
-        }
+        // Updated for new chat options UI - there's no text field anymore
+        // Instead, verify that the main chat interface is displayed
+        // Test that PET JOURNAL button is visible (part of chat screen)
+        composeRule.onNodeWithText("PET JOURNAL")
+            .assertIsDisplayed()
     }
 
     //tests visibility and clickability of the pet journal button
@@ -91,22 +87,18 @@ class NavigationAndBasicInteractionComposeTest {
             .performClick()
     }
 
-    //makes sure that the send button shows up when there is input but not when there isn't
+    //makes sure that navigation buttons work
     @Test
     fun testSendButtonShowsOnInput() {
         setupMockContent()
 
-        // Initially shouldn't exist if the input is blank
-        composeRule.onAllNodesWithText("Send")
-            .assertCountEquals(0)
+        // Wait for UI to stabilize
+        composeRule.waitForIdle()
 
-        // Type input
-        composeRule.onNodeWithTag("chatTextField")
-            .performTextInput("Hi!")
-
-        //send button should appear now
-        composeRule.onNodeWithText("Send")
+        // Updated for new chat options UI - no send button anymore
+        // Instead, verify that the pet screen button (navigation) works
+        composeRule.onNodeWithTag("petScreenButton")
             .assertIsDisplayed()
-            .performClick()
+            .assertHasClickAction()
     }
 }

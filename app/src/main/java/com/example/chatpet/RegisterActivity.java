@@ -177,13 +177,16 @@ public class RegisterActivity extends AppCompatActivity {
         User newUser = new User(username, password, firstName, lastName, email, avatarImageData);
 
         // Register user
+        Log.d(TAG, "Attempting to register user: " + username);
         boolean userCreated = userRepository.registerUser(newUser);
 
         if (userCreated) {
+            Log.d(TAG, "User registered successfully, creating pet...");
             // create pet for user
             boolean petCreated = userRepository.createPetForUser(username, petName, petType);
 
             if (petCreated) {
+                Log.d(TAG, "Pet created successfully!");
                 // toast notification for login
                 Toast.makeText(this, "Account created! Welcome, " + firstName + "!", Toast.LENGTH_LONG).show();
 
@@ -195,11 +198,13 @@ public class RegisterActivity extends AppCompatActivity {
                 startActivity(intent);
                 finish(); // close activity
             } else {
+                Log.e(TAG, "Failed to create pet for user: " + username);
                 errorText.setText("Failed to create pet. Please try again.");
                 errorText.setVisibility(View.VISIBLE);
             }
         } else {
-            errorText.setText("Couldn't register. try again");
+            Log.e(TAG, "Failed to register user: " + username);
+            errorText.setText("Couldn't register. Please try again.");
             errorText.setVisibility(View.VISIBLE);
         }
     }

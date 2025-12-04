@@ -137,26 +137,31 @@ public class UserRepository {
             // Add email if present
             if (user.getEmail() != null) {
                 values.put("email", user.getEmail());
+                Log.d(TAG, "Adding email: " + user.getEmail());
             }
             
             // Add avatar image if present
             if (user.getAvatarImage() != null) {
                 values.put("avatar_image", user.getAvatarImage());
+                Log.d(TAG, "Adding avatar image, size: " + user.getAvatarImage().length + " bytes");
             }
 
+            Log.d(TAG, "Attempting to insert user: " + user.getUsername());
             long result = db.insert("users", null, values);
 
             if (result != -1) {
-                Log.d(TAG, "User registered successfully: " + user.getUsername());
+                Log.d(TAG, "User registered successfully: " + user.getUsername() + " (ID: " + result + ")");
                 return true;
             } else {
-                Log.e(TAG, "Failed to register user: " + user.getUsername());
+                Log.e(TAG, "Failed to register user: " + user.getUsername() + " - Insert returned -1");
                 return false;
             }
             
 
         } catch (Exception e) {
-            Log.e(TAG, "Error during user registration", e);
+            Log.e(TAG, "Error during user registration for user: " + user.getUsername(), e);
+            Log.e(TAG, "Exception message: " + e.getMessage());
+            Log.e(TAG, "Exception cause: " + e.getCause());
             return false;
         } finally {
             if (db != null) {

@@ -16,6 +16,66 @@ public class DatabaseHelper extends SQLiteAssetHelper {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
     // https://github.com/jgilfelt/android-sqlite-asset-helper
+    
+    @Override
+    public void onOpen(SQLiteDatabase db) {
+        super.onOpen(db);
+        // Ensure all required columns exist when database is opened
+        // This handles both fresh installs and upgrades
+        ensureDatabaseSchema(db);
+    }
+    
+    private void ensureDatabaseSchema(SQLiteDatabase db) {
+        try {
+            // Check and add email column if it doesn't exist
+            android.database.Cursor emailCursor = db.rawQuery(
+                    "PRAGMA table_info(users)", null
+            );
+            
+            boolean hasEmail = false;
+            if (emailCursor != null && emailCursor.moveToFirst()) {
+                do {
+                    @SuppressLint("Range") String columnName = emailCursor.getString(emailCursor.getColumnIndex("name"));
+                    if (columnName.equals("email")) {
+                        hasEmail = true;
+                        break;
+                    }
+                } while (emailCursor.moveToNext());
+            }
+            emailCursor.close();
+            
+            if (!hasEmail) {
+                db.execSQL("ALTER TABLE users ADD COLUMN email TEXT");
+                Log.d(TAG, "Added email column to users table");
+            }
+            
+            // Check and add avatar_image column if it doesn't exist
+            android.database.Cursor avatarCursor = db.rawQuery(
+                    "PRAGMA table_info(users)", null
+            );
+            
+            boolean hasAvatar = false;
+            if (avatarCursor != null && avatarCursor.moveToFirst()) {
+                do {
+                    @SuppressLint("Range") String columnName = avatarCursor.getString(avatarCursor.getColumnIndex("name"));
+                    if (columnName.equals("avatar_image")) {
+                        hasAvatar = true;
+                        break;
+                    }
+                } while (avatarCursor.moveToNext());
+            }
+            avatarCursor.close();
+            
+            if (!hasAvatar) {
+                db.execSQL("ALTER TABLE users ADD COLUMN avatar_image BLOB");
+                Log.d(TAG, "Added avatar_image column to users table");
+            }
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error ensuring database schema: " + e.getMessage(), e);
+        }
+    }
+    
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Log.d(TAG, "========================================");

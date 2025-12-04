@@ -37,6 +37,15 @@ object ComposeTestHelpers {
     }
 
     @JvmStatic
+    fun onNodeWithTag(
+        rule: ComposeContentTestRule,
+        testTag: String,
+        useUnmergedTree: Boolean = false
+    ): SemanticsNodeInteraction {
+        return rule.onNodeWithTag(testTag, useUnmergedTree)
+    }
+
+    @JvmStatic
     fun onNode(
         rule: ComposeContentTestRule,
         matcher: SemanticsMatcher,
