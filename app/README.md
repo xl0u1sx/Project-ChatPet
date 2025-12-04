@@ -1,12 +1,26 @@
--- IMPROVED CAPABILITIES SINCE 2.4 --
+# IMPROVED CAPABILITIES SINCE 2.4
 
 
-1. Chat History Feature implemented in app/src/main/java/com/example/chatpet/ChatActivity.kt. The Chat page now displays all previous messages sent and received from the pet, including the timeline of the messages.![ChatHistoryREADME.png](ChatHistoryREADME.png)
+1. Chat History Feature implemented in app/src/main/java/com/example/chatpet/ChatActivity.kt. The Chat page now displays all previous messages sent and received from the pet, including the timeline of the messages.\\
+![ChatHistoryREADME.png | 500](ChatHistoryREADME.png)\\
 
-2. Lillie: Updated the navigation in order to ensure that the user is directed to their pet rather than the chat immediately after logging in or registering. The user interface of the main page was also updated to include a button allowing the user to reach the pet chat page. Along with this, file references within code and names were changed to reflect UI updates, which also include updated images for a cleaner look.
-3. Aakanksha Peeru: Chat was still allowed while the pet was asleep; it is disabled now, implemented in app/src/main/java/com/example/chatpet/MainActivity.kt. Verified that all other pet actions are disabled too while sleeping by running the PetLogicBlackTest test cases and passing them. The buttons in the pet screen were in one column, I changed the UI(in app/src/main/res/layout/activity_pet.xml) to neatly put them into columns so the user doesn't have to scroll too much to click on any button.
-4. Abhishek: Fixed issue where user was still able to chat even when happiness meter is full. Added this functionality with a boolean flag, and also fixed test cases that were failing due to main page refactor (in ChatTests). 
+2. Updated the navigation in order to ensure that the user is directed to their pet rather than the chat immediately after logging in or registering. The user interface of the main page was also updated to include a button allowing the user to reach the pet chat page. Along with this, file references within code and names were changed to reflect UI updates, which also include updated images for a cleaner look.\\
 
-![ChatAsleep2.png](ChatAsleep2.png)
-![chatAsleep1.png](chatAsleep1.png)
-![Buttons.png](Buttons.png)
+3. Chat was still allowed while the pet was asleep; it is disabled now, implemented in app/src/main/java/com/example/chatpet/MainActivity.kt. Verified that all other pet actions are disabled too while sleeping by running the PetLogicBlackTest test cases and passing them. The buttons in the pet screen were in one column, I changed the UI(in app/src/main/res/layout/activity_pet.xml) to neatly put them into columns so the user doesn't have to scroll too much to click on any button.\\
+
+4. Fixed issue where user was still able to chat even when happiness meter is full. Added this functionality with a boolean flag, and also fixed test cases that were failing due to main page refactor (in ChatTests). \\
+
+![ChatAsleep2.png | 300](ChatAsleep2.png)\\
+![chatAsleep1.png | 300](chatAsleep1.png)\\
+![Buttons.png | 300](Buttons.png)\\
+
+5. Added more visual feedback when each action is performed \\ 
+![actionVisuals.png | 400](actionVisuals.png)\\
+
+6. Added a user account page\\
+![userAccountPage.png | 400](userAccountPage.png)\\
+
+7. Display background on status page, convert the button layout and refine UI\\
+![backgroundPage.png | 400](backgroundPage.png)\\
+
+8. Email format check during registration\\
