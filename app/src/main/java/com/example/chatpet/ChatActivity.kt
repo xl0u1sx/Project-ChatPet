@@ -162,19 +162,55 @@ fun MainScreen(
         }
     }
 
+    // Check if pet is sleeping
+    val prefs = if (context is ChatActivity) {
+        context.getSharedPreferences("PetActivityPrefs", Context.MODE_PRIVATE)
+    } else null
+    val lastTuck = prefs?.getLong(username + "_lastTuckInTime", 0) ?: 0
+    val isSleeping = lastTuck != 0L && System.currentTimeMillis() - lastTuck < (30 * 1000L)
+
     val petImageRes = petInfo?.let { info ->
-        when (info.petType) {
-            "Dragon" -> when (info.petLevel) {
-                1 -> R.drawable.dragon_level1_transparent
-                2 -> R.drawable.dragon_level2_transparent
-                3 -> R.drawable.dragon_level3_transparent
-                else -> R.drawable.dragon_level1_transparent
+        val level = info.petLevel
+        val petTypePrefix = if (info.petType == "Dragon") "dragon" else "unicorn"
+        
+        if (isSleeping) {
+            // Show tuckin image when sleeping
+            val resourceName = "${petTypePrefix}lv${level}_tuckin_transparent"
+            val tuckinRes = context.resources.getIdentifier(resourceName, "drawable", context.packageName)
+            if (tuckinRes != 0) {
+                tuckinRes
+            } else {
+                // Fallback to regular image
+                when (info.petType) {
+                    "Dragon" -> when (level) {
+                        1 -> R.drawable.dragon_level1_transparent
+                        2 -> R.drawable.dragon_level2_transparent
+                        3 -> R.drawable.dragon_level3_transparent
+                        else -> R.drawable.dragon_level1_transparent
+                    }
+                    else -> when (level) {
+                        1 -> R.drawable.unicorn_level1_transparent
+                        2 -> R.drawable.unicorn_level2_transparent
+                        3 -> R.drawable.unicorn_level3_transparent
+                        else -> R.drawable.unicorn_level1_transparent
+                    }
+                }
             }
-            else -> when (info.petLevel) {
-                1 -> R.drawable.unicorn_level1_transparent
-                2 -> R.drawable.unicorn_level2_transparent
-                3 -> R.drawable.unicorn_level3_transparent
-                else -> R.drawable.unicorn_level1_transparent
+        } else {
+            // Show regular image when awake
+            when (info.petType) {
+                "Dragon" -> when (level) {
+                    1 -> R.drawable.dragon_level1_transparent
+                    2 -> R.drawable.dragon_level2_transparent
+                    3 -> R.drawable.dragon_level3_transparent
+                    else -> R.drawable.dragon_level1_transparent
+                }
+                else -> when (level) {
+                    1 -> R.drawable.unicorn_level1_transparent
+                    2 -> R.drawable.unicorn_level2_transparent
+                    3 -> R.drawable.unicorn_level3_transparent
+                    else -> R.drawable.unicorn_level1_transparent
+                }
             }
         }
     } ?: R.drawable.unicorn_level1_transparent
@@ -232,9 +268,7 @@ fun MainScreen(
                         .verticalScroll(scrollState)
                         .padding(16.dp)
                         .background(
-                            brush = Brush.linearGradient(
-                                colors = listOf(Color(0xFFFFD1DC), Color(0xFFFFD1DC))
-                            ),
+                            color = Color(0xFFE8E8E8),
                             shape = RoundedCornerShape(10.dp)
                         )
                         .padding(12.dp),
@@ -291,7 +325,7 @@ fun MainScreen(
             } else null
             
             val lastTuck = prefs?.getLong(username + "_lastTuckInTime", 0) ?: 0
-            val isSleeping = lastTuck != 0L && System.currentTimeMillis() - lastTuck < (2 * 60 * 1000L)
+            val isSleeping = lastTuck != 0L && System.currentTimeMillis() - lastTuck < (30 * 1000L)
             val currentHappiness = prefs?.getInt(username + "_happiness", 100) ?: 100
             val currentEnergy = prefs?.getInt(username + "_energy", 100) ?: 100
             val currentHunger = prefs?.getInt(username + "_hunger", 100) ?: 100
@@ -312,7 +346,7 @@ fun MainScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 4.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFD1DC)),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE0E0E0)),
                 shape = RoundedCornerShape(4.dp)
             ) {
                 Row(
@@ -374,7 +408,7 @@ fun MainScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = 4.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFB6C1)),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE0E0E0)),
                             shape = RoundedCornerShape(4.dp)
                         ) {
                             Text(
@@ -447,7 +481,7 @@ fun MainScreen(
         }
     }
 
-        // Floating Profile Button in Top Right
+        // Floating Profile Button in Top Right (aligned with pet picture)
         Button(
             onClick = {
                 val intent = Intent(context, UserProfileActivity::class.java).apply {
@@ -457,7 +491,7 @@ fun MainScreen(
             },
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(16.dp),
+                .padding(top = 24.dp, end = 16.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFB6C1)),
             shape = RoundedCornerShape(4.dp),
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)

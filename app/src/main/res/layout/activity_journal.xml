@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#FFF5F8"
     tools:context=".JournalActivity">
 
 <ScrollView
@@ -15,63 +16,69 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:paddingTop="64dp">
 
-        <TextView
-            android:id="@+id/titleTextView"
+        <!-- Header Section with Background -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Pet Journal"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:gravity="center"
-            android:layout_marginTop="16dp"
-            android:paddingBottom="16dp"/>
+            android:orientation="vertical"
+            android:background="#FFFFFF"
+            android:padding="20dp"
+            android:layout_marginBottom="16dp"
+            android:elevation="4dp">
 
-        <Button
-            android:id="@+id/generateJournalButton"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_marginTop="8dp"
-            android:backgroundTint="#FFB6C1"
-            android:textColor="#3E2723"
-            android:text="Generate Journal Entry"
-            android:textSize="16sp"
-            android:textStyle="bold"/>
+            <TextView
+                android:id="@+id/titleTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Pet Journal"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:textColor="#3E2723"
+                android:paddingBottom="16dp"/>
 
-        <ProgressBar
-            android:id="@+id/loadingProgressBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:visibility="gone"
-            android:layout_marginBottom="16dp"/>
+            <Button
+                android:id="@+id/generateJournalButton"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:backgroundTint="#FFB6C1"
+                android:textColor="#3E2723"
+                android:text="Generate Journal Entry"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
 
-        <TextView
-            android:id="@+id/loadingTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Generating journal entry..."
-            android:textSize="16sp"
-            android:gravity="center"
-            android:visibility="gone"
-            android:layout_marginBottom="16dp"/>
+            <ProgressBar
+                android:id="@+id/loadingProgressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="gone"
+                android:layout_marginTop="16dp"/>
 
-        <TextView
-            android:id="@+id/statusTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:text="Click button to generate journal entry"
-            android:textSize="14sp"
-            android:gravity="center"
-            android:layout_marginBottom="16dp"/>
+            <TextView
+                android:id="@+id/loadingTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Generating journal entry..."
+                android:textSize="16sp"
+                android:gravity="center"
+                android:visibility="gone"
+                android:layout_marginTop="8dp"/>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="?android:attr/listDivider"
-            android:layout_marginVertical="8dp"/>
+            <TextView
+                android:id="@+id/statusTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Click button to generate journal entry"
+                android:textSize="14sp"
+                android:textColor="#666666"
+                android:gravity="center"/>
+
+        </LinearLayout>
 
         <!-- Journal History Section -->
         <TextView
@@ -79,20 +86,22 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Past Journal Entries"
-            android:textSize="20sp"
+            android:textSize="22sp"
             android:textStyle="bold"
+            android:textColor="#3E2723"
             android:gravity="center"
-            android:layout_marginBottom="16dp"/>
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="20dp"/>
 
         <TextView
             android:id="@+id/emptyHistoryTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="No journal entries yet.\nGenerate your first entry above!"
-            android:textSize="14sp"
-            android:textColor="@android:color/darker_gray"
+            android:text="No journal entries yet.\nGenerate your first entry above! ✨"
+            android:textSize="16sp"
+            android:textColor="#999999"
             android:gravity="center"
-            android:padding="16dp"
+            android:padding="32dp"
             android:visibility="gone"/>
 
         <!-- Container for dynamically added journal entries -->
@@ -113,7 +122,7 @@
     android:layout_height="wrap_content"
     android:layout_gravity="top|start"
     android:layout_margin="16dp"
-    android:text="BACK"
+    android:text="Back"
     android:textSize="14sp"
     android:textStyle="bold"
     android:paddingStart="16dp"
@@ -122,6 +131,6 @@
     android:paddingBottom="8dp"
     android:backgroundTint="#FFB6C1"
     android:textColor="#3E2723"
-    android:elevation="4dp" />
+    android:elevation="8dp" />
 
 </FrameLayout>

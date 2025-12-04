@@ -172,11 +172,19 @@ public class JournalActivity extends AppCompatActivity {
         for (int i = entries.size() - 1; i >= 0; i--) { // Reverse order (newest first)
             JournalEntry entry = entries.get(i);
             
-            // Create a card for each entry
+            // Create a card for each entry with rounded corners and shadow
             LinearLayout entryCard = new LinearLayout(this);
             entryCard.setOrientation(LinearLayout.VERTICAL);
             entryCard.setPadding(32, 24, 32, 24);
-            entryCard.setBackgroundResource(android.R.drawable.dialog_holo_light_frame);
+            entryCard.setBackgroundColor(0xFFFFFFFF); // White background
+            entryCard.setElevation(8); // Add shadow
+            
+            android.graphics.drawable.GradientDrawable shape = new android.graphics.drawable.GradientDrawable();
+            shape.setShape(android.graphics.drawable.GradientDrawable.RECTANGLE);
+            shape.setCornerRadius(16);
+            shape.setColor(0xFFFFFFFF);
+            shape.setStroke(2, 0xFFFFB6C1); // Pink border
+            entryCard.setBackground(shape);
             
             LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -185,22 +193,68 @@ public class JournalActivity extends AppCompatActivity {
             cardParams.setMargins(0, 0, 0, 24);
             entryCard.setLayoutParams(cardParams);
             
+            // Header container with date and expand/collapse button
+            LinearLayout headerLayout = new LinearLayout(this);
+            headerLayout.setOrientation(LinearLayout.HORIZONTAL);
+            headerLayout.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ));
+            
             // Date header
             TextView dateHeader = new TextView(this);
-            dateHeader.setText("📅 " + entry.getDate() + " at " + entry.getTime());
+            dateHeader.setText(entry.getDate() + " at " + entry.getTime());
             dateHeader.setTextSize(14);
             dateHeader.setTextColor(getResources().getColor(android.R.color.holo_purple, null));
             dateHeader.setTypeface(null, android.graphics.Typeface.BOLD);
-            dateHeader.setPadding(0, 0, 0, 12);
-            entryCard.addView(dateHeader);
+            LinearLayout.LayoutParams dateParams = new LinearLayout.LayoutParams(
+                0,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                1.0f
+            );
+            dateHeader.setLayoutParams(dateParams);
+            headerLayout.addView(dateHeader);
             
-            // Journal content
+            // Expand/Collapse indicator
+            TextView expandIndicator = new TextView(this);
+            expandIndicator.setText("▼");
+            expandIndicator.setTextSize(16);
+            expandIndicator.setTextColor(getResources().getColor(android.R.color.holo_purple, null));
+            expandIndicator.setPadding(16, 0, 0, 0);
+            headerLayout.addView(expandIndicator);
+            
+            entryCard.addView(headerLayout);
+            
+            // Add spacing after header
+            android.widget.Space spacer = new android.widget.Space(this);
+            spacer.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                16
+            ));
+            entryCard.addView(spacer);
+            
+            // Journal content (initially visible)
             TextView contentView = new TextView(this);
             contentView.setText(entry.getJournalText());
             contentView.setTextSize(15);
-            contentView.setLineSpacing(1.2f, 1.0f);
+            contentView.setLineSpacing(6, 1.0f);
             contentView.setTextColor(getResources().getColor(android.R.color.black, null));
             entryCard.addView(contentView);
+            
+            // Make the entire card clickable to toggle expand/collapse
+            entryCard.setClickable(true);
+            entryCard.setFocusable(true);
+            entryCard.setOnClickListener(v -> {
+                if (contentView.getVisibility() == View.VISIBLE) {
+                    // Collapse
+                    contentView.setVisibility(View.GONE);
+                    expandIndicator.setText("▶");
+                } else {
+                    // Expand
+                    contentView.setVisibility(View.VISIBLE);
+                    expandIndicator.setText("▼");
+                }
+            });
             
             // Add the card to the container
             journalEntriesContainer.addView(entryCard);

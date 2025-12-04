@@ -232,73 +232,57 @@
             </LinearLayout>
 
 
-            <LinearLayout
+            <!-- Upgrade Pet Button - Full width on its own line -->
+            <Button
+                android:id="@+id/upgradePetButton"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
-                android:layout_marginBottom="12dp">
+                android:layout_height="60dp"
+                android:layout_marginBottom="12dp"
+                android:visibility="gone"
+                android:backgroundTint="#FFB6C1"
+                android:textColor="#3E2723"
+                android:text="⭐ Upgrade Pet ⭐"
+                android:textSize="14sp"
+                android:textStyle="bold" />
 
-                <Button
-                    android:id="@+id/upgradePetButton"
-                    android:layout_width="0dp"
-                    android:layout_height="60dp"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="8dp"
-                    android:visibility="gone"
-                    android:backgroundTint="#FFB6C1"
-                    android:textColor="#3E2723"
-                    android:text="⭐ Upgrade Pet ⭐"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-
-                <Button
-                    android:id="@+id/breatheFireButton"
-                    android:layout_width="0dp"
-                    android:layout_height="60dp"
-                    android:layout_weight="1"
-                    android:layout_marginStart="8dp"
-                    android:visibility="gone"
-                    android:backgroundTint="#FFB6C1"
-                    android:textColor="#3E2723"
-                    android:text="Breathe Fire"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-
-            <LinearLayout
+            <!-- Breathe Fire Button (Dragon only) - Full width on its own line -->
+            <Button
+                android:id="@+id/breatheFireButton"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
-                android:layout_marginBottom="12dp">
+                android:layout_height="60dp"
+                android:layout_marginBottom="12dp"
+                android:visibility="gone"
+                android:backgroundTint="#FFB6C1"
+                android:textColor="#3E2723"
+                android:text="Breathe Fire"
+                android:textSize="14sp"
+                android:textStyle="bold" />
 
-                <Button
-                    android:id="@+id/tellStoryButton"
-                    android:layout_width="0dp"
-                    android:layout_height="60dp"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="8dp"
-                    android:visibility="gone"
-                    android:backgroundTint="#FFB6C1"
-                    android:textColor="#3E2723"
-                    android:text="Tell Magical Story"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
 
-                <Button
-                    android:id="@+id/chatButton"
-                    android:layout_width="0dp"
-                    android:layout_height="60dp"
-                    android:layout_weight="1"
-                    android:layout_marginStart="8dp"
-                    android:backgroundTint="#FFB6C1"
-                    android:textColor="#3E2723"
-                    android:text="Chat with Pet"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
+            <!-- Tell Magical Story Button (Unicorn only) - Full width on its own line -->
+            <Button
+                android:id="@+id/tellStoryButton"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginBottom="12dp"
+                android:visibility="gone"
+                android:backgroundTint="#FFB6C1"
+                android:textColor="#3E2723"
+                android:text="Tell Magical Story"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <!-- Chat Button - Full width on its own line -->
+            <Button
+                android:id="@+id/chatButton"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginBottom="12dp"
+                android:backgroundTint="#FFB6C1"
+                android:textColor="#3E2723"
+                android:text="Chat with Pet"
+                android:textSize="14sp"
+                android:textStyle="bold" />
 
         </LinearLayout>
 
@@ -324,7 +308,8 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_gravity="top|end"
-    android:layout_margin="16dp"
+    android:layout_marginTop="24dp"
+    android:layout_marginEnd="16dp"
     android:text="PROFILE"
     android:textSize="14sp"
     android:textStyle="bold"

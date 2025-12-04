@@ -18,7 +18,7 @@ public class UserProfileActivity extends AppCompatActivity {
 
     private static final String TAG = "UserProfileActivity";
     private static final String PREFS_NAME = "PetActivityPrefs";
-    private static final long TUCK_IN_COOLDOWN = 2 * 60 * 1000; // 2 minutes
+    private static final long TUCK_IN_COOLDOWN = 30 * 1000; // 30 seconds
     private static final int XP_FOR_LEVEL_UP = 100;
 
     // Intent keys

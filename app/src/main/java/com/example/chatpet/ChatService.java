@@ -106,7 +106,7 @@ public class ChatService {
         }
 
         // Optional: Limit history size to prevent memory issues
-        if (conversationHistory.size() > 10) {
+        if (conversationHistory.size() > 6) {
             conversationHistory.remove(0); // Remove oldest message from memory
             // Note: We keep all messages in database for persistence
         }
@@ -116,18 +116,59 @@ public class ChatService {
         StringBuilder context = new StringBuilder();
         context.append(basePrompt);
 
-        if (!conversationHistory.isEmpty()) {
-            context.append("\n\nPrevious conversation today:\n");
-            for (ChatMessage msg : conversationHistory) {
+        // Estimate tokens: roughly 1 token per 4 characters
+        // Keep input under 300 tokens to leave room for output (~200 tokens)
+        int maxContextTokens = 300;
+        int basePromptTokens = estimateTokens(basePrompt);
+        int remainingTokens = maxContextTokens - basePromptTokens - 50; // Reserve 50 tokens for current message
+
+        if (!conversationHistory.isEmpty() && remainingTokens > 0) {
+            context.append("\n\nRecent conversation:\n");
+            
+            // Only include recent messages that fit within token limit
+            // Start from the most recent messages
+            List<ChatMessage> recentMessages = new ArrayList<>();
+            int currentTokenCount = 0;
+            
+            // Work backwards from most recent messages
+            for (int i = conversationHistory.size() - 1; i >= 0; i--) {
+                ChatMessage msg = conversationHistory.get(i);
+                int msgTokens = estimateTokens(msg.message) + 10; // +10 for "User: " or "Assistant: "
+                
+                if (currentTokenCount + msgTokens <= remainingTokens) {
+                    recentMessages.add(0, msg); // Add to beginning to maintain order
+                    currentTokenCount += msgTokens;
+                } else {
+                    break; // Stop if we exceed token limit
+                }
+                
+                // Limit to last 6 messages (3 exchanges) maximum
+                if (recentMessages.size() >= 6) {
+                    break;
+                }
+            }
+            
+            // Add the selected recent messages to context
+            for (ChatMessage msg : recentMessages) {
                 if ("user".equals(msg.role)) {
                     context.append("User: ").append(msg.message).append("\n");
                 } else {
                     context.append("Assistant: ").append(msg.message).append("\n");
                 }
             }
+            
+            Log.d("ChatService", "Included " + recentMessages.size() + " recent messages in context (est. " + currentTokenCount + " tokens)");
         }
 
         return context.toString();
+    }
+
+    /**
+     * Estimate token count - rough approximation: 1 token ≈ 4 characters
+     */
+    private int estimateTokens(String text) {
+        if (text == null) return 0;
+        return text.length() / 4;
     }
 
     public String generateResponse(Context context, String modelPath, String userMsg, String prompt) throws Exception {
@@ -179,7 +220,8 @@ public class ChatService {
                 LlmInference.LlmInferenceOptions options =
                         LlmInference.LlmInferenceOptions.builder()
                                 .setModelPath(modelPath)
-                                .setMaxTopK(64)
+                                .setMaxTokens(512)  // Total tokens: input + output
+                                .setMaxTopK(40)
                                 .build();
 
                 llm = LlmInference.createFromOptions(context, options);

@@ -83,7 +83,8 @@ public class JournalViewModel extends ViewModel
                 LlmInference.LlmInferenceOptions taskOptions =
                         LlmInference.LlmInferenceOptions.builder()
                                 .setModelPath(modelPath)
-                                .setMaxTopK(64) // Add other options as needed (maxTokens, temperature, etc.)
+                                .setMaxTokens(512)  // Total tokens: input + output
+                                .setMaxTopK(40)
                                 .build();
 
                 // createFromOptions can also be blocking

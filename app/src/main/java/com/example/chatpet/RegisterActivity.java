@@ -177,9 +177,11 @@ public class RegisterActivity extends AppCompatActivity {
                 // toast notification for login
                 Toast.makeText(this, "Account created! Welcome, " + firstName + "!", Toast.LENGTH_LONG).show();
 
-                // go to main activity
-                Intent intent = new Intent(RegisterActivity.this, ChatActivity.class);
-                intent.putExtra("username", username);
+                // Go to pet meters page (PetActivity)
+                Intent intent = new Intent(RegisterActivity.this, PetActivity.class);
+                intent.putExtra(PetActivity.temp_user_id, username);
+                intent.putExtra(PetActivity.temp_pet_name, petName);
+                intent.putExtra(PetActivity.temp_pet_type, petType);
                 startActivity(intent);
                 finish(); // close activity
             } else {

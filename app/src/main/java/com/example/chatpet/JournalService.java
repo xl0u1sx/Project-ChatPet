@@ -37,30 +37,21 @@ public class JournalService {
 
     @SuppressLint("DefaultLocale")
     static String formatPrompt(JournalEntry entry, String previousJournal) {
+        // Truncate previous journal if too long to keep context short
+        String truncatedPrevious = previousJournal;
+        if (!previousJournal.isEmpty() && previousJournal.length() > 150) {
+            truncatedPrevious = previousJournal.substring(0, 150) + "...";
+        }
+        
         return String.format(
-                "You are a %s named %s at level %d, level progress %d, " +
-                        "today's level experience gained %d. Today is %s, time is %s, " +
-                        "and this was your previous journal entry %s.\n" +
-                        "Write a concise diary entry about your day. Keep it short and to the point.\n" +
-                        "Today's Stats:\n" +
-                        "- Happiness: %d/100\n" +
-                        "- Energy: %d/100\n" +
-                        "- Hunger: %d/100\n" +
-                        "- Times chatted: %d\n" +
-                        "- Times fed: %d\n" +
-                        "- Times tucked in: %d\n" +
-                        "Write a journal entry from the pet's perspective about the day " +
-                        "based on the information above:\n" +
-                        "Level 1 = teen\n" +
-                        "Level 2 = young adult\n" +
-                        "Level 3 = adult.\n" +
-                        "Exclude any other statements than your current role as this pet, such as Okay here is your journal.\n" +
-                        "Don't start the journal with Okay.",
-                entry.getPetType(), entry.getPetName(), entry.getPetLevel(), entry.getLevelProgress(),
-                entry.getExpGained(), entry.getDate(), entry.getTime(),
-                previousJournal.isEmpty() ? "None" : previousJournal,
+                "You are %s, a level %d %s. Write a SHORT diary entry (2-3 sentences) about your day.\n" +
+                        "Stats - Happiness: %d, Energy: %d, Hunger: %d, Chats: %d, Fed: %d, Naps: %d\n" +
+                        "Previous: %s\n" +
+                        "Be concise and natural.",
+                entry.getPetName(), entry.getPetLevel(), entry.getPetType(),
                 entry.getHappiness(), entry.getEnergy(), entry.getHunger(),
-                entry.getTimesChatted(), entry.getTimesFed(), entry.getTimesTuckedIn()
+                entry.getTimesChatted(), entry.getTimesFed(), entry.getTimesTuckedIn(),
+                truncatedPrevious.isEmpty() ? "First entry" : truncatedPrevious
         );
     }
 

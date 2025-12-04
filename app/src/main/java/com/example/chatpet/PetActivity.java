@@ -52,7 +52,7 @@ public class PetActivity extends AppCompatActivity {
 
     // SharedPreferences for tracking tuck-in cooldown and pet state
     private static final String PREFS_NAME = "PetActivityPrefs";
-    private static final long TUCK_IN_COOLDOWN = 2 * 60 * 1000; // 2 minutes in milliseconds (for demo)
+    private static final long TUCK_IN_COOLDOWN = 30 * 1000; // 30 seconds (for demo)
 
     // Keys for persisting pet state (will be prefixed with username)
     private static final String KEY_HAPPINESS = "_happiness";
@@ -201,6 +201,15 @@ public class PetActivity extends AppCompatActivity {
                 // Block feeding while pet is asleep
                 if (isPetSleeping()) {
                     showSleepingMessage("feed them");
+                    return;
+                }
+
+                // Block feeding if hunger meter is full
+                PetState.Meters meters = pet.getPetState();
+                if (meters.hunger >= 100) {
+                    if (statusText != null) {
+                        statusText.setText(pet.getPetName() + " is not hungry right now! Their hunger meter is full.");
+                    }
                     return;
                 }
 
