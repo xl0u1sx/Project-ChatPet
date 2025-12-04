@@ -10,7 +10,7 @@ import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 public class DatabaseHelper extends SQLiteAssetHelper {
     private static final String TAG = "DatabaseHelper";
     private static final String DATABASE_NAME = "ChatPet.db";
-    private static final int DATABASE_VERSION = 5; // Incremented to trigger upgrade
+    private static final int DATABASE_VERSION = 6; // Incremented to add email column
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -76,6 +76,34 @@ public class DatabaseHelper extends SQLiteAssetHelper {
 
             } catch (Exception e) {
                 Log.e(TAG, "Error adding avatar_image column: " + e.getMessage(), e);
+            }
+        }
+
+        if (oldVersion < 6) {
+            try {
+                android.database.Cursor cursor = db.rawQuery(
+                        "PRAGMA table_info(users)", null
+                );
+
+                boolean hasEmail = false;
+                if (cursor != null && cursor.moveToFirst()) {
+                    do {
+                        @SuppressLint("Range") String columnName = cursor.getString(cursor.getColumnIndex("name"));
+                        if (columnName.equals("email")) {
+                            hasEmail = true;
+                            break;
+                        }
+                    } while (cursor.moveToNext());
+                }
+                cursor.close();
+
+                if (!hasEmail) {
+                    db.execSQL("ALTER TABLE users ADD COLUMN email TEXT");
+                    Log.d(TAG, "Added email column to users table");
+                }
+
+            } catch (Exception e) {
+                Log.e(TAG, "Error adding email column: " + e.getMessage(), e);
             }
         }
     }

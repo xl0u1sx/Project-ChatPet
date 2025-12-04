@@ -29,6 +29,7 @@ public class RegisterActivity extends AppCompatActivity {
     
     private EditText firstNameInput;
     private EditText lastNameInput;
+    private EditText emailInput;
     private EditText usernameInput;
     private EditText passwordInput;
     private EditText petNameInput;
@@ -59,6 +60,7 @@ public class RegisterActivity extends AppCompatActivity {
         //  views
         firstNameInput = findViewById(R.id.firstNameInput);
         lastNameInput = findViewById(R.id.lastNameInput);
+        emailInput = findViewById(R.id.emailInput);
         usernameInput = findViewById(R.id.usernameInput);
         passwordInput = findViewById(R.id.passwordInput);
         petNameInput = findViewById(R.id.petNameInput);
@@ -122,6 +124,7 @@ public class RegisterActivity extends AppCompatActivity {
         // get inputs
         String firstName = firstNameInput.getText().toString().trim();
         String lastName = lastNameInput.getText().toString().trim();
+        String email = emailInput.getText().toString().trim();
         String username = usernameInput.getText().toString().trim();
         String password = passwordInput.getText().toString().trim();
         String petName = petNameInput.getText().toString().trim();
@@ -135,8 +138,15 @@ public class RegisterActivity extends AppCompatActivity {
         Log.d(TAG, "Unicorn checked: " + unicornRadio.isChecked());
 
         // make sure no inputs are empty
-        if (firstName.isEmpty() || lastName.isEmpty() || username.isEmpty() || password.isEmpty()) {
+        if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || username.isEmpty() || password.isEmpty()) {
             errorText.setText("Please fill in all personal information fields");
+            errorText.setVisibility(View.VISIBLE);
+            return;
+        }
+
+        // Validate email format
+        if (!isValidEmail(email)) {
+            errorText.setText("Please enter a valid email address");
             errorText.setVisibility(View.VISIBLE);
             return;
         }
@@ -164,7 +174,7 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         // Create user object with avatar
-        User newUser = new User(username, password, firstName, lastName, avatarImageData);
+        User newUser = new User(username, password, firstName, lastName, email, avatarImageData);
 
         // Register user
         boolean userCreated = userRepository.registerUser(newUser);
@@ -238,5 +248,21 @@ public class RegisterActivity extends AppCompatActivity {
         int newHeight = Math.round(height * scale);
         
         return Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true);
+    }
+
+    /**
+     * Validate email format
+     * Checks for basic email pattern: text@text.text
+     */
+    private boolean isValidEmail(String email) {
+        if (email == null || email.isEmpty()) {
+            return false;
+        }
+        
+        // Basic email pattern: must contain @ and . after @
+        // Format: localpart@domain.extension
+        String emailPattern = "^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+        
+        return email.matches(emailPattern);
     }
 }

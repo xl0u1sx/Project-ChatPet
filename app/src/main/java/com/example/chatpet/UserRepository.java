@@ -134,6 +134,11 @@ public class UserRepository {
             values.put("first_name", user.getFirstName());
             values.put("last_name", user.getLastName());
             
+            // Add email if present
+            if (user.getEmail() != null) {
+                values.put("email", user.getEmail());
+            }
+            
             // Add avatar image if present
             if (user.getAvatarImage() != null) {
                 values.put("avatar_image", user.getAvatarImage());
@@ -663,6 +668,41 @@ public class UserRepository {
             if (cursor != null) {
                 cursor.close();
             }
+            if (db != null) {
+                db.close();
+            }
+        }
+    }
+
+    /**
+     * Update user avatar image
+     */
+    public boolean updateUserAvatar(String username, byte[] avatarImage) {
+        SQLiteDatabase db = null;
+
+        try {
+            db = dbHelper.getWritableDatabase();
+
+            ContentValues values = new ContentValues();
+            values.put("avatar_image", avatarImage);
+
+            String whereClause = "username = ?";
+            String[] whereArgs = {username};
+
+            int rowsAffected = db.update("users", values, whereClause, whereArgs);
+
+            if (rowsAffected > 0) {
+                Log.d(TAG, "Avatar updated successfully for user: " + username);
+                return true;
+            } else {
+                Log.w(TAG, "No user found to update avatar for: " + username);
+                return false;
+            }
+
+        } catch (Exception e) {
+            Log.e(TAG, "Error updating user avatar", e);
+            return false;
+        } finally {
             if (db != null) {
                 db.close();
             }

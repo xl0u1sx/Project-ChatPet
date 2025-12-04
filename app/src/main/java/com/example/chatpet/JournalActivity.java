@@ -233,13 +233,17 @@ public class JournalActivity extends AppCompatActivity {
             ));
             entryCard.addView(spacer);
             
-            // Journal content (initially visible)
+            // Journal content (initially collapsed)
             TextView contentView = new TextView(this);
             contentView.setText(entry.getJournalText());
             contentView.setTextSize(15);
             contentView.setLineSpacing(6, 1.0f);
             contentView.setTextColor(getResources().getColor(android.R.color.black, null));
+            contentView.setVisibility(View.GONE); // Start collapsed
             entryCard.addView(contentView);
+            
+            // Update indicator to show collapsed state
+            expandIndicator.setText("▶");
             
             // Make the entire card clickable to toggle expand/collapse
             entryCard.setClickable(true);

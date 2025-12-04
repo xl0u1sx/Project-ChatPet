@@ -1,9 +1,11 @@
 package com.example.chatpet;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -11,8 +13,14 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 
 public class UserProfileActivity extends AppCompatActivity {
 
@@ -37,9 +45,11 @@ public class UserProfileActivity extends AppCompatActivity {
     private TextView xpNextLevelText;
     private TextView maxLevelReachedText;
     private Button backButton;
+    private Button changeAvatarButton;
 
     private String currentUsername;
     private UserRepository userRepository;
+    private ActivityResultLauncher<Intent> imagePickerLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +69,7 @@ public class UserProfileActivity extends AppCompatActivity {
         xpNextLevelText = findViewById(R.id.xpNextLevelText);
         maxLevelReachedText = findViewById(R.id.maxLevelReachedText);
         backButton = findViewById(R.id.backButton);
+        changeAvatarButton = findViewById(R.id.changeAvatarButton);
 
         // Initialize repository
         userRepository = new UserRepository(this);
@@ -69,11 +80,31 @@ public class UserProfileActivity extends AppCompatActivity {
             currentUsername = "user123"; // Default fallback
         }
 
+        // Initialize image picker launcher
+        imagePickerLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                    Uri imageUri = result.getData().getData();
+                    if (imageUri != null) {
+                        handleImageSelection(imageUri);
+                    }
+                }
+            }
+        );
+
         // Load user profile data
         loadUserProfile();
 
         // Set up back button
         backButton.setOnClickListener(v -> finish());
+
+        // Set up change avatar button
+        changeAvatarButton.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_PICK);
+            intent.setType("image/*");
+            imagePickerLauncher.launch(intent);
+        });
     }
 
     private void loadUserProfile() {
@@ -219,6 +250,66 @@ public class UserProfileActivity extends AppCompatActivity {
         super.onResume();
         // Refresh profile data when returning to this activity
         loadUserProfile();
+    }
+
+    /**
+     * Handle image selection from gallery
+     */
+    private void handleImageSelection(Uri imageUri) {
+        try {
+            // Load the image as a bitmap
+            InputStream inputStream = getContentResolver().openInputStream(imageUri);
+            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+            
+            if (bitmap != null) {
+                // Resize the bitmap to a reasonable size (e.g., 300x300)
+                Bitmap resizedBitmap = resizeBitmap(bitmap, 300, 300);
+                
+                // Display the image in the avatar view
+                userAvatar.setImageBitmap(resizedBitmap);
+                
+                // Convert to byte array for database storage
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 80, stream);
+                byte[] avatarImageData = stream.toByteArray();
+                
+                // Update avatar in database
+                boolean success = userRepository.updateUserAvatar(currentUsername, avatarImageData);
+                
+                if (success) {
+                    Log.d(TAG, "Avatar updated successfully, size: " + avatarImageData.length + " bytes");
+                    Toast.makeText(this, "Avatar updated successfully!", Toast.LENGTH_SHORT).show();
+                } else {
+                    Log.e(TAG, "Failed to update avatar in database");
+                    Toast.makeText(this, "Failed to update avatar", Toast.LENGTH_SHORT).show();
+                }
+            }
+            
+            if (inputStream != null) {
+                inputStream.close();
+            }
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error handling image selection", e);
+            Toast.makeText(this, "Error loading image: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * Resize bitmap to fit within max dimensions while maintaining aspect ratio
+     */
+    private Bitmap resizeBitmap(Bitmap bitmap, int maxWidth, int maxHeight) {
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        
+        float scaleWidth = ((float) maxWidth) / width;
+        float scaleHeight = ((float) maxHeight) / height;
+        float scale = Math.min(scaleWidth, scaleHeight);
+        
+        int newWidth = Math.round(width * scale);
+        int newHeight = Math.round(height * scale);
+        
+        return Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true);
     }
 }
 

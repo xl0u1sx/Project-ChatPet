@@ -6,6 +6,7 @@ public class User {
     private String password;
     private String firstName;
     private String lastName;
+    private String email;
     private byte[] avatarImage;
 
     public User(String username, String password, String firstName, String lastName) {
@@ -13,14 +14,16 @@ public class User {
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.email = null;
         this.avatarImage = null;
     }
 
-    public User(String username, String password, String firstName, String lastName, byte[] avatarImage) {
+    public User(String username, String password, String firstName, String lastName, String email, byte[] avatarImage) {
         this.username = username;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.email = email;
         this.avatarImage = avatarImage;
     }
 
@@ -38,6 +41,10 @@ public class User {
 
     public String getLastName() {
         return lastName;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     public byte[] getAvatarImage() {
@@ -58,6 +65,10 @@ public class User {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public void setAvatarImage(byte[] avatarImage) {

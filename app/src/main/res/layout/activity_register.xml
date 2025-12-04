@@ -101,6 +101,18 @@
             android:layout_marginBottom="12dp" />
 
         <EditText
+            android:id="@+id/emailInput"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="Email Address"
+            android:inputType="textEmailAddress"
+            android:textColor="#3E2723"
+            android:textColorHint="#999999"
+            android:background="@android:drawable/edit_text"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp" />
+
+        <EditText
             android:id="@+id/usernameInput"
             android:layout_width="match_parent"
             android:layout_height="50dp"
