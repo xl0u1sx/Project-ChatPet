@@ -184,7 +184,7 @@
                 <ImageView
                     android:layout_width="100dp"
                     android:layout_height="100dp"
-                    android:src="@drawable/unicorn"
+                    android:src="@drawable/unicorn_level1_transparent"
                     android:contentDescription="Unicorn" />
 
                 <RadioButton
@@ -208,7 +208,7 @@
                 <ImageView
                     android:layout_width="100dp"
                     android:layout_height="100dp"
-                    android:src="@drawable/dragon"
+                    android:src="@drawable/dragon_transparent"
                     android:contentDescription="Dragon" />
 
                 <RadioButton
